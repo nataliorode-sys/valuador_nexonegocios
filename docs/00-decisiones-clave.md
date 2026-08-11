@@ -39,6 +39,9 @@
 - **Informe (R5):** co-branded, 8–12 pág., siempre rango, sección "cómo aumentar el valor", muestra razonamiento pero no parámetros internos. Detalle en `05-informe-pdf.md`.
 - **Marketplace (M6):** anonimato **a elección del dueño**; financieros públicos como **rango**; se publica **el precio del dueño** (no el rango de valuación); sello **"Negocio real · Existencia verificada"** (chequeo liviano en moderación, NO "datos verificados", que es del Full); fotos 3–6; contacto relay+reveal. Detalle en `06-marketplace.md`.
 
+## Decisiones cerradas (desarrollo)
+- **M4-G — Pasivo laboral / indemnizaciones: FUERA de alcance.** NexoDirecto es autogestionado y para negocios más chicos/simples. El cálculo de pasivo laboral (indemnizaciones por antigüedad) agrega complejidad que corresponde al **Servicio Full**. El motor **no** lo modela. Refuerza D1/D6/D7. (El intangible/pasivo laboral queda como argumento para derivar al Full cuando el caso lo amerite.)
+
 ## Decisiones abiertas (a resolver en su etapa)
 
 - Momento y campos exactos del teaser del paywall (Etapa 2).

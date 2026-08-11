@@ -1,0 +1,265 @@
+// Modelo de datos NexoDirecto — ver docs/08-especificacion-claude-code.md §8.5
+// Base: PostgreSQL. IDs UUID. Montos en USD y ARS segun corresponda.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum Rol {
+  VENDEDOR
+  ADMIN
+}
+
+enum EstadoValuacion {
+  BORRADOR
+  CALCULADA
+  PAGA
+  PUBLICACION_EN_ARMADO
+  EN_REVISION
+  PUBLICADA
+  RECHAZADA
+}
+
+enum EstadoPublicacion {
+  PUBLICADA
+  VENCIDA
+  VENDIDA
+  PAUSADA
+}
+
+enum EstadoPago {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  REEMBOLSADO
+}
+
+enum NivelPrivacidad {
+  ANONIMA
+  IDENTIFICADA
+}
+
+enum ResultadoModeracion {
+  APROBADA
+  RECHAZADA
+}
+
+enum Moneda {
+  ARS
+  USD
+}
+
+// ---------- Entidades ----------
+
+model User {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  passwordHash   String?
+  nombre         String?
+  telefono       String?
+  emailVerificado Boolean     @default(false)
+  rol            Rol          @default(VENDEDOR)
+  valuaciones    Valuacion[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Valuacion {
+  id            String           @id @default(uuid())
+  codigo        String           @unique // ND-2026-000481
+  user          User             @relation(fields: [userId], references: [id])
+  userId        String
+  estado        EstadoValuacion  @default(BORRADOR)
+
+  monedaCarga   Moneda           @default(ARS)
+  tcRef         Float?
+  tcFecha       DateTime?
+  engineVersion String?
+  precisionPct  Int?
+
+  perfil        PerfilNegocio?
+  resultado     ResultadoCalculo?
+  pago          Pago?
+  informes      Informe[]
+  publicacion   Publicacion?
+  flyer         Flyer?
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([estado])
+}
+
+// Datos crudos del formulario (7 pasos). Se guardan como JSON tipado + campos
+// clave desnormalizados para consulta. Ver docs/03-formulario.md
+model PerfilNegocio {
+  id           String    @id @default(uuid())
+  valuacion    Valuacion @relation(fields: [valuacionId], references: [id], onDelete: Cascade)
+  valuacionId  String    @unique
+
+  familia      String
+  rubroVisible String?
+  provincia    String?
+  localidad    String?
+  antiguedad   Int?
+  empleados    Int?
+
+  // Todos los campos elg_*, w1_*..w7_* (crudos y normalizados a USD)
+  datos        Json
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// Salida del motor (EngineResult). Ver docs/04-motor-valuacion.md
+model ResultadoCalculo {
+  id                String    @id @default(uuid())
+  valuacion         Valuacion @relation(fields: [valuacionId], references: [id], onDelete: Cascade)
+  valuacionId       String    @unique
+
+  sdeUsd            Float
+  ebitdaUsd         Float
+  claseTamanio      String
+  familia           String
+  baseGanancia      String
+  multiploFinal     Float
+  valorMultiplosUsd Float
+  valorDcfUsd       Float?
+  valorActivosUsd   Float
+
+  valorCentralUsd   Float
+  rangoMinUsd       Float
+  rangoMaxUsd       Float
+  valorCentralArs   Float
+  rangoMinArs       Float
+  rangoMaxArs       Float
+
+  metodoPredominante String
+  escenarios        Json
+  tablaDcf          Json?
+  drivers           Json
+  flags             Json
+  engineVersion     String
+
+  createdAt         DateTime  @default(now())
+}
+
+model Pago {
+  id           String     @id @default(uuid())
+  valuacion    Valuacion  @relation(fields: [valuacionId], references: [id], onDelete: Cascade)
+  valuacionId  String     @unique
+  proveedor    String     @default("mercadopago")
+  estado       EstadoPago @default(PENDIENTE)
+  montoArs     Float
+  ivaArs       Float
+  externalId   String?
+  datosFactura Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Informe {
+  id          String    @id @default(uuid())
+  valuacion   Valuacion @relation(fields: [valuacionId], references: [id], onDelete: Cascade)
+  valuacionId String
+  version     Int       @default(1)
+  urlPdf      String
+  hash        String?
+  generadoAt  DateTime  @default(now())
+
+  @@index([valuacionId])
+}
+
+model Publicacion {
+  id               String            @id @default(uuid())
+  valuacion        Valuacion         @relation(fields: [valuacionId], references: [id], onDelete: Cascade)
+  valuacionId      String            @unique
+  codigo           String            @unique // mismo ND-... para URL /empresa/{codigo}
+
+  titulo           String
+  descripcion      String
+  precioPublicacion Float
+  moneda           Moneda            @default(USD)
+  nivelPrivacidad  NivelPrivacidad   @default(ANONIMA)
+  configFinancieros Json             // { mostrarRangoFacturacion: bool, ... }
+  fotos            String[]
+  highlights       Json
+  selloExistencia  Boolean           @default(false)
+  selloFuente      String?
+
+  estadoPub        EstadoPublicacion @default(PUBLICADA)
+  fechaPublicacion DateTime?
+  fechaVencimiento DateTime?
+  vistas           Int               @default(0)
+
+  moderaciones     Moderacion[]
+  leads            Lead[]
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([estadoPub])
+  @@index([fechaVencimiento])
+}
+
+model Flyer {
+  id          String    @id @default(uuid())
+  valuacion   Valuacion @relation(fields: [valuacionId], references: [id], onDelete: Cascade)
+  valuacionId String    @unique
+  plantilla   String
+  formatos    Json // { story: url, post: url, horizontal?: url }
+  generadoAt  DateTime  @default(now())
+}
+
+model Lead {
+  id            String      @id @default(uuid())
+  publicacion   Publicacion @relation(fields: [publicacionId], references: [id], onDelete: Cascade)
+  publicacionId String
+  nombre        String
+  email         String?
+  telefono      String?
+  mensaje       String
+  createdAt     DateTime    @default(now())
+
+  @@index([publicacionId])
+}
+
+model Moderacion {
+  id                 String              @id @default(uuid())
+  publicacion        Publicacion         @relation(fields: [publicacionId], references: [id], onDelete: Cascade)
+  publicacionId      String
+  adminId            String?
+  resultado          ResultadoModeracion
+  motivo             String?
+  checklistExistencia Json?
+  createdAt          DateTime            @default(now())
+
+  @@index([publicacionId])
+}
+
+// Parametros del motor, versionados. El informe sella la version usada.
+model ParametrosMotor {
+  id        String   @id @default(uuid())
+  version   String   @unique
+  vigente   Boolean  @default(false)
+  params    Json     // EngineParams completo
+  createdAt DateTime @default(now())
+}
+
+model Rubro {
+  id            String  @id @default(uuid())
+  nombreVisible String
+  familia       String
+  tieneStock    Boolean @default(false)
+  activo        Boolean @default(true)
+
+  @@index([familia])
+}
