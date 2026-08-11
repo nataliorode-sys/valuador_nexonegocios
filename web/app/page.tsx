@@ -13,8 +13,8 @@ export default function LandingPage() {
             <Link href="/marketplace" className="text-slate-600 hover:text-nexo">
               Marketplace
             </Link>
-            <Link href="/ingresar" className="text-slate-600 hover:text-nexo">
-              Ingresar
+            <Link href="/panel" className="text-slate-600 hover:text-nexo">
+              Mi panel
             </Link>
             <Link
               href="/valuar"

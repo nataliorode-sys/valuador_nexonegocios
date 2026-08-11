@@ -1,33 +1,10 @@
 // Genera el informe PDF renderizando la pagina HTML del informe con Chromium.
 // Requiere un navegador Chromium disponible (executablePath). Ver docs/05 §5.1.
-import { existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 import { prisma } from "@/lib/prisma";
+import { resolveChromium } from "@/lib/chromium";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
-
-/**
- * Resuelve el ejecutable de Chromium: env explicito, o autodeteccion dentro de
- * PLAYWRIGHT_BROWSERS_PATH (/opt/pw-browsers/chromium-<rev>/chrome-linux/chrome),
- * o undefined para dejar que playwright-core use su default.
- */
-function resolveChromium(): string | undefined {
-  if (process.env.PLAYWRIGHT_CHROMIUM_PATH && existsSync(process.env.PLAYWRIGHT_CHROMIUM_PATH)) {
-    return process.env.PLAYWRIGHT_CHROMIUM_PATH;
-  }
-  const baseDir = process.env.PLAYWRIGHT_BROWSERS_PATH || "/opt/pw-browsers";
-  try {
-    const dir = readdirSync(baseDir).find((d) => /^chromium-\d+$/.test(d));
-    if (dir) {
-      const exe = join(baseDir, dir, "chrome-linux", "chrome");
-      if (existsSync(exe)) return exe;
-    }
-  } catch {
-    /* baseDir inexistente */
-  }
-  return undefined;
-}
 
 export async function GET(
   req: Request,

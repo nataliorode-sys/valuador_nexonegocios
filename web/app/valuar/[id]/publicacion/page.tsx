@@ -33,10 +33,17 @@ export default async function PublicacionPage({ params }: { params: Promise<{ id
         </div>
       )}
       {val.estado === "PUBLICADA" && (
-        <div className="mt-6 text-center">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link href={`/empresa/${p.codigo}`} className="rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
             Ver mi publicación online
           </Link>
+          <a href={`/api/flyer/${id}?f=story`} target="_blank" rel="noopener" className="rounded-lg border border-nexo px-5 py-3 font-medium text-nexo hover:bg-nexo-soft">
+            Descargar flyer (story)
+          </a>
+          <a href={`/api/flyer/${id}?f=post`} target="_blank" rel="noopener" className="rounded-lg border border-nexo px-5 py-3 font-medium text-nexo hover:bg-nexo-soft">
+            Flyer (post)
+          </a>
+          <Link href="/panel" className="text-sm text-slate-500 hover:text-nexo">Ir a mi panel →</Link>
         </div>
       )}
     </main>

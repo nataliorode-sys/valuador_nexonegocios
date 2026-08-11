@@ -149,14 +149,14 @@ try {
   await page.waitForTimeout(2000);
   log("Aprobada en moderación");
 
-  // 16) Marketplace
+  // 16) Marketplace lista publicaciones
   await page.goto(`${BASE}/marketplace`, { waitUntil: "networkidle" });
-  const cards = await page.locator('a[href^="/empresa/"]').count();
-  log("Publicaciones en Marketplace:", cards);
-  await page.locator('a[href^="/empresa/"]').first().click();
-  await page.waitForURL(/\/empresa\//, { timeout: 20000 });
+  log("Publicaciones en Marketplace:", await page.locator('a[href^="/empresa/"]').count());
 
-  // 17) Contacto (relay + reveal)
+  // 17) Contacto en la PROPIA ficha (determinístico)
+  await page.goto(`${BASE}/valuar/${id}/publicacion`, { waitUntil: "networkidle" });
+  const fichaHref = await page.locator('a[href^="/empresa/"]').first().getAttribute("href");
+  await page.goto(`${BASE}${fichaHref}`, { waitUntil: "networkidle" });
   await page.fill('input[placeholder="Tu nombre *"]', "Comprador Interesado");
   await page.fill('input[placeholder="Email"]', "comprador@test.com");
   await page.fill('textarea[placeholder="Tu consulta"]', "Me interesa, ¿podemos hablar?");
@@ -165,7 +165,25 @@ try {
   const contactoRevelado = (await page.locator("body").innerText()).includes("+54 9 351 1234567");
   log("Contacto del vendedor revelado:", contactoRevelado);
 
-  console.log("\n✅ E2E COMPLETO (Fases 1-3)");
+  // ===== Fase 4: flyer + panel =====
+
+  // 18) Flyer PNG (story)
+  const flyerRes = await ctx.request.get(`${BASE}/api/flyer/${id}?f=story`);
+  const fbuf = await flyerRes.body();
+  const isPng = fbuf[0] === 0x89 && fbuf[1] === 0x50 && fbuf[2] === 0x4e && fbuf[3] === 0x47;
+  log("Flyer status:", flyerRes.status(), "| es PNG:", isPng, "| bytes:", fbuf.length);
+
+  // 19) Panel del vendedor
+  await page.goto(`${BASE}/panel`, { waitUntil: "networkidle" });
+  const panelText = await page.locator("body").innerText();
+  log("Panel lista la publicación:", /Panader|Publicada|consulta/.test(panelText));
+
+  // 20) Detalle con leads (directo a la propia valuación)
+  await page.goto(`${BASE}/panel/${id}`, { waitUntil: "networkidle" });
+  const detalleText = await page.locator("body").innerText();
+  log("Detalle muestra la consulta:", detalleText.includes("Comprador Interesado"));
+
+  console.log("\n✅ E2E COMPLETO (Fases 1-4)");
 } catch (e) {
   console.error("\n❌ E2E FALLÓ:", e.message);
   console.error(await page.locator("body").innerText().catch(() => ""));
