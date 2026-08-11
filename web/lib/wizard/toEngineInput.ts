@@ -15,7 +15,8 @@ function n(v: unknown): number {
 
 function money(data: FormData, id: string): number {
   const base = n(data[id]);
-  const per = data[`${id}Periodo`] === "mensual" ? 12 : 1;
+  // Default mensual (coincide con el selector "/mes" de la UI): solo es anual si se elige explícitamente.
+  const per = data[`${id}Periodo`] === "anual" ? 1 : 12;
   return base * per;
 }
 

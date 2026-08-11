@@ -85,7 +85,7 @@ function sumaGastos(data: FormData): number {
   for (const id of lineas) {
     const n = toNum(data[id]);
     if (!Number.isNaN(n)) {
-      const per = data[`${id}Periodo`] === "mensual" ? 12 : 1;
+      const per = data[`${id}Periodo`] === "anual" ? 1 : 12;
       total += n * per;
     }
   }

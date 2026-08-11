@@ -23,18 +23,18 @@ export default function Field({ field, data, error, onChange }: Props) {
       </label>
 
       {field.type === "text" && (
-        <input type="text" value={(value as string) ?? ""} placeholder={field.ejemplo}
+        <input type="text" name={field.id} value={(value as string) ?? ""} placeholder={field.ejemplo}
           onChange={(e) => onChange(field.id, e.target.value)} className={inputClass} />
       )}
 
       {field.type === "textarea" && (
-        <textarea value={(value as string) ?? ""} placeholder={field.ejemplo} rows={3}
+        <textarea name={field.id} value={(value as string) ?? ""} placeholder={field.ejemplo} rows={3}
           onChange={(e) => onChange(field.id, e.target.value)} className={inputClass} />
       )}
 
       {(field.type === "int" || field.type === "money" || field.type === "percent") && (
         <div className="relative">
-          <input type="number" inputMode="decimal" value={value === undefined ? "" : (value as number)}
+          <input type="number" name={field.id} inputMode="decimal" value={value === undefined ? "" : (value as number)}
             placeholder={field.ejemplo} min={field.min} max={field.max}
             onChange={(e) => onChange(field.id, e.target.value === "" ? undefined : Number(e.target.value))}
             className={inputClass} />
@@ -44,11 +44,11 @@ export default function Field({ field, data, error, onChange }: Props) {
 
       {field.type === "moneyPeriod" && (
         <div className="mt-1 flex gap-2">
-          <input type="number" inputMode="decimal" value={value === undefined ? "" : (value as number)}
+          <input type="number" name={field.id} inputMode="decimal" value={value === undefined ? "" : (value as number)}
             placeholder={field.ejemplo}
             onChange={(e) => onChange(field.id, e.target.value === "" ? undefined : Number(e.target.value))}
             className={"w-full rounded-lg border px-3 py-2 " + (error ? "border-red-400 bg-red-50" : "border-slate-300")} />
-          <select value={(data[`${field.id}Periodo`] as string) ?? "mensual"}
+          <select name={`${field.id}Periodo`} value={(data[`${field.id}Periodo`] as string) ?? "mensual"}
             onChange={(e) => onChange(`${field.id}Periodo`, e.target.value)}
             className="rounded-lg border border-slate-300 px-2 py-2 text-sm">
             <option value="mensual">/ mes</option>
@@ -58,7 +58,7 @@ export default function Field({ field, data, error, onChange }: Props) {
       )}
 
       {field.type === "select" && (
-        <select value={(value as string) ?? ""} onChange={(e) => onChange(field.id, e.target.value)} className={inputClass}>
+        <select name={field.id} value={(value as string) ?? ""} onChange={(e) => onChange(field.id, e.target.value)} className={inputClass}>
           <option value="">Elegí una opción…</option>
           {field.opciones?.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -70,7 +70,7 @@ export default function Field({ field, data, error, onChange }: Props) {
         <div className="mt-2 flex gap-4">
           {[{ v: true, l: "Sí" }, { v: false, l: "No" }].map((o) => (
             <label key={o.l} className="flex items-center gap-2 text-sm">
-              <input type="radio" name={field.id} checked={value === o.v}
+              <input type="radio" name={field.id} value={String(o.v)} checked={value === o.v}
                 onChange={() => onChange(field.id, o.v)} />
               {o.l}
             </label>
