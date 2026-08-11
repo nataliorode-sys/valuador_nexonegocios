@@ -118,3 +118,4 @@ Debe cubrir, como mínimo:
 | **R5-D** | Nivel técnico | Explicaciones simples en el cuerpo + **detalle técnico en anexo**. |
 | **R5-E** | Extensión objetivo | **8–12 páginas** (premium sin ser abrumador). |
 | **R5-F** | Motor de render PDF | Definir en Etapa 8 (spec técnica); prioridad: fidelidad visual + gráficos. |
+| **R5-G** | Transparencia del método | **Mostrar el razonamiento, no los parámetros internos.** El informe explica "aplicamos un múltiplo de mercado ajustado por el riesgo de tu negocio" y el resultado, pero **no** expone la tabla interna de primas/tasas. (Cerrada.) |
