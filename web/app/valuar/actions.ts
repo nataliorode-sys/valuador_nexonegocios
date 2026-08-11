@@ -1,22 +1,23 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { valuar } from "@nexodirecto/engine";
 import { prisma } from "@/lib/prisma";
-import { ensureUserId } from "@/lib/session";
+import { getUserId } from "@/lib/session";
+import { assertOwner } from "@/lib/access";
+import { crearValuacion } from "@/lib/valuaciones";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import type { FormData } from "@/lib/wizard/types";
 
 const TC_REF = Number(process.env.TC_REF_DEFAULT ?? "1200");
 
-async function generarCodigo(): Promise<string> {
-  const seq = (await prisma.valuacion.count()) + 1;
-  return `ND-2026-${String(seq).padStart(6, "0")}`;
-}
-
-/** S5 Elegibilidad → crea la valuacion y su perfil inicial, redirige al wizard. */
+/**
+ * S5 Elegibilidad. Si el usuario NO está logueado, guarda las respuestas en una
+ * cookie y lo manda a registrarse (A2-A: cuenta después de la elegibilidad).
+ * Si está logueado, crea la valuación y entra al wizard.
+ */
 export async function iniciarValuacion(form: globalThis.FormData): Promise<void> {
-  const userId = await ensureUserId();
   const datosIniciales: FormData = {
     familia: String(form.get("familia") ?? ""),
     enMarcha: form.get("enMarcha") === "si",
@@ -24,25 +25,23 @@ export async function iniciarValuacion(form: globalThis.FormData): Promise<void>
     facturacionRango: String(form.get("facturacionRango") ?? ""),
     datosMano: String(form.get("datosMano") ?? ""),
   };
-  const codigo = await generarCodigo();
-  const valuacion = await prisma.valuacion.create({
-    data: {
-      codigo,
-      userId,
-      estado: "BORRADOR",
-      perfil: {
-        create: {
-          familia: datosIniciales.familia as string,
-          datos: datosIniciales as object,
-        },
-      },
-    },
-  });
+
+  const userId = await getUserId();
+  if (!userId) {
+    const store = await cookies();
+    store.set("nd_pending", JSON.stringify(datosIniciales), {
+      httpOnly: true, sameSite: "lax", path: "/", maxAge: 3600,
+    });
+    redirect("/registro");
+  }
+
+  const valuacion = await crearValuacion(userId, datosIniciales);
   redirect(`/valuar/${valuacion.id}`);
 }
 
 /** Autoguardado de un paso del wizard. */
 export async function guardarPaso(valuacionId: string, data: FormData): Promise<{ ok: boolean }> {
+  await assertOwner(valuacionId);
   await prisma.perfilNegocio.update({
     where: { valuacionId },
     data: {
@@ -130,6 +129,7 @@ const IVA = 0.21;
  * webhook de Mercado Pago. Marca el pago aprobado y desbloquea el resultado.
  */
 export async function pagarMock(valuacionId: string): Promise<void> {
+  await assertOwner(valuacionId);
   const val = await prisma.valuacion.findUnique({ where: { id: valuacionId } });
   if (!val) redirect("/");
   await prisma.pago.upsert({

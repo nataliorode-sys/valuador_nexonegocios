@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { assertOwner } from "@/lib/access";
 import { pagarMock } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 // S8 — Checkout. Version mock (Fase 2). Mercado Pago se integra en la Fase 2 final.
 export default async function PagoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  await assertOwner(id);
   const valuacion = await prisma.valuacion.findUnique({ where: { id } });
   if (!valuacion) notFound();
 

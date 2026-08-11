@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { assertOwner } from "@/lib/access";
 import { buildHighlights, rangoFacturacion } from "@/lib/publicacion";
 
 export interface PublicacionInput {
@@ -24,6 +25,7 @@ function ventasUsd(datos: Record<string, unknown>, tcRef: number): number {
 }
 
 export async function guardarPublicacion(valuacionId: string, data: PublicacionInput): Promise<void> {
+  await assertOwner(valuacionId);
   const val = await prisma.valuacion.findUnique({
     where: { id: valuacionId },
     include: { perfil: true, resultado: true },
@@ -90,6 +92,7 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
 }
 
 export async function enviarARevision(valuacionId: string): Promise<void> {
+  await assertOwner(valuacionId);
   await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "EN_REVISION" } });
   redirect(`/valuar/${valuacionId}/publicacion`);
 }

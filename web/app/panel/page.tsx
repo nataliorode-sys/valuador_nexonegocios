@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { getUserId } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
+import { signOut } from "@/auth";
 import { fmtUSD } from "@/lib/formato";
 
 export const dynamic = "force-dynamic";
@@ -17,25 +18,28 @@ const ESTADO_LABEL: Record<string, string> = {
 
 // S13 — Panel del vendedor.
 export default async function PanelPage() {
-  const userId = await getUserId();
-  const valuaciones = userId
-    ? await prisma.valuacion.findMany({
-        where: { userId },
-        include: {
-          resultado: true,
-          publicacion: { include: { _count: { select: { leads: true } } } },
-        },
-        orderBy: { updatedAt: "desc" },
-      })
-    : [];
+  const userId = await requireUserId();
+  const valuaciones = await prisma.valuacion.findMany({
+    where: { userId },
+    include: {
+      resultado: true,
+      publicacion: { include: { _count: { select: { leads: true } } } },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-nexo">Mis valuaciones</h1>
-        <Link href="/valuar" className="rounded-lg bg-nexo px-4 py-2 text-sm font-semibold text-white hover:bg-nexo-dark">
-          + Nueva valuación
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/valuar" className="rounded-lg bg-nexo px-4 py-2 text-sm font-semibold text-white hover:bg-nexo-dark">
+            + Nueva valuación
+          </Link>
+          <form action={async () => { "use server"; await signOut({ redirectTo: "/" }); }}>
+            <button className="text-sm text-slate-500 hover:text-nexo">Salir</button>
+          </form>
+        </div>
       </div>
 
       {valuaciones.length === 0 && (

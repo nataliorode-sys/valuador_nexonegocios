@@ -1,29 +1,28 @@
-// Sesion minima por cookie. Placeholder hasta integrar Auth.js (Fase 0 pendiente):
-// crea un usuario "anonimo" para poder persistir el borrador y retomarlo.
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
-
-const COOKIE = "nd_uid";
+// Sesión basada en Auth.js (ver auth.ts).
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 
 export async function getUserId(): Promise<string | null> {
-  const store = await cookies();
-  return store.get(COOKIE)?.value ?? null;
+  const s = await auth();
+  return s?.user?.id ?? null;
 }
 
-/** Devuelve el userId de la cookie o crea un usuario y setea la cookie. Solo en Server Actions / Route Handlers. */
-export async function ensureUserId(): Promise<string> {
-  const store = await cookies();
-  const existing = store.get(COOKIE)?.value;
-  if (existing) {
-    const user = await prisma.user.findUnique({ where: { id: existing } });
-    if (user) return user.id;
-  }
-  const user = await prisma.user.create({ data: { email: `anon-${crypto.randomUUID()}@nexodirecto.local` } });
-  store.set(COOKIE, user.id, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 90,
-  });
-  return user.id;
+export async function getRol(): Promise<string | null> {
+  const s = await auth();
+  return s?.user?.rol ?? null;
+}
+
+/** Redirige a login si no hay sesión. */
+export async function requireUserId(): Promise<string> {
+  const id = await getUserId();
+  if (!id) redirect("/ingresar");
+  return id;
+}
+
+/** Redirige si no es admin. */
+export async function requireAdmin(): Promise<string> {
+  const s = await auth();
+  if (!s?.user?.id) redirect("/ingresar");
+  if (s.user.rol !== "ADMIN") redirect("/");
+  return s.user.id;
 }

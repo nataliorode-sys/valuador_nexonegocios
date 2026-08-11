@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { assertOwner } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 // resumen de lo cargado, pero NO el valor (ver docs/00 A2-B). Sin semáforo.
 export default async function TeaserPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  await assertOwner(id);
   const valuacion = await prisma.valuacion.findUnique({
     where: { id },
     include: { perfil: true, resultado: true },

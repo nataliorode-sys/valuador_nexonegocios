@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Ficha from "@/components/marketplace/Ficha";
+import { assertOwner } from "@/lib/access";
 import { enviarARevision } from "../publicar/actions";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 // S11/S12 — Vista previa + envío a revisión.
 export default async function PublicacionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  await assertOwner(id);
   const val = await prisma.valuacion.findUnique({ where: { id }, include: { publicacion: true } });
   if (!val || !val.publicacion) notFound();
   const p = val.publicacion;

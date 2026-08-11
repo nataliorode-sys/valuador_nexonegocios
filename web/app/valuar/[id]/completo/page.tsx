@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
+import { assertOwner } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,7 @@ const METODO_LABEL: Record<string, string> = {
 // S9 — Resultado completo (post-pago).
 export default async function CompletoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  await assertOwner(id);
   const val = await prisma.valuacion.findUnique({
     where: { id },
     include: { resultado: true, perfil: true },

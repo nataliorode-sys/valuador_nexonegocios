@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/session";
 
 const DIAS_PUBLICACION = 100;
 
 // A1 — Aprobar: verifica existencia (checklist) y publica 100 días.
 export async function aprobarPublicacion(publicacionId: string, form: FormData): Promise<void> {
+  await requireAdmin();
   const checklist = {
     cuit: form.get("cuit") === "on",
     google: form.get("google") === "on",
@@ -40,6 +42,7 @@ export async function aprobarPublicacion(publicacionId: string, form: FormData):
 
 // A1 — Rechazar: con motivo. Reembolsa el pago (A2-D).
 export async function rechazarPublicacion(publicacionId: string, form: FormData): Promise<void> {
+  await requireAdmin();
   const motivo = String(form.get("motivo") ?? "Contenido no apto para publicación");
   const pub = await prisma.publicacion.findUnique({ where: { id: publicacionId } });
   if (!pub) return;

@@ -1,20 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getUserId } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 // S14 — Detalle de una publicación + consultas recibidas (leads).
 export default async function PanelDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const userId = await getUserId();
+  const userId = await requireUserId();
   const val = await prisma.valuacion.findUnique({
     where: { id },
     include: { publicacion: { include: { leads: { orderBy: { createdAt: "desc" } } } } },
   });
-  if (!val) notFound();
-  if (userId && val.userId !== userId) notFound(); // solo el dueño
+  if (!val || val.userId !== userId) notFound(); // solo el dueño
   const pub = val.publicacion;
 
   return (

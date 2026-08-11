@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import Ficha from "@/components/marketplace/Ficha";
+import { requireAdmin } from "@/lib/session";
 import { aprobarPublicacion, rechazarPublicacion } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-// A1 — Cola de moderación. NOTA: sin auth de admin todavía (Fase 5). Proteger antes de producción.
+// A1 — Cola de moderación. Solo ADMIN.
 export default async function ModeracionPage() {
+  await requireAdmin();
   const pendientes = await prisma.valuacion.findMany({
     where: { estado: "EN_REVISION" },
     include: { publicacion: true },

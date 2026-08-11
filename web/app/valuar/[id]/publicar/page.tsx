@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { sugerirTitulo } from "@/lib/publicacion";
+import { assertOwner } from "@/lib/access";
 import PublicarForm from "@/components/publicar/PublicarForm";
 import { guardarPublicacion } from "./actions";
 
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 // S10 — Armado de la publicación (post-pago).
 export default async function PublicarPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  await assertOwner(id);
   const val = await prisma.valuacion.findUnique({
     where: { id },
     include: { perfil: true, resultado: true, publicacion: true },
