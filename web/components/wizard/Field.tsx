@@ -1,0 +1,106 @@
+"use client";
+
+import type { FieldDef, FormData } from "@/lib/wizard/types";
+
+interface Props {
+  field: FieldDef;
+  data: FormData;
+  error?: string;
+  onChange: (id: string, value: FormData[string]) => void;
+}
+
+export default function Field({ field, data, error, onChange }: Props) {
+  const value = data[field.id];
+  const inputClass =
+    "mt-1 w-full rounded-lg border px-3 py-2 " +
+    (error ? "border-red-400 bg-red-50" : "border-slate-300");
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-slate-700">
+        {field.label}
+        {field.required && <span className="text-red-500"> *</span>}
+      </label>
+
+      {field.type === "text" && (
+        <input type="text" value={(value as string) ?? ""} placeholder={field.ejemplo}
+          onChange={(e) => onChange(field.id, e.target.value)} className={inputClass} />
+      )}
+
+      {field.type === "textarea" && (
+        <textarea value={(value as string) ?? ""} placeholder={field.ejemplo} rows={3}
+          onChange={(e) => onChange(field.id, e.target.value)} className={inputClass} />
+      )}
+
+      {(field.type === "int" || field.type === "money" || field.type === "percent") && (
+        <div className="relative">
+          <input type="number" inputMode="decimal" value={value === undefined ? "" : (value as number)}
+            placeholder={field.ejemplo} min={field.min} max={field.max}
+            onChange={(e) => onChange(field.id, e.target.value === "" ? undefined : Number(e.target.value))}
+            className={inputClass} />
+          {field.type === "percent" && <span className="absolute right-3 top-2.5 text-slate-400">%</span>}
+        </div>
+      )}
+
+      {field.type === "moneyPeriod" && (
+        <div className="mt-1 flex gap-2">
+          <input type="number" inputMode="decimal" value={value === undefined ? "" : (value as number)}
+            placeholder={field.ejemplo}
+            onChange={(e) => onChange(field.id, e.target.value === "" ? undefined : Number(e.target.value))}
+            className={"w-full rounded-lg border px-3 py-2 " + (error ? "border-red-400 bg-red-50" : "border-slate-300")} />
+          <select value={(data[`${field.id}Periodo`] as string) ?? "mensual"}
+            onChange={(e) => onChange(`${field.id}Periodo`, e.target.value)}
+            className="rounded-lg border border-slate-300 px-2 py-2 text-sm">
+            <option value="mensual">/ mes</option>
+            <option value="anual">/ año</option>
+          </select>
+        </div>
+      )}
+
+      {field.type === "select" && (
+        <select value={(value as string) ?? ""} onChange={(e) => onChange(field.id, e.target.value)} className={inputClass}>
+          <option value="">Elegí una opción…</option>
+          {field.opciones?.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      )}
+
+      {field.type === "bool" && (
+        <div className="mt-2 flex gap-4">
+          {[{ v: true, l: "Sí" }, { v: false, l: "No" }].map((o) => (
+            <label key={o.l} className="flex items-center gap-2 text-sm">
+              <input type="radio" name={field.id} checked={value === o.v}
+                onChange={() => onChange(field.id, o.v)} />
+              {o.l}
+            </label>
+          ))}
+        </div>
+      )}
+
+      {field.type === "multiselect" && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {field.opciones?.map((o) => {
+            const arr = (value as string[]) ?? [];
+            const sel = arr.includes(o.value);
+            return (
+              <button type="button" key={o.value}
+                onClick={() =>
+                  onChange(field.id, sel ? arr.filter((x) => x !== o.value) : [...arr, o.value])
+                }
+                className={
+                  "rounded-full border px-3 py-1 text-sm " +
+                  (sel ? "border-nexo bg-nexo text-white" : "border-slate-300 text-slate-600")
+                }>
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {field.help && !error && <p className="mt-1 text-xs text-slate-500">{field.help}</p>}
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+  );
+}
