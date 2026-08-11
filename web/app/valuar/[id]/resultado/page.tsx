@@ -51,11 +51,11 @@ export default async function TeaserPage({ params }: { params: Promise<{ id: str
         </div>
 
         <div className="mt-8">
-          <button disabled
-            className="w-full cursor-not-allowed rounded-lg bg-nexo px-6 py-3 font-semibold text-white opacity-90">
+          <Link href={`/valuar/${id}/pago`}
+            className="block w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
             Desbloquear por $180.000 + IVA
-          </button>
-          <p className="mt-2 text-xs text-slate-400">El pago se habilita en la Fase 2 (Mercado Pago).</p>
+          </Link>
+          <p className="mt-2 text-xs text-slate-400">Valor, informe PDF, publicación y flyer.</p>
         </div>
 
         <div className="mt-6 text-sm">

@@ -121,3 +121,29 @@ export async function calcular(valuacionId: string, data: FormData): Promise<voi
 
   redirect(`/valuar/${valuacionId}/resultado`);
 }
+
+const PRECIO = 180_000;
+const IVA = 0.21;
+
+/**
+ * Pago MOCK para desarrollo (Fase 2). En la version final lo reemplaza el
+ * webhook de Mercado Pago. Marca el pago aprobado y desbloquea el resultado.
+ */
+export async function pagarMock(valuacionId: string): Promise<void> {
+  const val = await prisma.valuacion.findUnique({ where: { id: valuacionId } });
+  if (!val) redirect("/");
+  await prisma.pago.upsert({
+    where: { valuacionId },
+    create: {
+      valuacionId,
+      proveedor: "mock",
+      estado: "APROBADO",
+      montoArs: PRECIO,
+      ivaArs: Math.round(PRECIO * IVA),
+      externalId: `mock-${valuacionId.slice(0, 8)}`,
+    },
+    update: { estado: "APROBADO" },
+  });
+  await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PAGA" } });
+  redirect(`/valuar/${valuacionId}/completo`);
+}
