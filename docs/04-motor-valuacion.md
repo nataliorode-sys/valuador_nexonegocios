@@ -265,11 +265,12 @@ Estrategia: **lista de rubros amplia** (que nadie quede afuera — decisión F3-
 ```
 **Determinismo:** sin aleatoriedad. Mismos inputs + misma versión de parámetros → mismo output (requisito de auditoría y de "no generar errores").
 
-## 4.19 Decisiones abiertas de la Etapa 4
-| ID | Decisión | Recomendación |
-|----|----------|---------------|
-| **M4-A** | Múltiplos de arranque por familia | Usar la tabla §4.15 como base y **calibrar con NexoNegocios** (datos de operaciones reales). |
-| **M4-B** | `tc_ref`: ¿MEP, CCL, blend? | **Dólar MEP** como referencia (accesible y representativo), configurable. |
-| **M4-C** | Ponderación múltiplos/DCF | **60/40** por defecto; DCF=0 si faltan datos. |
-| **M4-D** | Riesgo país en la tasa | Parámetro admin actualizable (alta volatilidad); no hardcodear. |
-| **M4-E** | ¿Mostrar la tabla DCF al usuario? | **Sí** (transparencia = credibilidad), en el informe pagado. |
+## 4.19 Decisiones de la Etapa 4 — RESUELTAS
+| ID | Decisión | Resolución |
+|----|----------|-----------|
+| **M4-A** | Múltiplos por familia | **Aprobados** los de §4.15 como arranque; se calibran con datos reales de NexoNegocios antes de producción. |
+| **M4-B** | `tc_ref` | **Dólar MEP**, configurable en admin. |
+| **M4-C** | Ponderación múltiplos/DCF | **60/40**; DCF=0 si faltan datos. |
+| **M4-D** | Riesgo país | Parámetro admin actualizable. |
+| **M4-E** | Tabla DCF al usuario | **Sí**, en el informe pagado. |
+| **M4-F** | Catálogo de rubros visibles | **Diferido a anexo** (`anexo-rubros.md`), se arma al final del diseño. |
