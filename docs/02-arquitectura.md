@@ -177,7 +177,10 @@ Barra de progreso persistente (paso X de 7), botón "Guardar y seguir después",
 | Vencimiento a 100 días | Notificación previa (día 90 y 99) + opción de renovar |
 | Edición de datos post-pago | Recalcula y **re-versiona** el informe (marca "actualizado") |
 
-## 2.9 Decisiones abiertas de la Etapa 2
+## 2.9 Decisiones de la Etapa 2 — RESUELTAS
+> Ver resoluciones definitivas en `00-decisiones-clave.md` (A2-A … A2-F). Resumen: cuenta tras elegibilidad con autoguardado/retoma; teaser = resumen de lo cargado + imágenes borrosas sin valores (sin semáforo); moderación 100% manual; **con** reembolso si se rechaza; precio lo fija el dueño con advertencia; contacto = relay + revelado de WhatsApp/email.
+
+### (histórico) Decisiones abiertas planteadas
 | ID | Decisión | Recomendación del equipo |
 |----|----------|--------------------------|
 | **A2-A** | Momento de creación de cuenta | **Después de S5 (elegibilidad), antes del wizard**, para poder autoguardar y enviar email de retoma. Registro liviano (email + password o magic link). |

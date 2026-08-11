@@ -22,6 +22,17 @@
   2. **NexoDirecto**: contacto directo con el vendedor, información autodeclarada no verificada.
 - **D8 — Datos a relevar:** El formulario debe capturar todo lo necesario para una estimación seria: rubro, ventas, costos, tendencias, estacionalidad, gastos, sueldo de dueños, inventario, capital de trabajo, activos, deudas, etc. (detalle en Etapa 3).
 
+## Decisiones cerradas (Etapa 2)
+
+| ID | Decisión | Resolución |
+|----|----------|-----------|
+| **A2-A** | Momento de creación de cuenta | Después de la **elegibilidad**, antes del wizard. **Autoguardado obligatorio**: el dueño puede cargar de a poco, cerrar y retomar otro día sin perder avance (email de retoma con deep-link al paso). |
+| **A2-B** | Contenido del teaser gratuito | Mostrar: (1) **resumen de lo que cargó el usuario** (para validar "entendimos bien tu negocio"); (2) **imágenes borrosas** del flujo de fondos y del EBITDA **sin valores**. **NO** mostrar semáforo de salud (se reserva para el informe pagado; un "rojo" sin explicación da mensaje equivocado). **NO** mostrar el valor ni el rango. |
+| **A2-C** | Moderación | **100% manual** al inicio (una persona de NexoNegocios aprueba/rechaza cada ficha). Migrar a semi-automática con volumen y aprendizaje. |
+| **A2-D** | Reembolso si se rechaza la publicación | **Sí, se reembolsa.** Prioridad: evitar conflicto y cliente insatisfecho. (Aplica a rechazos de publicación; el informe puede haberse entregado igual.) |
+| **A2-E** | Precio a publicar | Lo **decide el dueño**; el sistema sugiere el rango y **advierte** si se aparta mucho. |
+| **A2-F** | Contacto comprador↔vendedor | **Híbrido recomendado:** formulario *relay* que captura el lead (queda registrado en el panel) y, al enviarlo, **revela/envía el WhatsApp y email del vendedor** para contacto directo. El vendedor elige qué datos exponer. Combina "contacto directo" (D7) con captación de leads y protección anti-spam. |
+
 ## Decisiones abiertas (a resolver en su etapa)
 
 - Momento y campos exactos del teaser del paywall (Etapa 2).
