@@ -31,7 +31,8 @@
 | Indumentaria / Boutique | Comercio minorista | Sí |
 | Calzado | Comercio minorista | Sí |
 | Ferretería | Comercio minorista | Sí |
-| Librería / Papelería | Comercio minorista | Sí |
+| Librería / Papelería / Artística | Comercio minorista | Sí |
+| Casa de arte / Bellas artes / Manualidades | Comercio minorista | Sí |
 | Perfumería / Cosmética | Comercio minorista | Sí |
 | Juguetería | Comercio minorista | Sí |
 | Dietética / Productos naturales | Comercio minorista | Sí |
@@ -46,7 +47,6 @@
 | Verdulería / Frutería | Comercio minorista | Sí |
 | Carnicería / Pollería / Pescadería | Comercio minorista | Sí |
 | Vinoteca / Bebidas | Comercio minorista | Sí |
-| Farmacia ⚠️ | Comercio minorista | Sí |
 
 ## Mayorista / distribución
 | Rubro visible | Familia | Stock |
@@ -96,6 +96,7 @@
 | Centro de diagnóstico por imágenes | Salud y bienestar | Sí |
 | Geriátrico / Residencia | Salud y bienestar | No |
 | Centro de estética médica | Salud y bienestar | Sí |
+| Farmacia / Perfumería farmacéutica | Salud y bienestar | Sí |
 
 ## Tecnología / digital
 | Rubro visible | Familia | Stock |
@@ -197,14 +198,19 @@
 
 ## Notas y casos a validar con NexoNegocios (⚠️)
 1. **Panadería / Confitería:** la puse en Gastronomía (comercio+producción, muy dependiente del dueño). Alternativa: Industria si es productora que vende a terceros. → **¿Confirmás Gastronomía por defecto?**
-2. **Farmacia:** regulada y con stock alto; financieramente se comporta como retail. La mapeé a Comercio minorista. → **¿Ok, o preferís una familia propia con múltiplo distinto?**
+2. **Farmacia:** **RESUELTO** → mapeada a **Salud y bienestar** (lado "pharma": licencia regulada + recurrencia bajan el riesgo → múltiplo mayor que retail común). Un rubro resuelve a **una** familia (determinismo del motor); no se duplica en el selector. Si la calibración lo pide, se le asigna múltiplo propio.
 3. **Óptica:** mitad salud, mitad retail. La puse en Salud. → **¿Ok?**
 4. **Estación de servicio:** muy particular (margen bajo, volumen alto, activos pesados, regulada). La dejé en Otros/genérico. → **¿Merece tratamiento/múltiplo propio?**
 5. **Autoescuela / Remis / Transporte de pasajeros:** dependen de habilitaciones y flota (activos). → **¿Los tratamos como asset-heavy?**
 6. **Franquicia:** no es un rubro sino un formato; propongo que, al elegirla, el sistema pida el rubro real y use esa familia (una franquicia suele tener **menor riesgo** → +ajuste de múltiplo). → **¿De acuerdo?**
 7. **Agencia de viajes:** la puse en Servicios profesionales (comisiones), no en Turismo asset-heavy. → **¿Ok?**
 
-## Pendiente
-- Ajustar mapeos según tu experiencia.
-- Confirmar si alguna familia asset-heavy (Agro, Turismo, Inmobiliario, Estación de servicio) usa **preponderancia de activos** en el motor (§4.7) por defecto.
-- Definir el orden/agrupación visual de rubros en el selector (por familia o alfabético con buscador).
+## Decisiones del selector (RESUELTAS)
+- **UI:** buscador con **autocompletado** (el usuario escribe y filtra), no dropdown gigante. Agrupado por familia como fallback de navegación.
+- Un rubro = **una** familia (determinismo). Casos "duales" (farmacia) se resuelven eligiendo la familia que mejor refleja el valor, no duplicando.
+- Siempre disponible **"Otro (no listado)"** → familia genérica + pregunta de stock.
+
+## Pendiente (calibración pre-producción)
+- Ajustar múltiplos finales por familia con datos reales de NexoNegocios.
+- Confirmar preponderancia de activos (§4.7) para Agro, Turismo, Inmobiliario y Estación de servicio.
+- Sumar rubros que la experiencia comercial indique que faltan.
