@@ -195,6 +195,18 @@ model Publicacion {
   selloExistencia  Boolean           @default(false)
   selloFuente      String?
 
+  // Datos publicos denormalizados (para el Marketplace, sin exponer el perfil privado)
+  familia          String
+  provincia        String?
+  localidad        String?
+  antiguedad       Int?
+  facturacionPublica String?         // ej "USD 200k–300k" o null si se oculta
+
+  // Contacto del vendedor (se revela al enviar el formulario de contacto — A2-F)
+  contactoNombre   String?
+  contactoWhatsapp String?
+  contactoEmail    String?
+
   estadoPub        EstadoPublicacion @default(PUBLICADA)
   fechaPublicacion DateTime?
   fechaVencimiento DateTime?

@@ -121,7 +121,51 @@ try {
   const isPdf = buf.slice(0, 5).toString() === "%PDF-";
   log("PDF status:", pdfRes.status(), "| es PDF:", isPdf, "| bytes:", buf.length);
 
-  console.log("\n✅ E2E COMPLETO");
+  // ===== Fase 3: publicar → moderar → marketplace → contacto =====
+
+  // 13) Armado de publicación
+  await page.goto(`${BASE}/valuar/${id}/completo`, { waitUntil: "networkidle" });
+  await page.getByRole("link", { name: /Publicar en el Marketplace/ }).click();
+  await page.waitForSelector("text=Armá tu publicación");
+  await page.fill('input[placeholder="Tu nombre"]', "Juan Panadero");
+  await page.fill('input[placeholder^="WhatsApp"]', "+54 9 351 1234567");
+  await page.fill('input[placeholder="Email"]', "juan@panaderia.com");
+  await Promise.all([
+    page.waitForURL(/\/publicacion/, { timeout: 20000 }),
+    page.getByRole("button", { name: /Ver vista previa/ }).click(),
+  ]);
+  log("Publicación armada");
+
+  // 14) Enviar a revisión
+  await page.getByRole("button", { name: /Enviar a revisión/ }).click();
+  await page.getByText(/en revisión/i).waitFor({ timeout: 20000 });
+  log("Enviada a revisión");
+
+  // 15) Moderación (admin)
+  await page.goto(`${BASE}/admin/moderacion`, { waitUntil: "networkidle" });
+  await page.check('input[name="cuit"]');
+  await page.check('input[name="google"]');
+  await page.getByRole("button", { name: /Aprobar y publicar/ }).click();
+  await page.waitForTimeout(2000);
+  log("Aprobada en moderación");
+
+  // 16) Marketplace
+  await page.goto(`${BASE}/marketplace`, { waitUntil: "networkidle" });
+  const cards = await page.locator('a[href^="/empresa/"]').count();
+  log("Publicaciones en Marketplace:", cards);
+  await page.locator('a[href^="/empresa/"]').first().click();
+  await page.waitForURL(/\/empresa\//, { timeout: 20000 });
+
+  // 17) Contacto (relay + reveal)
+  await page.fill('input[placeholder="Tu nombre *"]', "Comprador Interesado");
+  await page.fill('input[placeholder="Email"]', "comprador@test.com");
+  await page.fill('textarea[placeholder="Tu consulta"]', "Me interesa, ¿podemos hablar?");
+  await page.getByRole("button", { name: /Enviar consulta y ver contacto/ }).click();
+  await page.getByText(/Contactá al vendedor/).waitFor({ timeout: 20000 });
+  const contactoRevelado = (await page.locator("body").innerText()).includes("+54 9 351 1234567");
+  log("Contacto del vendedor revelado:", contactoRevelado);
+
+  console.log("\n✅ E2E COMPLETO (Fases 1-3)");
 } catch (e) {
   console.error("\n❌ E2E FALLÓ:", e.message);
   console.error(await page.locator("body").innerText().catch(() => ""));

@@ -132,9 +132,9 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
           className="flex-1 rounded-lg bg-nexo px-6 py-3 text-center font-semibold text-white hover:bg-nexo-dark">
           Descargar informe PDF
         </a>
-        <button disabled className="flex-1 cursor-not-allowed rounded-lg border border-slate-300 px-6 py-3 text-center font-semibold text-slate-400">
-          Publicar en el Marketplace (Fase 3)
-        </button>
+        <Link href={`/valuar/${id}/publicar`} className="flex-1 rounded-lg border border-nexo px-6 py-3 text-center font-semibold text-nexo hover:bg-nexo-soft">
+          Publicar en el Marketplace
+        </Link>
       </section>
 
       <p className="mt-6 text-center text-xs text-slate-400">
