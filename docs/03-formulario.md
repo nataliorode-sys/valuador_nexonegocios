@@ -10,6 +10,9 @@ Alimenta el motor de la Etapa 4. Filosofía: **máxima precisión con la mínima
 4. **Montos con período flexible.** Campos como alquiler o sueldos aceptan carga **mensual o anual** con un selector; el sistema anualiza. Reduce errores.
 5. **Moneda:** se carga en ARS o USD (selector); el motor ancla en USD con el tipo de cambio del panel admin.
 6. **Condicionalidad por rubro:** p. ej. inventario sólo se pide a rubros con stock.
+7. **Mini-resumen al cierre de cada paso.** Al terminar cada sección se muestra un recuadro *"Esto es lo que entendimos"* con los datos cargados y los derivados clave (ej. margen implícito), para chequear y **corregir antes de arrastrar un error**. (Decisión del cliente, Etapa 3.)
+8. **Carga de ventas flexible.** El dueño elige cómo cargar: anual, mes a mes (12 valores) o promedio mensual ×12. La carga mensual además **detecta la estacionalidad automáticamente**.
+9. **Todo en moneda dura como ancla.** Por la inflación argentina, el motor convierte a **USD** al tipo de cambio del panel admin y razona en USD; muestra ARS y USD. Detalle en Etapa 4.
 
 ## 3.1 Convenciones de la especificación
 Cada campo tiene: `id` · Etiqueta · Descripción · Obligatorio · Tipo/Formato · Validaciones · Ayuda · Ejemplo.
@@ -52,15 +55,16 @@ Objetivo: fijar expectativas, rutear a Full si corresponde, y precargar identida
 
 | id | Etiqueta | Oblig. | Formato | Validación | Ayuda / Ejemplo |
 |----|----------|:---:|---------|-----------|-----------------|
-| `w2_moneda` | ¿En qué moneda cargás los números? | Sí | select (ARS/USD) | — | Default ARS. Todo el wizard usa esta moneda |
-| `w2_ventas_a0` | Ventas de los últimos 12 meses | Sí | number$ | >0 | Facturación total sin IVA. Ej: 240.000.000 |
-| `w2_ventas_a1` | Ventas del año anterior | Recom. | number$ | ≥0 | Ayuda a ver la tendencia. Ej: 180.000.000 |
-| `w2_ventas_a2` | Ventas de 2 años atrás | No | number$ | ≥0 | Afina la tendencia |
+| `w2_moneda` | ¿En qué moneda cargás los números? | Sí | select (ARS/USD) | — | Default ARS. Todo el wizard usa esta moneda; el motor la lleva a USD |
+| `w2_carga_modo` | ¿Cómo querés cargar tus ventas? | Sí | select (Total anual / Mes a mes / Promedio mensual) | — | El dueño elige. Mes a mes detecta estacionalidad solo |
+| `w2_ventas_a0` | Ventas de los últimos 12 meses | Sí (modo anual) | number$ | >0 | Facturación total sin IVA. Ej: 240.000.000 |
+| `w2_ventas_meses[1..12]` | Ventas de cada mes | Sí (modo mensual) | number$ ×12 | ≥0 | Cargá los últimos 12 meses. Suma = ventas anuales |
+| `w2_ventas_prom` | Ventas de un mes típico | Sí (modo promedio) | number$ | >0 | Se multiplica ×12. Ej: 20.000.000 |
 | `w2_anio_representativo` | ¿El último año fue "normal"? | Sí | select (Sí / Fue mejor / Fue peor de lo normal) | — | Evita valuar sobre un año atípico |
-| `w2_estacional` | ¿Tus ventas se concentran en ciertos meses? | No | bool (+ multiselect meses si Sí) | — | Ej: Sí — Nov/Dic/Ene |
+| `w2_estacional` | ¿Tus ventas se concentran en ciertos meses? | Cond.* | bool (+ multiselect meses) | — | *Sólo si NO cargó mes a mes (si cargó mensual, se detecta) |
 | `w2_concentracion_cliente` | ¿Tu cliente más grande qué % de las ventas representa? | No | percent (0–100) | 0–100 | Mucha concentración = más riesgo. Ej: 15% |
 
-**Derivaciones:** tendencia de ventas (creciente/estable/decreciente) y CAGR histórico se calculan de `w2_ventas_a0..a2`; se confirman con el usuario en W7, no se re-preguntan.
+> **Decisión F3-A (cerrada):** **1 año** de ventas (los últimos 12 meses). No se promedian años anteriores por la distorsión inflacionaria; la comparabilidad se logra anclando en **USD** (Etapa 4). La tendencia futura se releva cualitativamente en W7.
 
 ---
 
@@ -74,8 +78,26 @@ Objetivo: fijar expectativas, rutear a Full si corresponde, y precargar identida
 | `w3_gastos_modo` | ¿Cómo cargás los gastos fijos? | Sí | select (Total / Desglosado) | — | Sin contar retiros de dueños |
 | `w3_alquiler` | Alquiler del local | Cond.* | number$ + period | ≥0 | *Obligatorio si `w1_local`=Alquilado. Ej: $1.200.000/mes |
 | `w3_sueldos_empleados` | Sueldos de empleados (con cargas) | Cond.** | number$ + period | ≥0 | **Obligatorio si `w1_empleados`>0. No incluyas a los dueños |
-| `w3_otros_gastos` | Otros gastos (servicios, impuestos, seguros, marketing, etc.) | Sí | number$ + period | ≥0 | Todo lo demás para operar. Ej: $900.000/mes |
-| `w3_gastos_total` | Gastos fijos totales anuales | (modo Total) | number$ | ≥0 | Alternativa al desglose |
+| `w3_gastos_total` | Gastos fijos totales | (modo Total) | number$ + period | ≥0 | Todo lo que gastás para operar (sin retiros de dueños). Alternativa al desglose |
+
+**Desglose guiado (modo Desglosado)** — checklist de categorías para que no se olvide ninguna importante; cada línea es opcional (0 si no aplica), con `period` mensual/anual:
+
+| id | Categoría | Ejemplo |
+|----|-----------|---------|
+| `w3_g_alquiler` | Alquiler (si el local es alquilado) | Local, depósito |
+| `w3_g_sueldos` | Sueldos de empleados (con cargas) | No incluye dueños |
+| `w3_g_servicios` | Servicios | Luz, gas, agua, internet, teléfono |
+| `w3_g_logistica` | Logística y fletes | Distribución, envíos, combustible |
+| `w3_g_packaging` | Packaging / embalaje | Bolsas, cajas, etiquetas |
+| `w3_g_publicidad` | Publicidad y marketing | Redes, Google, cartelería |
+| `w3_g_comisiones` | Comisiones | Tarjetas, plataformas (MercadoLibre, apps), vendedores |
+| `w3_g_impuestos` | Impuestos y tasas | IIBB, tasa municipal (no Ganancias) |
+| `w3_g_seguros` | Seguros | Local, mercadería, ART |
+| `w3_g_mantenimiento` | Mantenimiento y reparaciones | Equipos, local |
+| `w3_g_honorarios` | Honorarios | Contador, legales |
+| `w3_g_otros` | Otros gastos | Lo que no entró arriba |
+
+> El sistema suma el desglose y muestra el total anual. Este total (o `w3_gastos_total`) es el que usa el motor.
 
 ---
 
@@ -101,13 +123,36 @@ Objetivo: fijar expectativas, rutear a Full si corresponde, y precargar identida
 
 | id | Etiqueta | Oblig. | Formato | Validación | Ayuda / Ejemplo |
 |----|----------|:---:|---------|-----------|-----------------|
-| `w5_inventario` | Valor de tu stock/mercadería hoy | Cond.* | number$ | ≥0 | *Se pide sólo a rubros con stock. A precio de costo. Ej: $15.000.000 |
+**A. Capital de trabajo (lo que hace funcionar el negocio hoy)**
+
+| id | Etiqueta | Oblig. | Formato | Validación | Ayuda / Ejemplo |
+|----|----------|:---:|---------|-----------|-----------------|
+| `w5_inventario` | Valor de tu stock/mercadería hoy | Cond.* | number$ | ≥0 | *Sólo rubros con stock. A precio de costo. Ej: $15.000.000 |
+| `w5_inventario_minimo` | Stock mínimo para que el negocio funcione | No | number$ | ≥0 | Capital de trabajo básico que el comprador necesita sí o sí |
 | `w5_por_cobrar` | ¿Cuánto te deben tus clientes hoy? | No | number$ | ≥0 | Cuentas por cobrar. Ej: $8.000.000 |
-| `w5_por_pagar` | ¿Cuánto les debés a tus proveedores hoy? | No | number$ | ≥0 | Cuentas por pagar. Ej: $6.000.000 |
-| `w5_equipamiento` | Valor de equipos/maquinaria/rodados | Recom. | number$ | ≥0 | A valor de usado/mercado, no de compra. Ej: $20.000.000 |
+| `w5_por_pagar` | ¿Cuánto les debés a proveedores hoy? | No | number$ | ≥0 | Cuentas por pagar. Ej: $6.000.000 |
+
+**B. Activos tangibles (a valor de mercado usado, no de compra)**
+
+| id | Etiqueta | Oblig. | Formato | Validación | Ayuda / Ejemplo |
+|----|----------|:---:|---------|-----------|-----------------|
+| `w5_equipamiento` | Equipos, maquinaria, herramientas, mobiliario, rodados | Recom. | number$ | ≥0 | Todo lo físico que se incluye. Ej: $20.000.000 |
 | `w5_inmueble_incluido` | ¿El inmueble propio se incluye en la venta? | Cond.** | bool | — | **Sólo si `w1_local`=Propio |
-| `w5_inmueble_valor` | Valor estimado del inmueble | Cond. | number$ | ≥0 | Sólo si el anterior = Sí. Se valúa aparte del negocio |
-| `w5_incluye_venta` | ¿Qué se incluye en la venta? | Sí | multiselect (Fondo de comercio, Stock, Equipos, Inmueble, Marca, Cartera de clientes, Empleados) | ≥1 | Se reusa en la publicación |
+| `w5_inmueble_valor` | Valor estimado del inmueble | Cond. | number$ | ≥0 | Se valúa **aparte** del negocio (no se le aplica múltiplo) |
+
+**C. Activos intangibles — "¿qué obtiene el comprador?"** (se listan y, si el dueño puede, se estiman; muchos suman valor cualitativo aunque no tengan precio)
+
+| id | Etiqueta | Oblig. | Formato | Ayuda / Ejemplo |
+|----|----------|:---:|---------|-----------------|
+| `w5_intangibles` | ¿Qué intangibles se llevan con la empresa? | No | multiselect (Marca registrada, Página web, Redes sociales + seguidores, Cartera de clientes, Base de datos, Recetas/procesos propios, Licencias/habilitaciones, Contratos vigentes, Franquicia, Dominio web, Reputación/reseñas) | Ej: Marca registrada + Web + 30k seguidores IG |
+| `w5_intangibles_detalle` | Detalle de los intangibles | No | textarea | Ej: "Marca registrada en INPI, web con e-commerce, 30k seguidores" |
+| `w5_seguidores` | Seguidores en redes (total) | No | int | Señal de activo digital. Ej: 30000 |
+
+**D. Qué se incluye en la operación**
+
+| id | Etiqueta | Oblig. | Formato | Ayuda |
+|----|----------|:---:|---------|-------|
+| `w5_incluye_venta` | ¿Qué se incluye en la venta? | Sí | multiselect (Fondo de comercio, Stock, Equipos, Inmueble, Marca, Cartera de clientes, Empleados, Intangibles digitales) | Se reusa en la publicación y define el tipo de operación |
 
 ---
 
@@ -151,10 +196,13 @@ Objetivo: fijar expectativas, rutear a Full si corresponde, y precargar identida
 | Montos con más de X dígitos / negativos | Hard | Bloquea, formato inválido |
 | Falta un obligatorio del paso | Hard | Bloquea avance |
 
-## 3.12 Decisiones abiertas de la Etapa 3
-| ID | Decisión | Recomendación |
-|----|----------|---------------|
-| **F3-A** | ¿1, 2 o 3 años de ventas? | **1 obligatorio + 2 recomendados.** Con 3 años el motor estima tendencia sin depender de la opinión del usuario. |
-| **F3-B** | Catálogo de rubros y sus múltiplos | Definir lista cerrada (~15–25 rubros) con múltiplo y parámetros por rubro (Etapa 4). Evita texto libre. |
-| **F3-C** | ¿Pedir sueldo de mercado del dueño (`w4_sueldo_mercado`) o estimarlo? | **Pedirlo con sugerencia** precargada por rubro/tamaño (editable). Es el ajuste que más mueve el valor en PyMEs. |
-| **F3-D** | Carga mensual vs anual | **Selector por campo** con anualización automática y vista previa del total anual. |
+## 3.12 Decisiones de la Etapa 3 — RESUELTAS
+| ID | Decisión | Resolución |
+|----|----------|-----------|
+| **F3-A** | Años de ventas | **1 año** (últimos 12 meses). Sin promediar años (distorsión inflacionaria); comparabilidad vía USD. Carga flexible: anual / mes a mes / promedio. |
+| **F3-B** | Catálogo de rubros | Lista **amplia** ("mejor de más que de menos, que nadie se sienta afuera"). Se arma en Etapa 4 con múltiplos y parámetros. |
+| **F3-C** | Sueldo de mercado del dueño | **Se pide, con valor sugerido** por rubro/tamaño (editable). |
+| **F3-D** | Período de carga | **Selector por campo** (mensual/anual) con anualización automática. |
+| **F3-E** | Confianza en datos del dueño | **Avisar** cuando un valor se aparta mucho de lo típico y pedir confirmación; **mini-resumen tras cada paso**; datos "raros" **amplían el rango de incertidumbre** (no bloquean). |
+| **F3-F** | Costos | **Checklist guiado** de categorías (logística, packaging, publicidad, comisiones, etc.) para no omitir gastos importantes. |
+| **F3-G** | Activos | Tangibles **e intangibles** (marca, web, redes, cartera, licencias) + capital de trabajo mínimo, enfocado en "qué obtiene el comprador". |
