@@ -33,6 +33,12 @@
 | **A2-E** | Precio a publicar | Lo **decide el dueño**; el sistema sugiere el rango y **advierte** si se aparta mucho. |
 | **A2-F** | Contacto comprador↔vendedor | **Híbrido recomendado:** formulario *relay* que captura el lead (queda registrado en el panel) y, al enviarlo, **revela/envía el WhatsApp y email del vendedor** para contacto directo. El vendedor elige qué datos exponer. Combina "contacto directo" (D7) con captación de leads y protección anti-spam. |
 
+## Decisiones cerradas (Etapas 3–6) — resumen
+- **Formulario (F3):** 1 año de ventas con carga flexible; catálogo de rubros amplio (anexo); sueldo de mercado del dueño con sugerencia; costos por checklist guiado; activos tangibles + intangibles; avisos ante datos atípicos + mini-resumen por paso. Detalle en `03-formulario.md`.
+- **Motor (M4):** múltiplos (primario) + DCF (secundario, 60/40) + activos (piso); ancla en **USD** (dólar MEP), sin promediar años; escenarios conservador/base/optimista; rango que se ensancha con la incertidumbre. Detalle en `04-motor-valuacion.md`.
+- **Informe (R5):** co-branded, 8–12 pág., siempre rango, sección "cómo aumentar el valor", muestra razonamiento pero no parámetros internos. Detalle en `05-informe-pdf.md`.
+- **Marketplace (M6):** anonimato **a elección del dueño**; financieros públicos como **rango**; se publica **el precio del dueño** (no el rango de valuación); sello **"Negocio real · Existencia verificada"** (chequeo liviano en moderación, NO "datos verificados", que es del Full); fotos 3–6; contacto relay+reveal. Detalle en `06-marketplace.md`.
+
 ## Decisiones abiertas (a resolver en su etapa)
 
 - Momento y campos exactos del teaser del paywall (Etapa 2).

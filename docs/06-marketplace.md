@@ -5,7 +5,7 @@ La publicación se **arma automáticamente** con datos del formulario + el paso 
 
 ## 6.0 Principios
 1. **Auto-armado.** La ficha se pre-completa sola desde el wizard; el dueño edita/aprueba, no carga de cero.
-2. **Privacidad por defecto.** Vender un negocio es sensible (empleados, competencia, clientes). La ficha es **anónima por defecto**; el dueño puede revelar identidad si quiere.
+2. **El dueño elige el nivel de exposición.** Al armar la publicación se le pregunta si prefiere **anónima** (protege ante empleados/competencia) o **identificada** (con todos los datos atractivos: nombre, fotos, etc.). Se le explica el trade-off (identificada = más consultas).
 3. **Protección de datos financieros.** Nunca se exponen los números finos. En público se muestran **rangos** y señales, no el detalle.
 4. **Diferenciación clara** (D7): NexoDirecto (contacto directo, info no verificada) vs. Intermediadas (asesor, info verificada).
 5. **Contacto híbrido** (A2-F): formulario relay que captura lead y revela WhatsApp/email del vendedor.
@@ -41,8 +41,20 @@ El sistema **genera y el dueño ajusta**:
 - **Resumen auto:** 2–3 frases armadas desde los datos ("Negocio de {rubro} en {zona}, en operación desde {año}, con {empleados} empleados. Se vende incluyendo {qué incluye}.").
 - **Highlights automáticos** (chips), disparados por flags del motor:
   - "En marcha hace +X años" · "Rentabilidad demostrada" · "Ingresos recurrentes" · "Baja dependencia del dueño" · "Incluye marca registrada" · "Incluye web y redes (Xk seguidores)" · "Local propio incluido" · "Stock incluido".
-- **Sello de confianza:** "Valuado con NexoDirecto" (no se publica el rango del informe; es privado del dueño — ver M6-C).
+- **Sello de confianza:** "**Negocio real · Existencia verificada**" (ver §6.3.1). No se publica el rango del informe; es privado del dueño (M6-C).
 - **Precio:** el que fijó el dueño en S10 (con advertencia del sistema si se aparta mucho del rango — A2-E).
+- **Fotos:** el dueño sube **pocas fotos** (ej. 3–6) en S10; se usan en la ficha y en el flyer.
+
+### 6.3.1 Verificación de existencia (parte de la moderación A1)
+Chequeo **liviano** de que la empresa es real (no verifica los números). Durante la moderación, NexoNegocios corrobora al menos uno/varios de:
+- CUIT / existencia fiscal.
+- Ficha de Google Business / dirección.
+- Redes sociales activas.
+- Sitio web propio.
+
+Resultado → sello **"Negocio real · Existencia verificada"**. Si no se puede verificar, la ficha se publica **sin** el sello (o se pide más info al dueño).
+
+> ⚠️ **Regla de marca (no negociable):** el sello dice **"existencia"**, nunca "información/datos verificados". Los datos económicos de NexoDirecto son **provistos por el propietario**. "Información verificada" queda reservado exclusivamente para las publicaciones **Intermediadas** (Servicio Full). Esto preserva D4 (protección legal) y D7 (diferenciación).
 
 ## 6.3 Diferenciación NexoDirecto vs. Intermediadas (D7)
 Dos tipos de publicación conviven en el Marketplace, visualmente distinguidas:
@@ -50,7 +62,8 @@ Dos tipos de publicación conviven en el Marketplace, visualmente distinguidas:
 | | **NexoDirecto** (este producto) | **Intermediada por NexoNegocios** (Full) |
 |---|---|---|
 | Badge | "Contacto directo con el vendedor" | "Intermediada · Asesor NexoNegocios" |
-| Info | Provista por el propietario (no verificada) | Verificada por NexoNegocios |
+| Sello | "Negocio real · Existencia verificada" | "Información verificada por NexoNegocios" |
+| Info | Provista por el propietario (existencia verificada, números **no** verificados) | Existencia **+ números** verificados |
 | Contacto | Directo (relay + WhatsApp/email del vendedor) | A través de un asesor |
 | Color/etiqueta | Distinto (definir en guía visual) | Destacado premium |
 
@@ -75,11 +88,13 @@ Dos tipos de publicación conviven en el Marketplace, visualmente distinguidas:
 - Compatible con el **flyer** (Etapa 7) y links a WhatsApp.
 - Página del Marketplace optimizada para captar compradores (canal orgánico).
 
-## 6.7 Decisiones abiertas de la Etapa 6
-| ID | Decisión | Recomendación |
-|----|----------|---------------|
-| **M6-A** | Anonimato de la ficha | **Anónima por defecto**, con opción de revelar identidad. Protege al vendedor. |
-| **M6-B** | Financieros en público | **Rango** (facturación y rentabilidad), no valores exactos. Configurable por el dueño. |
-| **M6-C** | ¿Publicar el rango de valuación del informe? | **No auto.** Se muestra precio del dueño + sello "Valuado con NexoDirecto". El rango del informe es privado (evita anclar/discutir el número). |
-| **M6-D** | Contacto | **Relay + reveal** (A2-F), con registro de lead y anti-spam. |
-| **M6-E** | ¿Cuenta para contactar? | Comprador contacta **sin cuenta** (mínima fricción); se piden datos básicos en el form. |
+## 6.7 Decisiones de la Etapa 6 — RESUELTAS
+| ID | Decisión | Resolución |
+|----|----------|-----------|
+| **M6-A** | Anonimato de la ficha | **Se le pregunta al dueño**: anónima o identificada (con todos los datos atractivos + fotos). Se explica el trade-off. |
+| **M6-B** | Financieros en público | **Rango** (facturación/rentabilidad), no exactos. Configurable por el dueño. |
+| **M6-C** | ¿Publicar el rango de valuación? | **No.** Sólo el **precio del dueño**; publicar además nuestro rango confunde. |
+| **M6-D** | Contacto | **Relay + reveal** (A2-F), con lead y anti-spam. |
+| **M6-E** | ¿Cuenta para contactar? | Comprador contacta **sin cuenta**. |
+| **M6-F** | Sello de confianza | **"Negocio real · Existencia verificada"** vía chequeo liviano (CUIT/Google/redes/web) en la moderación. **NO** usar "información/datos verificados" (reservado al Full). |
+| **M6-G** | Fotos | El dueño sube **pocas fotos** (3–6) en S10, reutilizadas en ficha y flyer. |
