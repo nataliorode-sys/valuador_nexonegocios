@@ -8,6 +8,7 @@ import { getUserId } from "@/lib/session";
 import { assertOwner } from "@/lib/access";
 import { crearValuacion, marcarPagada } from "@/lib/valuaciones";
 import { crearPreferencia } from "@/lib/mercadopago";
+import { baseUrl as siteBaseUrl } from "@/lib/seo";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import type { FormData } from "@/lib/wizard/types";
 
@@ -135,14 +136,14 @@ export async function iniciarPagoMP(valuacionId: string): Promise<void> {
   if (!val) redirect("/");
 
   const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "http";
+  const proto = h.get("x-forwarded-proto") ?? "https";
   const host = h.get("host");
-  const baseUrl = process.env.APP_BASE_URL ?? `${proto}://${host}`;
+  const base = process.env.APP_BASE_URL ? siteBaseUrl() : `${proto}://${host}`;
 
   const url = await crearPreferencia({
     valuacionId,
     titulo: "NexoDirecto · Valuación y publicación",
-    baseUrl,
+    baseUrl: base,
   });
   redirect(url);
 }

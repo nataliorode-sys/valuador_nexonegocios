@@ -1,8 +1,9 @@
 // Notificaciones de negocio (buscan el destinatario y envían el email).
 import { prisma } from "@/lib/prisma";
 import { enviarEmail, layout } from "@/lib/email";
+import { baseUrl } from "@/lib/seo";
 
-const APP = process.env.APP_BASE_URL || "";
+const APP = process.env.APP_BASE_URL ? baseUrl() : "";
 
 /** Nueva consulta de un comprador → avisa al vendedor. */
 export async function notificarNuevoLead(
