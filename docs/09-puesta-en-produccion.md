@@ -146,13 +146,17 @@ marca vencidas. Programarlo **1 vez por día**:
 ---
 
 ## 9.9 Deploy paso a paso — Opción A (Railway/Render)
-1. Conectar el repo de GitHub al host; seleccionar la app (monorepo: root, o `web` como raíz del servicio).
-2. **Build command:** `npm install && cd web && npx prisma generate && PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install --with-deps chromium && npm run build`
-3. **Start command:** `cd web && npx prisma migrate deploy && npm run start`
-4. Cargar **todas las variables** de §9.2 en el panel del host.
-5. Provisionar **Postgres** gestionado y pegar su `DATABASE_URL`.
-6. Deploy. Cuando esté verde, correr el **seed admin** (§9.3) una vez.
-7. Configurar el **webhook de MP** y el **cron** (§9.6, §9.8).
+El repo ya trae **`Dockerfile`** y **`railway.json`**: el host detecta el Dockerfile y hace todo
+el build solo (deps, Chromium, compilación) y al arrancar corre `prisma migrate deploy`.
+No hay que configurar build/start commands a mano.
+
+1. Conectar el repo de GitHub al host (deploy desde la branch con el código).
+2. Provisionar **Postgres** gestionado y enlazar su `DATABASE_URL` al servicio.
+3. Cargar las **variables** de §9.2 (mínimo para arrancar: `DATABASE_URL`, `AUTH_SECRET`, `APP_BASE_URL`, `TC_REF_DEFAULT`, `MP_ACCESS_TOKEN`, `CRON_SECRET`).
+4. Deploy (compila y migra solo). Revisar logs.
+5. Correr el **seed admin** una vez (§9.3).
+6. Configurar el **webhook de MP** y el **cron** (§9.6, §9.8).
+7. Agregar cuando quieras: **R2/S3** (fotos persistentes) y **Resend** (emails).
 
 ## 9.10 Deploy — Opción B (Vercel), resumen
 1. Importar el repo; root del proyecto = `web` (o configurar monorepo).
