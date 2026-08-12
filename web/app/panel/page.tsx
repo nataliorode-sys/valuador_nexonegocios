@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { requireUserId } from "@/lib/session";
+import { requireUserId, getRol } from "@/lib/session";
 import { signOut } from "@/auth";
 import { fmtUSD } from "@/lib/formato";
 import Logo from "@/components/Logo";
@@ -20,6 +20,7 @@ const ESTADO_LABEL: Record<string, string> = {
 // S13 — Panel del vendedor.
 export default async function PanelPage() {
   const userId = await requireUserId();
+  const esAdmin = (await getRol()) === "ADMIN";
   const valuaciones = await prisma.valuacion.findMany({
     where: { userId },
     include: {
@@ -35,6 +36,11 @@ export default async function PanelPage() {
       <div className="mt-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-nexo">Mis valuaciones</h1>
         <div className="flex items-center gap-3">
+          {esAdmin && (
+            <Link href="/admin/moderacion" className="rounded-lg border border-nexo px-3 py-2 text-sm font-medium text-nexo hover:bg-nexo-soft">
+              Moderación
+            </Link>
+          )}
           <Link href="/valuar" className="rounded-lg bg-nexo px-4 py-2 text-sm font-semibold text-white hover:bg-nexo-dark">
             + Nueva valuación
           </Link>

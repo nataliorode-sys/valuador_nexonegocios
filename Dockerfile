@@ -25,4 +25,4 @@ RUN npm run build --workspace web
 
 EXPOSE 3000
 # Al iniciar: aplica migraciones pendientes y arranca la app en el puerto del host
-CMD ["sh", "-c", "cd web && npx prisma migrate deploy && npx next start -p ${PORT:-3000} -H 0.0.0.0"]
+CMD ["sh", "-c", "cd web && npx prisma migrate deploy && (node scripts/seed-admin.mjs || echo 'seed-admin omitido') && npx next start -p ${PORT:-3000} -H 0.0.0.0"]
