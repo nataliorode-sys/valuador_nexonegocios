@@ -16,6 +16,7 @@
     "@nexodirecto/engine": "*",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
+    "mercadopago": "^2.13.0",
     "next": "^15.1.6",
     "next-auth": "^5.0.0-beta.25",
     "playwright-core": "^1.49.1",

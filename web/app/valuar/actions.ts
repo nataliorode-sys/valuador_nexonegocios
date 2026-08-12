@@ -1,12 +1,13 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { valuar } from "@nexodirecto/engine";
 import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/session";
 import { assertOwner } from "@/lib/access";
-import { crearValuacion } from "@/lib/valuaciones";
+import { crearValuacion, marcarPagada } from "@/lib/valuaciones";
+import { crearPreferencia } from "@/lib/mercadopago";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import type { FormData } from "@/lib/wizard/types";
 
@@ -121,29 +122,37 @@ export async function calcular(valuacionId: string, data: FormData): Promise<voi
   redirect(`/valuar/${valuacionId}/resultado`);
 }
 
-const PRECIO = 180_000;
-const IVA = 0.21;
+/**
+ * Inicia el pago con Mercado Pago (Checkout Pro): crea la preferencia y redirige
+ * al checkout. Al volver, /valuar/[id]/pago/retorno verifica y desbloquea.
+ */
+export async function iniciarPagoMP(valuacionId: string): Promise<void> {
+  await assertOwner(valuacionId);
+  const val = await prisma.valuacion.findUnique({
+    where: { id: valuacionId },
+    include: { publicacion: true },
+  });
+  if (!val) redirect("/");
+
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const host = h.get("host");
+  const baseUrl = process.env.APP_BASE_URL ?? `${proto}://${host}`;
+
+  const url = await crearPreferencia({
+    valuacionId,
+    titulo: "NexoDirecto · Valuación y publicación",
+    baseUrl,
+  });
+  redirect(url);
+}
 
 /**
- * Pago MOCK para desarrollo (Fase 2). En la version final lo reemplaza el
- * webhook de Mercado Pago. Marca el pago aprobado y desbloquea el resultado.
+ * Pago MOCK para desarrollo (cuando Mercado Pago no está configurado).
+ * Marca el pago aprobado y desbloquea el resultado.
  */
 export async function pagarMock(valuacionId: string): Promise<void> {
   await assertOwner(valuacionId);
-  const val = await prisma.valuacion.findUnique({ where: { id: valuacionId } });
-  if (!val) redirect("/");
-  await prisma.pago.upsert({
-    where: { valuacionId },
-    create: {
-      valuacionId,
-      proveedor: "mock",
-      estado: "APROBADO",
-      montoArs: PRECIO,
-      ivaArs: Math.round(PRECIO * IVA),
-      externalId: `mock-${valuacionId.slice(0, 8)}`,
-    },
-    update: { estado: "APROBADO" },
-  });
-  await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PAGA" } });
+  await marcarPagada(valuacionId, `mock-${valuacionId.slice(0, 8)}`, "mock");
   redirect(`/valuar/${valuacionId}/completo`);
 }

@@ -18,6 +18,19 @@ export async function crearValuacion(userId: string, datos: FormData): Promise<{
   });
 }
 
+const PRECIO_ARS = 180_000;
+const IVA_ARS = Math.round(180_000 * 0.21);
+
+/** Marca la valuación como pagada (idempotente). Usada por webhook/retorno/mock. */
+export async function marcarPagada(valuacionId: string, externalId: string, proveedor = "mercadopago"): Promise<void> {
+  await prisma.pago.upsert({
+    where: { valuacionId },
+    create: { valuacionId, proveedor, estado: "APROBADO", montoArs: PRECIO_ARS, ivaArs: IVA_ARS, externalId },
+    update: { estado: "APROBADO", externalId, proveedor },
+  });
+  await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PAGA" } });
+}
+
 /**
  * Si hay una elegibilidad pendiente (cookie de S5), crea la valuación y devuelve
  * la ruta del wizard; si no, devuelve /panel. Se llama dentro de las acciones de auth.

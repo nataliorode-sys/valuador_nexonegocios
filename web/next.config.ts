@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // El motor es un paquete TS del workspace: Next lo transpila.
   transpilePackages: ["@nexodirecto/engine"],
-  serverExternalPackages: ["playwright-core", "@prisma/client"],
+  serverExternalPackages: ["playwright-core", "@prisma/client", "mercadopago"],
   reactStrictMode: true,
   webpack: (config) => {
     // El motor usa imports con extension .js (estilo NodeNext) sobre archivos .ts.
