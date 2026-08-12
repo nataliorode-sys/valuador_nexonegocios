@@ -13,6 +13,7 @@
     "prisma:validate": "prisma validate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1108.0",
     "@nexodirecto/engine": "*",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",

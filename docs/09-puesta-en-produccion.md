@@ -78,17 +78,24 @@ Por eso hay dos caminos:
 
 ---
 
-## 9.4 Almacenamiento de fotos (S3/R2) — cambio requerido
-Hoy `web/lib/storage.ts` guarda en disco. En serverless el disco no persiste, y en
-contenedor se pierde en cada redeploy salvo volumen. Para producción:
+## 9.4 Almacenamiento de fotos (R2/S3) — ya implementado ✅
+`web/lib/storage.ts` soporta **Cloudflare R2 / S3** y disco, según el entorno:
+- Si están seteadas `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` → usa R2/S3.
+- Si no → usa disco (`UPLOAD_DIR`), ideal para desarrollo.
 
-- **Recomendado:** implementar `guardarImagen`/`leerImagen` contra **S3 o Cloudflare R2**
-  (R2 es barato y sin egress). Es un solo archivo; las variables `S3_*` ya están reservadas.
-  El resto de la app no cambia (sigue usando `/api/media/...` o URLs firmadas).
-- **Alternativa temporal (contenedor):** montar un **volumen persistente** y apuntar
-  `UPLOAD_DIR` ahí. Funciona para empezar; migrar a R2/S3 al crecer.
+**Configurar Cloudflare R2:**
+1. Crear un bucket en R2 (ej. `nexodirecto`).
+2. Crear un **API Token** de R2 (Access Key ID + Secret) con permiso de lectura/escritura al bucket.
+3. Setear variables:
+   - `S3_ENDPOINT` = `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
+   - `S3_BUCKET` = `nexodirecto`
+   - `S3_ACCESS_KEY` / `S3_SECRET_KEY` = las del token
+   - `S3_REGION` = `auto`
+   - `S3_PUBLIC_URL` (opcional) = si activás **acceso público** del bucket o un dominio propio
+     (ej. `https://cdn.nexonegocios.com`), las fotos se sirven directo desde ahí (más rápido).
+     Si no lo seteás, se sirven vía `/api/media/...` (funciona igual, con un fetch extra).
 
-> Decime si querés que implemente R2/S3 ahora (necesito el proveedor y las credenciales para probarlo, o lo dejo listo y lo probás vos).
+Sin `S3_PUBLIC_URL`, no hace falta hacer público el bucket (más seguro). Con él, ganás performance/CDN.
 
 ---
 
