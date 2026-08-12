@@ -14,6 +14,7 @@ Diseño completo del producto **NexoDirecto** (NexoNegocios): valuación express
 | [`06-marketplace.md`](06-marketplace.md) | Publicación: público/privado, verificación, diferenciación |
 | [`07-flyer.md`](07-flyer.md) | Flyer de difusión: formatos, estructura, plantillas |
 | [`08-especificacion-claude-code.md`](08-especificacion-claude-code.md) | **Spec maestra**: datos, reglas, no-funcionales, stack, roadmap |
+| [`09-puesta-en-produccion.md`](09-puesta-en-produccion.md) | **Deploy**: variables, DB, storage, Chromium, MP, emails, cron, checklist |
 | [`anexo-rubros.md`](anexo-rubros.md) | (Pendiente) Catálogo de rubros → familias de múltiplo |
 
 ## Estado
