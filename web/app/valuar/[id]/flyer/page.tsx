@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import QRCode from "qrcode";
 import { prisma } from "@/lib/prisma";
 import { temaPara } from "@/lib/flyerTheme";
 import { fmtUSD } from "@/lib/formato";
+import { baseUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +22,7 @@ export default async function FlyerPage({
   if (!val || !val.publicacion) notFound();
   const p = val.publicacion;
 
-  const h = await headers();
-  const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
-  const url = `${origin}/empresa/${p.codigo}`;
+  const url = `${baseUrl()}/empresa/${p.codigo}`;
   const qrSvg = await QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#0B3B6F", light: "#ffffff" } });
 
   const tema = temaPara(p.familia);

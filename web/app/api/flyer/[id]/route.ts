@@ -1,6 +1,6 @@
 // Captura el flyer (pagina HTML) a PNG con Chromium. ?f=story|post
 import { prisma } from "@/lib/prisma";
-import { resolveChromium } from "@/lib/chromium";
+import { resolveChromium, internalOrigin } from "@/lib/chromium";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -14,8 +14,7 @@ export async function GET(
   const val = await prisma.valuacion.findUnique({ where: { id }, include: { publicacion: true } });
   if (!val || !val.publicacion) return new Response("No encontrado", { status: 404 });
 
-  const origin = new URL(req.url).origin;
-  const url = `${origin}/valuar/${id}/flyer?f=${formato}`;
+  const url = `${internalOrigin()}/valuar/${id}/flyer?f=${formato}`;
   const W = 1080;
   const H = formato === "story" ? 1920 : 1080;
 

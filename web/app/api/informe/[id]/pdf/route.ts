@@ -1,13 +1,13 @@
 // Genera el informe PDF renderizando la pagina HTML del informe con Chromium.
 // Requiere un navegador Chromium disponible (executablePath). Ver docs/05 §5.1.
 import { prisma } from "@/lib/prisma";
-import { resolveChromium } from "@/lib/chromium";
+import { resolveChromium, internalOrigin } from "@/lib/chromium";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -17,8 +17,7 @@ export async function GET(
     return new Response("El informe no está disponible hasta completar el pago.", { status: 402 });
   }
 
-  const origin = new URL(req.url).origin;
-  const url = `${origin}/valuar/${id}/informe`;
+  const url = `${internalOrigin()}/valuar/${id}/informe`;
 
   try {
     const { chromium } = await import("playwright-core");
