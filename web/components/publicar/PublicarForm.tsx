@@ -14,7 +14,8 @@ interface Props {
 
 export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin, rangoMax }: Props) {
   const [d, setD] = useState<PublicacionInput>(defaults);
-  const [fotosText, setFotosText] = useState(defaults.fotos.join("\n"));
+  const [uploading, setUploading] = useState(false);
+  const [fotoError, setFotoError] = useState("");
   const [pending, start] = useTransition();
 
   const set = <K extends keyof PublicacionInput>(k: K, v: PublicacionInput[K]) =>
@@ -23,9 +24,28 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
   const fueraDeRango =
     d.precioUsd > 0 && (d.precioUsd < rangoMin * 0.7 || d.precioUsd > rangoMax * 1.3);
 
+  const onFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
+    setFotoError("");
+    const fd = new FormData();
+    Array.from(files).forEach((f) => fd.append("file", f));
+    setUploading(true);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error subiendo la imagen.");
+      set("fotos", [...d.fotos, ...data.urls].slice(0, 6));
+    } catch (err) {
+      setFotoError(err instanceof Error ? err.message : "Error subiendo la imagen.");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
   const submit = () => {
-    const fotos = fotosText.split("\n").map((s) => s.trim()).filter(Boolean);
-    start(() => void guardar(valuacionId, { ...d, fotos }));
+    start(() => void guardar(valuacionId, d));
   };
 
   const label = "block text-sm font-medium text-slate-700";
@@ -80,9 +100,25 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
         </label>
 
         <div>
-          <label className={label}>Fotos (una URL por línea, opcional)</label>
-          <textarea className={inp} rows={3} placeholder="https://…" value={fotosText} onChange={(e) => setFotosText(e.target.value)} />
-          <p className="mt-1 text-xs text-slate-500">Pocas fotos (3–6). La carga de archivos se habilita más adelante.</p>
+          <label className={label}>Fotos (hasta 6)</label>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {d.fotos.map((src, i) => (
+              <div key={i} className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" className="h-24 w-full rounded-lg object-cover" />
+                <button type="button" onClick={() => set("fotos", d.fotos.filter((_, j) => j !== i))}
+                  className="absolute right-1 top-1 rounded-full bg-black/60 px-2 leading-6 text-white">×</button>
+              </div>
+            ))}
+            {d.fotos.length < 6 && (
+              <label className="flex h-24 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-slate-300 text-sm text-slate-400 hover:border-nexo">
+                {uploading ? "Subiendo…" : "+ Foto"}
+                <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={onFiles} disabled={uploading} />
+              </label>
+            )}
+          </div>
+          {fotoError && <p className="mt-1 text-xs text-red-600">{fotoError}</p>}
+          <p className="mt-1 text-xs text-slate-500">JPG, PNG o WebP, hasta 5 MB cada una.</p>
         </div>
 
         <fieldset className="rounded-xl border border-slate-200 p-4">

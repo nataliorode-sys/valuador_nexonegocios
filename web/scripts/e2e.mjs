@@ -111,6 +111,14 @@ try {
   await page.fill('input[placeholder="Tu nombre"]', "Juan Panadero");
   await page.fill('input[placeholder^="WhatsApp"]', "+54 9 351 1234567");
   await page.fill('input[placeholder="Email"]', "juan@panaderia.com");
+  // Subida real de una foto
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEUlEQVR42mNk+M9QzwAEjDAGACtVAv8AKG0LAAAAAElFTkSuQmCC",
+    "base64",
+  );
+  await page.setInputFiles('input[type=file]', { name: "foto.png", mimeType: "image/png", buffer: png });
+  await page.waitForSelector('img[src^="/api/media/"]', { timeout: 15000 });
+  log("Foto subida (miniatura visible)");
   await page.getByRole("button", { name: /Ver vista previa/ }).click();
   await waitUrl(page, /\/publicacion/);
   await page.getByRole("button", { name: /Enviar a revisión/ }).click();
@@ -144,6 +152,7 @@ try {
   await page.goto(`${BASE}/valuar/${id}/publicacion`, { waitUntil: "networkidle" });
   await page.getByRole("link", { name: /Ver mi publicación online/ }).click();
   await waitUrl(page, /\/empresa\//);
+  log("Ficha muestra la foto:", (await page.locator('img[src^="/api/media/"]').count()) > 0);
   await page.fill('input[placeholder="Tu nombre *"]', "Comprador Interesado");
   await page.fill('input[placeholder="Email"]', "comprador@test.com");
   await page.fill('textarea[placeholder="Tu consulta"]', "Me interesa, ¿podemos hablar?");
