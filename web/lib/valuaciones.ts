@@ -18,8 +18,8 @@ export async function crearValuacion(userId: string, datos: FormData): Promise<{
   });
 }
 
-const PRECIO_ARS = 180_000;
-const IVA_ARS = Math.round(180_000 * 0.21);
+const PRECIO_ARS = 150_000; // precio final (IVA incluido)
+const IVA_ARS = Math.round(150_000 - 150_000 / 1.21); // IVA contenido
 
 /** Marca la valuación como pagada (idempotente). Usada por webhook/retorno/mock. */
 export async function marcarPagada(valuacionId: string, externalId: string, proveedor = "mercadopago"): Promise<void> {

@@ -31,7 +31,7 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
         </ul>
         <div className="mt-6 flex items-baseline justify-between border-t border-slate-100 pt-4">
           <span className="text-slate-600">Total</span>
-          <span className="text-2xl font-bold text-nexo">$180.000 <span className="text-sm font-normal text-slate-500">+ IVA</span></span>
+          <span className="text-2xl font-bold text-nexo">$150.000 <span className="text-sm font-normal text-slate-500">precio final</span></span>
         </div>
 
         {mp ? (

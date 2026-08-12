@@ -22,6 +22,42 @@ import { computeCrecimiento, computeDcf, computeTasa } from "./dcf.js";
 import { computeActivosNetos, deudaTransferida, excesoInventario } from "./assets.js";
 import { clamp, roundTo } from "./util.js";
 
+export interface Desglose {
+  tcRef: number;
+  ventas: number;
+  cogs: number;
+  gastosFijos: number;
+  resultadoOperativo: number;
+  gastosPersonales: number;
+  extraordGasto: number;
+  extraordIngreso: number;
+  sde: number;
+  sueldoMercadoDueno: number;
+  ebitda: number;
+  margenSde: number;
+}
+
+/** Desglose del P&L normalizado en USD (para el informe). Determinístico. */
+export function desglosar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS): Desglose {
+  void params;
+  const n = normalize(input);
+  const e = computeEarnings(n);
+  return {
+    tcRef: n.tcRef,
+    ventas: n.ventas,
+    cogs: n.cogs,
+    gastosFijos: n.gastosFijos,
+    resultadoOperativo: e.resultadoOperativoAntesDueno,
+    gastosPersonales: n.gastosPersonales,
+    extraordGasto: n.extraordGasto,
+    extraordIngreso: n.extraordIngreso,
+    sde: e.sde,
+    sueldoMercadoDueno: n.sueldoMercadoDueno,
+    ebitda: e.ebitda,
+    margenSde: e.margenSde,
+  };
+}
+
 export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS): EngineResult {
   const n = normalize(input);
   const e = computeEarnings(n);

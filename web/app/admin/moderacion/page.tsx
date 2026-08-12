@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Ficha from "@/components/marketplace/Ficha";
 import { requireAdmin } from "@/lib/session";
+import { signOut } from "@/auth";
 import { aprobarPublicacion, rechazarPublicacion } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +18,12 @@ export default async function ModeracionPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
+      <div className="mb-6 flex items-center justify-between text-sm">
+        <Link href="/panel" className="text-slate-500 hover:text-nexo">← Mi panel</Link>
+        <form action={async () => { "use server"; await signOut({ redirectTo: "/" }); }}>
+          <button className="rounded-lg border border-slate-300 px-3 py-1.5 text-slate-600 hover:text-nexo">Salir</button>
+        </form>
+      </div>
       <h1 className="text-2xl font-bold text-nexo">Moderación · cola de revisión</h1>
       <p className="mt-1 text-sm text-slate-500">{pendientes.length} publicación(es) esperando aprobación.</p>
 

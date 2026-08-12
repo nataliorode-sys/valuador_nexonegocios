@@ -9,10 +9,9 @@ import { assertOwner } from "@/lib/access";
 import { crearValuacion, marcarPagada } from "@/lib/valuaciones";
 import { crearPreferencia } from "@/lib/mercadopago";
 import { baseUrl as siteBaseUrl } from "@/lib/seo";
+import { obtenerTcRef } from "@/lib/tc";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import type { FormData } from "@/lib/wizard/types";
-
-const TC_REF = Number(process.env.TC_REF_DEFAULT ?? "1200");
 
 /**
  * S5 Elegibilidad. Si el usuario NO está logueado, guarda las respuestas en una
@@ -61,7 +60,8 @@ export async function guardarPaso(valuacionId: string, data: FormData): Promise<
 /** Ejecuta el motor, persiste el resultado y pasa a CALCULADA. */
 export async function calcular(valuacionId: string, data: FormData): Promise<void> {
   await guardarPaso(valuacionId, data);
-  const input = toEngineInput(data, TC_REF);
+  const tcRef = await obtenerTcRef();
+  const input = toEngineInput(data, tcRef);
   const r = valuar(input);
 
   await prisma.resultadoCalculo.upsert({
@@ -117,7 +117,7 @@ export async function calcular(valuacionId: string, data: FormData): Promise<voi
 
   await prisma.valuacion.update({
     where: { id: valuacionId },
-    data: { estado: "CALCULADA", engineVersion: r.engineVersion, tcRef: TC_REF, precisionPct: r.precisionPct },
+    data: { estado: "CALCULADA", engineVersion: r.engineVersion, tcRef, precisionPct: r.precisionPct },
   });
 
   redirect(`/valuar/${valuacionId}/resultado`);

@@ -9,6 +9,14 @@ interface Props {
   onChange: (id: string, value: FormData[string]) => void;
 }
 
+// Formatea con separador de miles es-AR; parsea a número entero.
+const fmtMiles = (v: FormData[string]) =>
+  v === undefined || v === "" ? "" : Number(v).toLocaleString("es-AR");
+const parseMiles = (s: string): number | undefined => {
+  const d = s.replace(/[^\d]/g, "");
+  return d === "" ? undefined : Number(d);
+};
+
 export default function Field({ field, data, error, onChange }: Props) {
   const value = data[field.id];
   const inputClass =
@@ -32,7 +40,7 @@ export default function Field({ field, data, error, onChange }: Props) {
           onChange={(e) => onChange(field.id, e.target.value)} className={inputClass} />
       )}
 
-      {(field.type === "int" || field.type === "money" || field.type === "percent") && (
+      {(field.type === "int" || field.type === "percent") && (
         <div className="relative">
           <input type="number" name={field.id} inputMode="decimal" value={value === undefined ? "" : (value as number)}
             placeholder={field.ejemplo} min={field.min} max={field.max}
@@ -42,12 +50,25 @@ export default function Field({ field, data, error, onChange }: Props) {
         </div>
       )}
 
+      {field.type === "money" && (
+        <div className="relative">
+          <span className="absolute left-3 top-2.5 text-slate-400">$</span>
+          <input type="text" name={field.id} inputMode="numeric" value={fmtMiles(value)}
+            placeholder={field.ejemplo}
+            onChange={(e) => onChange(field.id, parseMiles(e.target.value))}
+            className={inputClass + " pl-7"} />
+        </div>
+      )}
+
       {field.type === "moneyPeriod" && (
         <div className="mt-1 flex gap-2">
-          <input type="number" name={field.id} inputMode="decimal" value={value === undefined ? "" : (value as number)}
-            placeholder={field.ejemplo}
-            onChange={(e) => onChange(field.id, e.target.value === "" ? undefined : Number(e.target.value))}
-            className={"w-full rounded-lg border px-3 py-2 " + (error ? "border-red-400 bg-red-50" : "border-slate-300")} />
+          <div className="relative w-full">
+            <span className="absolute left-3 top-2.5 text-slate-400">$</span>
+            <input type="text" name={field.id} inputMode="numeric" value={fmtMiles(value)}
+              placeholder={field.ejemplo}
+              onChange={(e) => onChange(field.id, parseMiles(e.target.value))}
+              className={"w-full rounded-lg border pl-7 pr-3 py-2 " + (error ? "border-red-400 bg-red-50" : "border-slate-300")} />
+          </div>
           <select name={`${field.id}Periodo`} value={(data[`${field.id}Periodo`] as string) ?? "mensual"}
             onChange={(e) => onChange(`${field.id}Periodo`, e.target.value)}
             className="rounded-lg border border-slate-300 px-2 py-2 text-sm">

@@ -48,28 +48,37 @@ export function validateStep(step: StepDef, data: FormData): Record<string, stri
   return errores;
 }
 
-/** Advertencias de coherencia (soft). No bloquean; se muestran para confirmar. */
+/** Advertencias de coherencia (soft). No bloquean; solo se muestran cuando el
+ * campo relevante YA fue cargado (evita alertas prematuras). */
 export function softWarnings(data: FormData): SoftWarning[] {
   const w: SoftWarning[] = [];
+  const has = (k: string) => data[k] !== undefined && data[k] !== "";
   const ventas = toNum(data.ventasCargaModo === "promedio" ? mult12(data.ventasProm) : data.ventasAnual);
-  const cogs =
-    data.cogsModo === "monto" ? toNum(data.cogsMonto) : (toNum(data.cogsPct) / 100) * ventas;
 
-  if (Number.isFinite(ventas) && ventas > 0) {
+  // Pérdida operativa: solo si ya se cargó el costo de mercadería.
+  if (Number.isFinite(ventas) && ventas > 0 && (has("cogsPct") || has("cogsMonto"))) {
+    const cogs = data.cogsModo === "monto" ? toNum(data.cogsMonto) : (toNum(data.cogsPct) / 100) * ventas;
     const gastos = sumaGastos(data);
     if (Number.isFinite(cogs) && cogs + gastos > ventas) {
       w.push({ mensaje: "Según los números, el negocio estaría dando pérdida operativa. ¿Es correcto?" });
     }
+  }
+
+  // Stock alto: solo si ya se cargó el inventario.
+  if (has("inventario") && Number.isFinite(ventas) && ventas > 0) {
     const inv = toNum(data.inventario);
-    if (Number.isFinite(inv) && inv > ventas) {
+    if (inv > ventas) {
       w.push({ fieldId: "inventario", mensaje: "El stock parece muy alto respecto de tus ventas. ¿Está bien?" });
     }
   }
 
-  const retiro = toNum(data.retiroDuenos);
-  const duenos = toNum(data.duenosTrabajan);
-  if (duenos > 0 && (Number.isNaN(retiro) || retiro === 0)) {
-    w.push({ fieldId: "retiroDuenos", mensaje: "¿Los dueños no retiran nada? Cargá lo que se llevan para una mejor estimación." });
+  // Retiros en 0: solo si el usuario ya llegó al campo de retiros.
+  if (has("retiroDuenos")) {
+    const retiro = toNum(data.retiroDuenos);
+    const duenos = toNum(data.duenosTrabajan);
+    if (duenos > 0 && retiro === 0) {
+      w.push({ fieldId: "retiroDuenos", mensaje: "¿Los dueños no retiran nada? Cargá lo que se llevan para una mejor estimación." });
+    }
   }
   return w;
 }

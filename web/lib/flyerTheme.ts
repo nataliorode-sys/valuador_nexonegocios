@@ -1,28 +1,23 @@
-// Temas visuales del flyer, auto-seleccionados por familia de rubro (docs/07 §7.4).
-export interface FlyerTheme {
-  bg: string; // gradiente CSS
-  accent: string;
-  text: string;
-  chip: string;
-}
-
-const TEMAS: Record<string, FlyerTheme> = {
-  calido: { bg: "linear-gradient(160deg,#7a1f1f,#c0392b)", accent: "#45B649", text: "#fff", chip: "rgba(255,255,255,.15)" },
-  sobrio: { bg: "linear-gradient(160deg,#0B1C2E,#15314D)", accent: "#45B649", text: "#fff", chip: "rgba(255,255,255,.10)" },
-  moderno: { bg: "linear-gradient(160deg,#0B1C2E,#123a2a)", accent: "#45B649", text: "#fff", chip: "rgba(255,255,255,.12)" },
-  natural: { bg: "linear-gradient(160deg,#14532d,#2F8F38)", accent: "#eaff9a", text: "#fff", chip: "rgba(255,255,255,.14)" },
+// Color de acento del flyer según el rubro (diseño claro y vivo).
+const ACENTOS: Record<string, string> = {
+  gastronomia: "#F59E0B", // ámbar
+  comercio_minorista: "#2563EB", // azul
+  mayorista_distribucion: "#2563EB",
+  belleza_estetica_fitness: "#EC4899", // rosa
+  tecnologia_digital: "#0EA5E9", // celeste
+  ecommerce: "#0EA5E9",
+  salud_bienestar: "#14B8A6", // teal
+  agro: "#22C55E",
+  turismo_hoteleria: "#22C55E",
+  industria_manufactura: "#6366F1", // índigo
+  construccion: "#F97316", // naranja
+  educacion: "#8B5CF6", // violeta
+  logistica_transporte: "#0EA5E9",
+  servicios_profesionales: "#2F8F38",
+  inmobiliario_rentas: "#2F8F38",
+  otros: "#2F8F38",
 };
 
-const MAPA: Record<string, keyof typeof TEMAS> = {
-  gastronomia: "calido",
-  belleza_estetica_fitness: "calido",
-  tecnologia_digital: "moderno",
-  ecommerce: "moderno",
-  agro: "natural",
-  turismo_hoteleria: "natural",
-  salud_bienestar: "sobrio",
-};
-
-export function temaPara(familia: string): FlyerTheme {
-  return TEMAS[MAPA[familia] ?? "sobrio"];
+export function acentoPara(familia: string): string {
+  return ACENTOS[familia] ?? "#2F8F38";
 }
