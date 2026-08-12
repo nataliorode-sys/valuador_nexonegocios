@@ -1,14 +1,16 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function LandingPage() {
   return (
     <main>
       {/* Header */}
-      <header className="border-b border-slate-100">
+      <header className="border-b border-nexo-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="text-xl font-bold text-nexo">
-            Nexo<span className="text-nexo-accent">Directo</span>
-          </div>
+          <Link href="/" className="flex items-center gap-2 text-lg">
+            <Logo />
+            <span className="rounded bg-nexo-accent/10 px-1.5 py-0.5 text-xs font-semibold text-nexo-greenDark">Directo</span>
+          </Link>
           <nav className="flex items-center gap-6 text-sm">
             <Link href="/marketplace" className="text-slate-600 hover:text-nexo">
               Marketplace
@@ -105,10 +107,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-100">
-        <div className="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-500">
-          © NexoNegocios · NexoDirecto es una orientación basada en información provista por el
-          propietario, no verificada. No constituye tasación ni asesoramiento.
+      <footer className="border-t border-nexo-border bg-nexo-soft">
+        <div className="mx-auto max-w-6xl px-6 py-8">
+          <Logo className="text-base" />
+          <p className="mt-3 text-sm text-nexo-muted">
+            © NexoNegocios · NexoDirecto es una orientación basada en información provista por el
+            propietario, no verificada. No constituye tasación ni asesoramiento.
+          </p>
         </div>
       </footer>
     </main>

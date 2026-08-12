@@ -44,10 +44,17 @@ export default async function FlyerPage({
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontSize: 40, fontWeight: 800 }}>
-          Nexo<span style={{ color: tema.accent }}>Directo</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <svg viewBox="0 0 62 60" width={54} height={54} fill="none">
+            <path d="M23 50 L23 16 L51 46 L51 13" stroke="rgba(255,255,255,0.25)" strokeWidth={10.5} strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M16 50 L16 16 L44 46 L44 13" stroke="#45B649" strokeWidth={10.5} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <div style={{ fontSize: 40, fontWeight: 800 }}>
+            <span style={{ color: "#45B649" }}>Nexo</span>
+            <span style={{ color: "#fff" }}>Negocios</span>
+          </div>
         </div>
-        <div style={{ background: tema.accent, color: "#111", padding: "10px 24px", borderRadius: 999, fontWeight: 800, fontSize: 30 }}>
+        <div style={{ background: "#45B649", color: "#062012", padding: "10px 24px", borderRadius: 999, fontWeight: 800, fontSize: 30 }}>
           EN VENTA
         </div>
       </div>

@@ -7,10 +7,10 @@ export interface FlyerTheme {
 }
 
 const TEMAS: Record<string, FlyerTheme> = {
-  calido: { bg: "linear-gradient(160deg,#7a1f1f,#c0392b)", accent: "#f1c40f", text: "#fff", chip: "rgba(255,255,255,.15)" },
-  sobrio: { bg: "linear-gradient(160deg,#0B3B6F,#082a4f)", accent: "#1F9D8F", text: "#fff", chip: "rgba(255,255,255,.12)" },
-  moderno: { bg: "linear-gradient(160deg,#12103a,#3b1f7a)", accent: "#22d3ee", text: "#fff", chip: "rgba(255,255,255,.14)" },
-  natural: { bg: "linear-gradient(160deg,#14532d,#166534)", accent: "#a3e635", text: "#fff", chip: "rgba(255,255,255,.14)" },
+  calido: { bg: "linear-gradient(160deg,#7a1f1f,#c0392b)", accent: "#45B649", text: "#fff", chip: "rgba(255,255,255,.15)" },
+  sobrio: { bg: "linear-gradient(160deg,#0B1C2E,#15314D)", accent: "#45B649", text: "#fff", chip: "rgba(255,255,255,.10)" },
+  moderno: { bg: "linear-gradient(160deg,#0B1C2E,#123a2a)", accent: "#45B649", text: "#fff", chip: "rgba(255,255,255,.12)" },
+  natural: { bg: "linear-gradient(160deg,#14532d,#2F8F38)", accent: "#eaff9a", text: "#fff", chip: "rgba(255,255,255,.14)" },
 };
 
 const MAPA: Record<string, keyof typeof TEMAS> = {

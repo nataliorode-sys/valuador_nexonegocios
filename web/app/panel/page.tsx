@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { signOut } from "@/auth";
 import { fmtUSD } from "@/lib/formato";
+import Logo from "@/components/Logo";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,8 @@ export default async function PanelPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
-      <div className="flex items-center justify-between">
+      <Link href="/" className="text-base"><Logo /></Link>
+      <div className="mt-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-nexo">Mis valuaciones</h1>
         <div className="flex items-center gap-3">
           <Link href="/valuar" className="rounded-lg bg-nexo px-4 py-2 text-sm font-semibold text-white hover:bg-nexo-dark">

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
 import PrintButton from "@/components/PrintButton";
+import Logo from "@/components/Logo";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
       {/* Portada / encabezado */}
       <header className="border-b-2 border-nexo pb-4">
         <div className="flex items-center justify-between">
-          <div className="text-xl font-bold text-nexo">Nexo<span className="text-nexo-accent">Directo</span></div>
+          <span className="text-lg"><Logo /></span>
           <div className="text-right text-xs text-slate-400">
             Informe {val.codigo}<br />TC ref: {r ? val.tcRef?.toLocaleString("es-AR") : "—"} ARS/USD
           </div>
