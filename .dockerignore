@@ -1,0 +1,11 @@
+**/node_modules
+**/.next
+web/uploads
+.git
+**/dist
+**/coverage
+*.log
+.env
+**/.env
+**/.env*.local
+scratchpad
