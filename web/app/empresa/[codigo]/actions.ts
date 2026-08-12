@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { notificarNuevoLead } from "@/lib/notificaciones";
 
 export interface ContactoInput {
   nombre: string;
@@ -26,15 +27,16 @@ export async function enviarContacto(
     return { error: "Dejanos tu nombre y un dato de contacto." };
   }
 
-  await prisma.lead.create({
-    data: {
-      publicacionId: pub.id,
-      nombre: data.nombre.trim(),
-      email: data.email?.trim() || null,
-      telefono: data.telefono?.trim() || null,
-      mensaje: data.mensaje?.trim() || "",
-    },
-  });
+  const lead = {
+    nombre: data.nombre.trim(),
+    email: data.email?.trim() || null,
+    telefono: data.telefono?.trim() || null,
+    mensaje: data.mensaje?.trim() || "",
+  };
+  await prisma.lead.create({ data: { publicacionId: pub.id, ...lead } });
+
+  // Aviso al vendedor (no bloquea la respuesta al comprador).
+  await notificarNuevoLead(pub.id, lead).catch(() => {});
 
   return { nombre: pub.contactoNombre, whatsapp: pub.contactoWhatsapp, email: pub.contactoEmail };
 }

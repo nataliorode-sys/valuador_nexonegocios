@@ -211,6 +211,7 @@ model Publicacion {
   fechaPublicacion DateTime?
   fechaVencimiento DateTime?
   vistas           Int               @default(0)
+  avisoVencimiento Int               @default(0) // 0=ninguno, 90=aviso dia 90, 99=aviso dia 99
 
   moderaciones     Moderacion[]
   leads            Lead[]

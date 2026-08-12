@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
+import { notificarModeracion } from "@/lib/notificaciones";
 
 const DIAS_PUBLICACION = 100;
 
@@ -37,6 +38,7 @@ export async function aprobarPublicacion(publicacionId: string, form: FormData):
   await prisma.moderacion.create({
     data: { publicacionId, resultado: "APROBADA", checklistExistencia: checklist },
   });
+  await notificarModeracion(pub.valuacionId, true).catch(() => {});
   revalidatePath("/admin/moderacion");
 }
 
@@ -51,5 +53,6 @@ export async function rechazarPublicacion(publicacionId: string, form: FormData)
   await prisma.moderacion.create({ data: { publicacionId, resultado: "RECHAZADA", motivo } });
   // Reembolso (A2-D): evitar cliente insatisfecho.
   await prisma.pago.updateMany({ where: { valuacionId: pub.valuacionId }, data: { estado: "REEMBOLSADO" } });
+  await notificarModeracion(pub.valuacionId, false, motivo).catch(() => {});
   revalidatePath("/admin/moderacion");
 }
