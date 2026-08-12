@@ -32,6 +32,7 @@ export async function GET(
         headers: {
           "Content-Type": "image/png",
           "Content-Disposition": `inline; filename="Flyer-${val.publicacion.codigo}-${formato}.png"`,
+          "Cache-Control": "public, max-age=3600, s-maxage=3600",
         },
       });
     } finally {

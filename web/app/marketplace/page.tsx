@@ -7,6 +7,13 @@ import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Empresas en venta",
+  description:
+    "Explorá empresas y fondos de comercio en venta en Argentina. Publicaciones NexoDirecto con contacto directo al vendedor e intermediadas por NexoNegocios.",
+  alternates: { canonical: "/marketplace" },
+};
+
 // S2 — Marketplace público.
 export default async function MarketplacePage({
   searchParams,

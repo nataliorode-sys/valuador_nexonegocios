@@ -1,10 +1,36 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Ficha from "@/components/marketplace/Ficha";
 import ContactForm from "@/components/marketplace/ContactForm";
+import { familiaLabel } from "@/lib/publicacion";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ codigo: string }> }): Promise<Metadata> {
+  const { codigo } = await params;
+  const p = await prisma.publicacion.findUnique({
+    where: { codigo },
+    select: { titulo: true, descripcion: true, estadoPub: true, valuacionId: true, familia: true, provincia: true },
+  });
+  if (!p || p.estadoPub !== "PUBLICADA") return { title: "Publicación no disponible" };
+
+  const desc = `${familiaLabel(p.familia)} en venta${p.provincia ? ` · ${p.provincia}` : ""}. ${p.descripcion}`.slice(0, 200);
+  const ogImage = `/api/flyer/${p.valuacionId}?f=post`;
+  return {
+    title: p.titulo,
+    description: desc,
+    alternates: { canonical: `/empresa/${codigo}` },
+    openGraph: {
+      title: p.titulo,
+      description: desc,
+      type: "website",
+      images: [{ url: ogImage, width: 1080, height: 1080, alt: p.titulo }],
+    },
+    twitter: { card: "summary_large_image", title: p.titulo, description: desc, images: [ogImage] },
+  };
+}
 
 // S3 — Ficha pública de la empresa.
 export default async function EmpresaPage({ params }: { params: Promise<{ codigo: string }> }) {

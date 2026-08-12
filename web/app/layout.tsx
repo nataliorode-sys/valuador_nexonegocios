@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { baseUrl } from "@/lib/seo";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -10,9 +11,19 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "NexoDirecto — Valuá y vendé tu empresa | NexoNegocios",
+  metadataBase: new URL(baseUrl()),
+  title: {
+    default: "NexoDirecto — Valuá y vendé tu empresa | NexoNegocios",
+    template: "%s | NexoNegocios",
+  },
   description:
     "Obtené una orientación de valuación de tu empresa, publicala en el Marketplace de NexoNegocios y generá un flyer para difundir. Autogestión, contacto directo.",
+  openGraph: {
+    siteName: "NexoNegocios",
+    locale: "es_AR",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
