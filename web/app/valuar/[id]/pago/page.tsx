@@ -18,21 +18,39 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
   const pagarMercadoPago = iniciarPagoMP.bind(null, id);
   const pagar = pagarMock.bind(null, id);
 
+  const incluye = [
+    { t: "Valor orientativo y rango", d: "En USD y ARS, con escenarios." },
+    { t: "Informe profesional en PDF", d: "Análisis completo, listo para compartir." },
+    { t: "Publicación 100 días en el Marketplace", d: "Te encuentran compradores reales." },
+    { t: "Flyer para difundir", d: "Para redes y WhatsApp." },
+  ];
+
   return (
     <main className="mx-auto max-w-lg px-6 py-12">
-      <h1 className="text-2xl font-bold text-nexo">Desbloqueá tu valuación completa</h1>
-      <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="text-sm font-semibold uppercase text-slate-400">Incluye</div>
-        <ul className="mt-3 space-y-2 text-sm text-slate-700">
-          <li>✓ Valor orientativo y rango (USD y ARS)</li>
-          <li>✓ Informe profesional en PDF</li>
-          <li>✓ Publicación 100 días en el Marketplace</li>
-          <li>✓ Flyer para difundir</li>
-        </ul>
-        <div className="mt-6 flex items-baseline justify-between border-t border-slate-100 pt-4">
-          <span className="text-slate-600">Total</span>
-          <span className="text-2xl font-bold text-nexo">$150.000 <span className="text-sm font-normal text-slate-500">precio final</span></span>
-        </div>
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-nexo">Desbloqueá tu valuación completa</h1>
+        <p className="mt-2 text-slate-600">Un solo pago. Todo lo que necesitás para poner tu empresa en venta.</p>
+      </div>
+
+      <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="h-1.5 w-full bg-gradient-to-r from-nexo-accent to-emerald-400" />
+        <div className="p-6">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Todo esto incluye</div>
+          <ul className="mt-4 space-y-3">
+            {incluye.map((it) => (
+              <li key={it.t} className="flex gap-3">
+                <Check />
+                <div>
+                  <div className="text-sm font-semibold text-slate-800">{it.t}</div>
+                  <div className="text-xs text-slate-500">{it.d}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 flex items-baseline justify-between rounded-xl bg-nexo-soft px-4 py-3">
+            <span className="font-medium text-slate-600">Total</span>
+            <span className="text-3xl font-bold text-nexo">$150.000 <span className="text-sm font-normal text-slate-500">precio final</span></span>
+          </div>
 
         {mp ? (
           <>
@@ -55,10 +73,32 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
             </p>
           </>
         )}
+        </div>
       </div>
-      <div className="mt-4 text-center text-sm">
+
+      <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-slate-400">
+        <LockIcon /> Pago protegido · sin cargos ocultos
+      </div>
+      <div className="mt-3 text-center text-sm">
         <Link href={`/valuar/${id}/resultado`} className="text-slate-500 hover:text-nexo">← Volver</Link>
       </div>
     </main>
+  );
+}
+
+function Check() {
+  return (
+    <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 flex-none text-nexo-accent" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="10" className="text-emerald-100" fill="currentColor" stroke="none" />
+      <path d="M8 12.5l2.5 2.5L16 9" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
   );
 }

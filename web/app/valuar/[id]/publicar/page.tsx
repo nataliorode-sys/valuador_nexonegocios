@@ -23,6 +23,7 @@ export default async function PublicarPage({ params }: { params: Promise<{ id: s
   const antiguedad = anioInicio > 0 ? 2026 - anioInicio : null;
   const tituloSugerido = sugerirTitulo(val.perfil.familia, datos.localidad as string, antiguedad);
   const pub = val.publicacion;
+  const verif = (pub?.datosVerificacion as { cuit?: string; googleUrl?: string; redesUrl?: string; webUrl?: string } | null) ?? null;
 
   return (
     <PublicarForm
@@ -38,6 +39,10 @@ export default async function PublicarPage({ params }: { params: Promise<{ id: s
         contactoNombre: pub?.contactoNombre ?? "",
         contactoWhatsapp: pub?.contactoWhatsapp ?? "",
         contactoEmail: pub?.contactoEmail ?? "",
+        verifCuit: verif?.cuit ?? "",
+        verifGoogleUrl: verif?.googleUrl ?? "",
+        verifRedesUrl: verif?.redesUrl ?? "",
+        verifWebUrl: verif?.webUrl ?? "",
       }}
       rangoMin={val.resultado.rangoMinUsd}
       rangoMax={val.resultado.rangoMaxUsd}

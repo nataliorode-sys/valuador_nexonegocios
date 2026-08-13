@@ -11,9 +11,10 @@ interface Props {
   initialData: FormData;
   guardarPaso: (valuacionId: string, data: FormData) => Promise<{ ok: boolean }>;
   calcular: (valuacionId: string, data: FormData) => Promise<void>;
+  esEdicion?: boolean;
 }
 
-export default function Wizard({ valuacionId, initialData, guardarPaso, calcular }: Props) {
+export default function Wizard({ valuacionId, initialData, guardarPaso, calcular, esEdicion = false }: Props) {
   const [data, setData] = useState<FormData>(initialData ?? {});
   const [stepIndex, setStepIndex] = useState(0);
   const [errores, setErrores] = useState<Record<string, string>>({});
@@ -87,6 +88,13 @@ export default function Wizard({ valuacionId, initialData, guardarPaso, calcular
         </div>
       </div>
 
+      {esEdicion && (
+        <div className="mb-4 rounded-lg border border-nexo/30 bg-nexo-soft px-4 py-3 text-sm text-slate-700">
+          Estás <strong>ajustando</strong> una valuación ya generada. Cuando recalcules, se actualiza tu
+          valor e informe <strong>sin volver a cobrar</strong>.
+        </div>
+      )}
+
       <h1 className="text-2xl font-bold text-slate-900">{step.titulo}</h1>
       <p className="mt-1 text-slate-600">{step.descripcion}</p>
 
@@ -135,7 +143,7 @@ export default function Wizard({ valuacionId, initialData, guardarPaso, calcular
           </button>
           <button onClick={siguiente} disabled={pending}
             className="rounded-lg bg-nexo px-6 py-2.5 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">
-            {esUltimo ? (pending ? "Calculando…" : "Calcular mi valuación") : "Siguiente →"}
+            {esUltimo ? (pending ? "Calculando…" : esEdicion ? "Recalcular" : "Calcular mi valuación") : "Siguiente →"}
           </button>
         </div>
       </div>

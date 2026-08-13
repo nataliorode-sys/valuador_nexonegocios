@@ -25,6 +25,10 @@ export default function RegistroPage() {
           <label className="block text-sm font-medium text-slate-700">Contraseña</label>
           <input name="password" type="password" required minLength={6} className={inp} placeholder="Mínimo 6 caracteres" />
         </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Repetí la contraseña</label>
+          <input name="password2" type="password" required minLength={6} className={inp} placeholder="Volvé a escribir tu contraseña" />
+        </div>
         {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
         <button type="submit" disabled={pending}
           className="w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">

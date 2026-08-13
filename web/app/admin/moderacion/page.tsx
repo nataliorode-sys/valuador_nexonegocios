@@ -38,14 +38,38 @@ export default async function ModeracionPage() {
           const p = v.publicacion!;
           const aprobar = aprobarPublicacion.bind(null, p.id);
           const rechazar = rechazarPublicacion.bind(null, p.id);
+          const verif = (p.datosVerificacion as { cuit?: string; googleUrl?: string; redesUrl?: string; webUrl?: string } | null) ?? {};
+          const provistos = [verif.cuit, verif.googleUrl, verif.redesUrl, verif.webUrl].filter(Boolean).length;
           return (
             <div key={v.id} className="rounded-2xl border border-slate-200 bg-white p-6">
               <div className="text-xs text-slate-400">{p.codigo}</div>
               <Ficha p={p} />
 
-              <div className="mt-6 grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2">
+              {/* Datos de verificación provistos por el dueño */}
+              <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-slate-700">Datos aportados por el dueño</div>
+                  <span className={"rounded-full px-2 py-0.5 text-xs font-medium " + (provistos >= 2 ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800")}>
+                    {provistos}/4 aportados
+                  </span>
+                </div>
+                <dl className="mt-2 space-y-1 text-sm">
+                  <VerifRow k="CUIT" v={verif.cuit} />
+                  <VerifRow k="Ficha de Google" v={verif.googleUrl} link />
+                  <VerifRow k="Redes sociales" v={verif.redesUrl} link />
+                  <VerifRow k="Sitio web" v={verif.webUrl} link />
+                </dl>
+                {provistos < 2 && (
+                  <p className="mt-2 text-xs text-amber-700">
+                    ⚠️ El dueño aportó menos de 2 datos. Revisá con más cuidado antes de aprobar.
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-4 grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-2">
                 <form action={aprobar} className="rounded-lg bg-emerald-50 p-4">
                   <div className="text-sm font-semibold text-emerald-800">Verificación de existencia</div>
+                  <p className="mt-1 text-xs text-emerald-700">Tildá lo que pudiste comprobar. Regla: al menos 2 de 4.</p>
                   <div className="mt-2 space-y-1 text-sm text-emerald-900">
                     <label className="flex items-center gap-2"><input type="checkbox" name="cuit" /> CUIT / existencia fiscal</label>
                     <label className="flex items-center gap-2"><input type="checkbox" name="google" /> Ficha de Google</label>
@@ -71,5 +95,20 @@ export default async function ModeracionPage() {
         })}
       </div>
     </main>
+  );
+}
+
+function VerifRow({ k, v, link }: { k: string; v?: string; link?: boolean }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <dt className="text-slate-500">{k}</dt>
+      <dd className="text-right font-medium">
+        {v
+          ? link
+            ? <a href={v} target="_blank" rel="noopener noreferrer" className="text-nexo underline break-all">Abrir ↗</a>
+            : <span className="text-slate-700 break-all">{v}</span>
+          : <span className="text-slate-300">no aportado</span>}
+      </dd>
+    </div>
   );
 }

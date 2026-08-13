@@ -101,18 +101,38 @@ function Accion({ v }: { v: { id: string; estado: string; publicacion: { codigo:
     case "CALCULADA":
       return <Link href={`/valuar/${id}/resultado`} className={btn}>Desbloquear</Link>;
     case "PAGA":
-      return (<><Link href={`/valuar/${id}/completo`} className={btn}>Ver resultado</Link><Link href={`/valuar/${id}/publicar`} className={btnSoft}>Publicar</Link></>);
+      return (
+        <>
+          <Link href={`/valuar/${id}/completo`} className={btn}>Ver resultado</Link>
+          <Link href={`/valuar/${id}/publicar`} className={btnSoft}>Publicar</Link>
+          <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
+          <Link href={`/valuar/${id}`} className={btnSoft}>Ajustar respuestas</Link>
+        </>
+      );
     case "PUBLICACION_EN_ARMADO":
-      return <Link href={`/valuar/${id}/publicacion`} className={btn}>Continuar publicación</Link>;
+      return (
+        <>
+          <Link href={`/valuar/${id}/publicacion`} className={btn}>Continuar publicación</Link>
+          <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
+          <Link href={`/valuar/${id}`} className={btnSoft}>Ajustar respuestas</Link>
+        </>
+      );
     case "EN_REVISION":
-      return <span className="text-slate-400">Esperando aprobación…</span>;
+      return (
+        <>
+          <span className="text-slate-400">Esperando aprobación…</span>
+          <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
+        </>
+      );
     case "PUBLICADA":
       return (
         <>
           <Link href={`/empresa/${v.publicacion?.codigo}`} className={btn}>Ver publicación</Link>
           <Link href={`/panel/${id}`} className={btnSoft}>Ver consultas</Link>
+          <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
           <a href={`/api/flyer/${id}?f=story`} target="_blank" rel="noopener" className={btnSoft}>Flyer story</a>
           <a href={`/api/flyer/${id}?f=post`} target="_blank" rel="noopener" className={btnSoft}>Flyer post</a>
+          <Link href={`/valuar/${id}`} className={btnSoft}>Ajustar respuestas</Link>
         </>
       );
     case "RECHAZADA":

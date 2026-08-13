@@ -194,6 +194,7 @@ model Publicacion {
   highlights       Json
   selloExistencia  Boolean           @default(false)
   selloFuente      String?
+  datosVerificacion Json?            // { cuit, googleUrl, redesUrl, webUrl } provistos por el dueño para moderación
 
   // Datos publicos denormalizados (para el Marketplace, sin exponer el perfil privado)
   familia          String

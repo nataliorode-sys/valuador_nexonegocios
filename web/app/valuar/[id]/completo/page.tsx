@@ -40,9 +40,14 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
     <main className="mx-auto max-w-3xl px-6 py-10">
       <div className="flex items-center justify-between">
         <div className="text-sm text-slate-500">Informe {val.codigo}</div>
-        <Link href={`/valuar/${id}/informe`} className="rounded-lg border border-nexo px-4 py-2 text-sm font-medium text-nexo hover:bg-nexo-soft">
-          Ver informe PDF
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href={`/valuar/${id}`} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:text-nexo">
+            Ajustar respuestas
+          </Link>
+          <Link href={`/valuar/${id}/informe`} className="rounded-lg border border-nexo px-4 py-2 text-sm font-medium text-nexo hover:bg-nexo-soft">
+            Ver informe PDF
+          </Link>
+        </div>
       </div>
 
       {/* Valor + rango */}

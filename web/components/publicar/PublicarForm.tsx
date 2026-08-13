@@ -24,6 +24,9 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
   const fueraDeRango =
     d.precioUsd > 0 && (d.precioUsd < rangoMin * 0.7 || d.precioUsd > rangoMax * 1.3);
 
+  const verifCount = [d.verifCuit, d.verifGoogleUrl, d.verifRedesUrl, d.verifWebUrl]
+    .filter((x) => x?.trim()).length;
+
   const onFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
@@ -128,6 +131,39 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
             <input className={inp} placeholder="WhatsApp (ej: +54 9 351 …)" value={d.contactoWhatsapp} onChange={(e) => set("contactoWhatsapp", e.target.value)} />
             <input className={inp} placeholder="Email" value={d.contactoEmail} onChange={(e) => set("contactoEmail", e.target.value)} />
           </div>
+        </fieldset>
+
+        <fieldset className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+          <legend className="px-2 text-sm font-semibold text-emerald-800">Verificación de existencia</legend>
+          <p className="text-sm text-slate-600">
+            Para publicar con el sello <strong>“Empresa verificada por NexoNegocios”</strong>, chequeamos que tu
+            negocio exista de verdad. Necesitamos que completes <strong>al menos 2 de estos 4</strong> datos.
+            Cuantos más completes, más confianza genera tu aviso. <span className="text-slate-500">No se muestran públicamente:
+            los usa solo nuestro equipo de moderación.</span>
+          </p>
+          <div className="mt-3 space-y-3">
+            <div>
+              <label className={label}>CUIT de la empresa</label>
+              <input className={inp} placeholder="30-12345678-9" value={d.verifCuit} onChange={(e) => set("verifCuit", e.target.value)} />
+            </div>
+            <div>
+              <label className={label}>Link a tu ficha de Google (Google Maps / Business)</label>
+              <input className={inp} placeholder="https://maps.app.goo.gl/…" value={d.verifGoogleUrl} onChange={(e) => set("verifGoogleUrl", e.target.value)} />
+            </div>
+            <div>
+              <label className={label}>Link a tus redes sociales (Instagram, Facebook…)</label>
+              <input className={inp} placeholder="https://instagram.com/tunegocio" value={d.verifRedesUrl} onChange={(e) => set("verifRedesUrl", e.target.value)} />
+            </div>
+            <div>
+              <label className={label}>Sitio web</label>
+              <input className={inp} placeholder="https://tunegocio.com.ar" value={d.verifWebUrl} onChange={(e) => set("verifWebUrl", e.target.value)} />
+            </div>
+          </div>
+          <p className={"mt-3 rounded-lg px-3 py-2 text-sm " + (verifCount >= 2 ? "bg-emerald-100 text-emerald-800" : "bg-amber-50 text-amber-700")}>
+            {verifCount >= 2
+              ? `✓ Cumplís con ${verifCount} de 4. Tu aviso puede recibir el sello de verificación.`
+              : `Completaste ${verifCount} de 4. Necesitás al menos 2 para el sello de verificación.`}
+          </p>
         </fieldset>
       </div>
 

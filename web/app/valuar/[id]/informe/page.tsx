@@ -17,6 +17,10 @@ interface Driver { factor: string; efecto: string; detalle: string }
 
 const u = (v: number) => fmtUSD(Math.round(v));
 
+const LBL_ANIO: Record<string, string> = { normal: "Sí, fue normal", mejor: "Fue mejor de lo normal", peor: "Fue peor de lo normal" };
+const LBL_TEND: Record<string, string> = { crece: "Va a crecer", estable: "Se mantiene", baja: "Va a bajar" };
+const LBL_DEP: Record<string, string> = { baja: "Sigue igual", media: "Se complica un poco", alta: "Depende mucho del dueño" };
+
 export default async function InformePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const val = await prisma.valuacion.findUnique({ where: { id }, include: { resultado: true, perfil: true } });
@@ -37,6 +41,20 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
   );
   const dcfData = dcf?.map((f) => ({ label: `Año ${f.anio}`, value: Math.max(0, f.fcf) })) ?? [];
   const antiguedad = Number(datos.anioInicio) > 0 ? 2026 - Number(datos.anioInicio) : null;
+
+  // Resumen de respuestas: formateo en la moneda cargada por el dueño.
+  const monedaCarga = String(datos.monedaCarga ?? "ARS");
+  const simb = monedaCarga === "USD" ? "US$" : "$";
+  const money = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? `${simb} ${n.toLocaleString("es-AR")}` : "—";
+  };
+  const moneyP = (fid: string) => {
+    const n = Number(datos[fid]);
+    if (!Number.isFinite(n) || n <= 0) return "—";
+    const periodo = datos[`${fid}Periodo`] === "anual" ? "/año" : "/mes";
+    return `${simb} ${n.toLocaleString("es-AR")} ${periodo}`;
+  };
 
   return (
     <div className="mx-auto max-w-[820px] bg-white px-10 py-8 text-slate-800 print:px-0 print:py-0">
@@ -92,9 +110,51 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
         </table>
       </section>
 
-      {/* 3. Situación económica */}
+      {/* 3. Resumen de tus respuestas */}
       <section className="mt-6">
-        <h2 className="text-lg font-bold">3. Situación económica (normalizada, en USD)</h2>
+        <h2 className="text-lg font-bold">3. Resumen de tus respuestas</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Estos son los datos clave que cargaste, tal como los ingresaste ({monedaCarga === "USD" ? "en dólares" : "en pesos"}).
+          Sobre ellos construimos toda la valuación: si alguno cambia, el valor cambia.
+        </p>
+
+        <h3 className="mt-4 text-sm font-semibold text-slate-700">Ventas y actividad</h3>
+        <table className="mt-1 w-full text-sm">
+          <tbody>
+            <TR k={datos.ventasCargaModo === "promedio" ? "Ventas de un mes típico" : "Ventas de los últimos 12 meses"}
+              v={datos.ventasCargaModo === "promedio" ? money(datos.ventasProm) + " /mes" : money(datos.ventasAnual)} />
+            <TR k="¿El último año fue normal?" v={LBL_ANIO[String(datos.anioRepresentativo ?? "")] ?? "—"} />
+            {datos.concentracionClientePct != null && datos.concentracionClientePct !== "" &&
+              <TR k="Ventas del cliente más grande" v={`${Number(datos.concentracionClientePct)}%`} />}
+          </tbody>
+        </table>
+
+        <h3 className="mt-4 text-sm font-semibold text-slate-700">Costos y retiros</h3>
+        <table className="mt-1 w-full text-sm">
+          <tbody>
+            <TR k="Costo de mercadería / insumos"
+              v={datos.cogsModo === "monto" ? money(datos.cogsMonto) : (datos.cogsPct != null && datos.cogsPct !== "" ? `${Number(datos.cogsPct)}% de las ventas` : "—")} />
+            <TR k="Retiro de los dueños" v={moneyP("retiroDuenos")} />
+            <TR k="Sueldo de mercado del dueño" v={moneyP("sueldoMercadoDueno")} />
+            {Number(datos.gastosPersonales) > 0 && <TR k="Gastos personales por la empresa" v={money(datos.gastosPersonales)} />}
+          </tbody>
+        </table>
+
+        <h3 className="mt-4 text-sm font-semibold text-slate-700">Perspectivas del negocio</h3>
+        <table className="mt-1 w-full text-sm">
+          <tbody>
+            <TR k="Hacia adelante, el negocio…" v={LBL_TEND[String(datos.tendencia ?? "")] ?? "—"} />
+            {datos.crecimientoPct != null && datos.crecimientoPct !== "" &&
+              <TR k="Crecimiento esperado por año" v={`${Number(datos.crecimientoPct)}% (real)`} />}
+            <TR k="Si el dueño se va…" v={LBL_DEP[String(datos.dependenciaDueno ?? "")] ?? "—"} />
+            <TR k="¿Tiene ventas recurrentes?" v={datos.recurrencia === true ? "Sí" : "No"} />
+          </tbody>
+        </table>
+      </section>
+
+      {/* 4. Situación económica */}
+      <section className="mt-6">
+        <h2 className="text-lg font-bold">4. Situación económica (normalizada, en USD)</h2>
         <p className="mt-1 text-sm text-slate-600">
           Partimos de tus ventas y le restamos costos y gastos para llegar a lo que realmente gana el
           negocio. Ajustamos algunos valores para reflejar su capacidad real de generar ganancias.
@@ -118,7 +178,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
 
       {/* 4. Cómo llegamos al valor */}
       <section className="mt-6 pb">
-        <h2 className="text-lg font-bold">4. Cómo llegamos al valor</h2>
+        <h2 className="text-lg font-bold">5. Cómo llegamos al valor</h2>
         <p className="mt-2 text-sm text-slate-600">{analisis.metodoTexto}</p>
         <div className="mt-3 grid grid-cols-2 gap-4">
           <div>
@@ -151,7 +211,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
       {/* 5. Flujo de fondos */}
       {dcf && (
         <section className="mt-6">
-          <h2 className="text-lg font-bold">5. Flujo de fondos proyectado (5 años)</h2>
+          <h2 className="text-lg font-bold">6. Flujo de fondos proyectado (5 años)</h2>
           <p className="mt-1 text-sm text-slate-600">
             Proyectamos el dinero que genera tu negocio y lo traemos a valor de hoy (una empresa vale
             por lo que va a generar en el futuro).
@@ -172,7 +232,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
 
       {/* 6. Escenarios */}
       <section className="mt-6">
-        <h2 className="text-lg font-bold">6. Escenarios</h2>
+        <h2 className="text-lg font-bold">7. Escenarios</h2>
         <p className="mt-1 text-sm text-slate-600">Toda estimación tiene incertidumbre; por eso damos un rango con tres escenarios.</p>
         <div className="mt-3 grid grid-cols-3 gap-3 text-center text-sm">
           <div className="rounded border border-slate-200 p-3"><div className="text-xs text-slate-500">Conservador</div><div className="font-bold text-nexo">{u(esc.conservador)}</div></div>
@@ -183,7 +243,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
 
       {/* 7. Análisis NexoNegocios */}
       <section className="mt-6 pb">
-        <h2 className="text-lg font-bold">7. Nuestro análisis</h2>
+        <h2 className="text-lg font-bold">8. Nuestro análisis</h2>
         <div className="mt-3 grid grid-cols-2 gap-4">
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
             <div className="text-sm font-semibold text-emerald-800">Fortalezas</div>
@@ -204,7 +264,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
 
       {/* 8. Recomendaciones */}
       <section className="mt-6">
-        <h2 className="text-lg font-bold">8. Cómo aumentar el valor de tu empresa</h2>
+        <h2 className="text-lg font-bold">9. Cómo aumentar el valor de tu empresa</h2>
         <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-700">
           {analisis.recomendaciones.map((rc, i) => <li key={i}>{rc}</li>)}
         </ol>
@@ -212,7 +272,7 @@ export default async function InformePage({ params }: { params: Promise<{ id: st
 
       {/* 9. Conclusión */}
       <section className="mt-6">
-        <h2 className="text-lg font-bold">9. Conclusión y precio sugerido</h2>
+        <h2 className="text-lg font-bold">10. Conclusión y precio sugerido</h2>
         <p className="mt-2 text-sm text-slate-600">
           Como orientación, el valor de tu empresa se ubica entre <strong>{u(r.rangoMinUsd)}</strong> y
           {" "}<strong>{u(r.rangoMaxUsd)}</strong>. Sugerimos usar este rango como referencia para tu

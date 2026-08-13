@@ -57,9 +57,16 @@ export async function guardarPaso(valuacionId: string, data: FormData): Promise<
   return { ok: true };
 }
 
-/** Ejecuta el motor, persiste el resultado y pasa a CALCULADA. */
+/**
+ * Ejecuta el motor y persiste el resultado.
+ * - Si la valuación aún no fue pagada, pasa a CALCULADA y muestra el resultado (con paywall).
+ * - Si ya fue pagada/publicada (edición posterior), recalcula SIN volver a cobrar,
+ *   conserva el estado y devuelve al resultado desbloqueado.
+ */
 export async function calcular(valuacionId: string, data: FormData): Promise<void> {
   await guardarPaso(valuacionId, data);
+  const actual = await prisma.valuacion.findUnique({ where: { id: valuacionId }, select: { estado: true } });
+  const yaProcesada = actual != null && actual.estado !== "BORRADOR" && actual.estado !== "CALCULADA";
   const tcRef = await obtenerTcRef();
   const input = toEngineInput(data, tcRef);
   const r = valuar(input);
@@ -117,10 +124,11 @@ export async function calcular(valuacionId: string, data: FormData): Promise<voi
 
   await prisma.valuacion.update({
     where: { id: valuacionId },
-    data: { estado: "CALCULADA", engineVersion: r.engineVersion, tcRef, precisionPct: r.precisionPct },
+    // Si ya estaba pagada/publicada, conserva el estado (no revierte a CALCULADA ni recobra).
+    data: { estado: yaProcesada ? undefined : "CALCULADA", engineVersion: r.engineVersion, tcRef, precisionPct: r.precisionPct },
   });
 
-  redirect(`/valuar/${valuacionId}/resultado`);
+  redirect(yaProcesada ? `/valuar/${valuacionId}/completo` : `/valuar/${valuacionId}/resultado`);
 }
 
 /**

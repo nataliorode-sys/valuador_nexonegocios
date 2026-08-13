@@ -17,7 +17,8 @@ export default async function WizardPage({ params }: { params: Promise<{ id: str
   if (!valuacion || !valuacion.perfil) notFound();
 
   const datos = (valuacion.perfil.datos ?? {}) as FormData;
+  const esEdicion = valuacion.estado !== "BORRADOR" && valuacion.estado !== "CALCULADA";
   return (
-    <Wizard valuacionId={id} initialData={datos} guardarPaso={guardarPaso} calcular={calcular} />
+    <Wizard valuacionId={id} initialData={datos} guardarPaso={guardarPaso} calcular={calcular} esEdicion={esEdicion} />
   );
 }

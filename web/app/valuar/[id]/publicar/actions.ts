@@ -15,6 +15,21 @@ export interface PublicacionInput {
   contactoNombre: string;
   contactoWhatsapp: string;
   contactoEmail: string;
+  // Verificación de existencia (se muestran al moderador; regla ≥2 de 4).
+  verifCuit: string;
+  verifGoogleUrl: string;
+  verifRedesUrl: string;
+  verifWebUrl: string;
+}
+
+/** Empaqueta los datos de verificación provistos por el dueño (solo los no vacíos). */
+function armarVerificacion(d: PublicacionInput): Record<string, string> {
+  const v: Record<string, string> = {};
+  if (d.verifCuit?.trim()) v.cuit = d.verifCuit.trim();
+  if (d.verifGoogleUrl?.trim()) v.googleUrl = d.verifGoogleUrl.trim();
+  if (d.verifRedesUrl?.trim()) v.redesUrl = d.verifRedesUrl.trim();
+  if (d.verifWebUrl?.trim()) v.webUrl = d.verifWebUrl.trim();
+  return v;
 }
 
 function ventasUsd(datos: Record<string, unknown>, tcRef: number): number {
@@ -37,6 +52,7 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
   const antiguedad = anioInicio > 0 ? 2026 - anioInicio : Number(datos.antiguedadElg ?? 0) || null;
   const tc = val.tcRef ?? 1200;
   const facturacion = data.mostrarFacturacion ? rangoFacturacion(ventasUsd(datos, tc)) : null;
+  const verificacion = armarVerificacion(data);
 
   const highlights = buildHighlights(
     {
@@ -71,6 +87,7 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
       contactoNombre: data.contactoNombre || null,
       contactoWhatsapp: data.contactoWhatsapp || null,
       contactoEmail: data.contactoEmail || null,
+      datosVerificacion: verificacion,
     },
     update: {
       titulo: data.titulo,
@@ -84,6 +101,7 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
       contactoNombre: data.contactoNombre || null,
       contactoWhatsapp: data.contactoWhatsapp || null,
       contactoEmail: data.contactoEmail || null,
+      datosVerificacion: verificacion,
     },
   });
 

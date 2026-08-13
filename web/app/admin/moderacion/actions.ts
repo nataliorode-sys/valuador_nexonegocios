@@ -16,7 +16,8 @@ export async function aprobarPublicacion(publicacionId: string, form: FormData):
     redes: form.get("redes") === "on",
     web: form.get("web") === "on",
   };
-  const selloExistencia = Object.values(checklist).some(Boolean);
+  // Regla: la empresa se considera "verificada" con al menos 2 de 4 chequeos.
+  const selloExistencia = Object.values(checklist).filter(Boolean).length >= 2;
 
   const pub = await prisma.publicacion.findUnique({ where: { id: publicacionId } });
   if (!pub) return;
