@@ -24,9 +24,6 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
   const fueraDeRango =
     d.precioUsd > 0 && (d.precioUsd < rangoMin * 0.7 || d.precioUsd > rangoMax * 1.3);
 
-  const verifCount = [d.verifCuit, d.verifGoogleUrl, d.verifRedesUrl, d.verifWebUrl]
-    .filter((x) => x?.trim()).length;
-
   const onFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
@@ -137,9 +134,8 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
           <legend className="px-2 text-sm font-semibold text-emerald-800">Verificación de existencia</legend>
           <p className="text-sm text-slate-600">
             Para publicar con el sello <strong>“Empresa verificada por NexoNegocios”</strong>, chequeamos que tu
-            negocio exista de verdad. Necesitamos que completes <strong>al menos 2 de estos 4</strong> datos.
-            Cuantos más completes, más confianza genera tu aviso. <span className="text-slate-500">No se muestran públicamente:
-            los usa solo nuestro equipo de moderación.</span>
+            negocio exista de verdad. <strong>Completá estos datos</strong> para que podamos verificarlo más rápido.
+            <span className="text-slate-500"> No se muestran públicamente: los usa solo nuestro equipo de moderación.</span>
           </p>
           <div className="mt-3 space-y-3">
             <div>
@@ -159,11 +155,6 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
               <input className={inp} placeholder="https://tunegocio.com.ar" value={d.verifWebUrl} onChange={(e) => set("verifWebUrl", e.target.value)} />
             </div>
           </div>
-          <p className={"mt-3 rounded-lg px-3 py-2 text-sm " + (verifCount >= 2 ? "bg-emerald-100 text-emerald-800" : "bg-amber-50 text-amber-700")}>
-            {verifCount >= 2
-              ? `✓ Cumplís con ${verifCount} de 4. Tu aviso puede recibir el sello de verificación.`
-              : `Completaste ${verifCount} de 4. Necesitás al menos 2 para el sello de verificación.`}
-          </p>
         </fieldset>
       </div>
 

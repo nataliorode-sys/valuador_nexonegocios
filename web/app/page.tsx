@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import SiteHeader from "@/components/SiteHeader";
+import { IconCargar, IconValor, IconPublicar, IconDifundir } from "@/components/StepIcons";
 
 function Check() {
   return (
@@ -11,10 +13,10 @@ function Check() {
 }
 
 const PASOS = [
-  { icon: "📝", t: "Cargá tu negocio", d: "Respondé en criollo: ventas, costos, activos. Sin tecnicismos." },
-  { icon: "📊", t: "Obtené tu valor", d: "Calculamos un rango de valuación en USD y ARS con método profesional." },
-  { icon: "🏪", t: "Publicá 100 días", d: "Tu empresa aparece en el Marketplace de NexoNegocios." },
-  { icon: "📣", t: "Difundí y vendé", d: "Compartí tu flyer y recibí consultas directas de compradores." },
+  { Icon: IconCargar, t: "Cargá tu negocio", d: "Respondé en criollo: ventas, costos, activos. Sin tecnicismos." },
+  { Icon: IconValor, t: "Obtené tu valor", d: "Calculamos un rango de valuación en USD y ARS con método profesional." },
+  { Icon: IconPublicar, t: "Publicá 100 días", d: "Tu empresa aparece en el Marketplace de NexoNegocios." },
+  { Icon: IconDifundir, t: "Difundí y vendé", d: "Compartí tu flyer y recibí consultas directas de compradores." },
 ];
 
 const INCLUYE = [
@@ -27,21 +29,7 @@ const INCLUYE = [
 export default function LandingPage() {
   return (
     <main>
-      <header className="border-b border-nexo-border bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2 text-lg">
-            <Logo />
-            <span className="rounded bg-nexo-accent/10 px-1.5 py-0.5 text-xs font-semibold text-nexo-greenDark">Directo</span>
-          </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            <Link href="/marketplace" className="text-slate-600 hover:text-nexo">Marketplace</Link>
-            <Link href="/panel" className="text-slate-600 hover:text-nexo">Mi panel</Link>
-            <Link href="/valuar" className="rounded-lg bg-nexo px-4 py-2 font-medium text-white hover:bg-nexo-dark">
-              Valuá tu empresa
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-nexo-soft">
@@ -79,10 +67,13 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Tarjeta visual del hero */}
+          {/* Tarjeta visual del hero (ejemplo ilustrativo) */}
           <div className="relative hidden md:block">
-            <div className="rounded-2xl border border-nexo-border bg-white p-6 shadow-lg">
-              <div className="text-xs uppercase text-slate-400">Valor orientativo</div>
+            <div className="relative rounded-2xl border border-nexo-border bg-white p-6 shadow-lg">
+              <span className="absolute right-4 top-4 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                Ejemplo
+              </span>
+              <div className="text-xs uppercase text-slate-400">Así se ve tu resultado</div>
               <div className="mt-1 text-4xl font-extrabold text-nexo">USD 150.000</div>
               <div className="text-slate-500">Rango: USD 130.000 – 170.000</div>
               <div className="mt-4 h-2 w-full rounded-full" style={{ background: "linear-gradient(90deg,#EAF2FB,#45B649)" }} />
@@ -96,6 +87,9 @@ export default function LandingPage() {
                   <span key={c} className="rounded-full border border-nexo-border px-2.5 py-1 text-xs text-slate-600">✓ {c}</span>
                 ))}
               </div>
+              <p className="mt-4 border-t border-nexo-border pt-3 text-xs text-slate-400">
+                Ejemplo ilustrativo. Tu valuación real depende de los datos de tu negocio.
+              </p>
             </div>
           </div>
         </div>
@@ -108,7 +102,9 @@ export default function LandingPage() {
         <div className="mt-10 grid gap-6 md:grid-cols-4">
           {PASOS.map((s, i) => (
             <div key={s.t} className="relative rounded-xl border border-nexo-border bg-white p-6 transition hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-nexo-accent/12 text-2xl">{s.icon}</div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-nexo-accent/10 text-nexo-greenDark">
+                <s.Icon className="h-6 w-6" />
+              </div>
               <div className="mt-4 text-xs font-bold text-nexo-accent">PASO {i + 1}</div>
               <h3 className="mt-1 font-semibold text-slate-900">{s.t}</h3>
               <p className="mt-2 text-sm text-slate-600">{s.d}</p>
