@@ -16,6 +16,16 @@ const MIME_EXT: Record<string, string> = {
 const EXT_MIME: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" };
 const PREFIX = "uploads";
 
+/** Detecta el tipo real por los magic bytes (no confía en el MIME del cliente). */
+function sniffMime(buf: Buffer): string | null {
+  if (buf.length < 12) return null;
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "image/jpeg";
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return "image/png";
+  // WEBP: "RIFF"...."WEBP"
+  if (buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WEBP") return "image/webp";
+  return null;
+}
+
 function s3Habilitado(): boolean {
   return !!(process.env.S3_ENDPOINT && process.env.S3_BUCKET && process.env.S3_ACCESS_KEY && process.env.S3_SECRET_KEY);
 }
@@ -37,10 +47,12 @@ function s3(): S3Client {
 }
 
 /** Guarda una imagen y devuelve la URL servible. */
-export async function guardarImagen(buf: Buffer, mime: string): Promise<string> {
-  const ext = MIME_EXT[mime];
-  if (!ext) throw new Error("Formato no soportado. Usá JPG, PNG o WebP.");
+export async function guardarImagen(buf: Buffer, _mimeCliente: string): Promise<string> {
   if (buf.length > MAX_BYTES) throw new Error("La imagen supera 5 MB.");
+  // Validar por contenido real, no por el MIME declarado por el cliente (falsificable).
+  const mime = sniffMime(buf);
+  const ext = mime ? MIME_EXT[mime] : undefined;
+  if (!mime || !ext) throw new Error("Formato no soportado. Usá JPG, PNG o WebP.");
   const name = `${randomUUID()}.${ext}`;
 
   if (s3Habilitado()) {

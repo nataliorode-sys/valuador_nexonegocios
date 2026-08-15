@@ -20,6 +20,7 @@ export default function Wizard({ valuacionId, initialData, guardarPaso, calcular
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
+  const [calcError, setCalcError] = useState("");
   const [pending, startTransition] = useTransition();
 
   const step = STEPS[stepIndex]!;
@@ -53,8 +54,15 @@ export default function Wizard({ valuacionId, initialData, guardarPaso, calcular
     }
     await persistir();
     if (esUltimo) {
-      startTransition(() => {
-        void calcular(valuacionId, data);
+      setCalcError("");
+      startTransition(async () => {
+        try {
+          await calcular(valuacionId, data);
+        } catch (e) {
+          // El redirect exitoso de la server action no cae acá; solo errores reales.
+          if (e && typeof e === "object" && "digest" in e && String((e as { digest?: string }).digest).startsWith("NEXT_REDIRECT")) return;
+          setCalcError("No pudimos calcular tu valuación. Tus datos están guardados; reintentá en unos segundos.");
+        }
       });
     } else {
       setStepIndex((i) => i + 1);
@@ -128,6 +136,12 @@ export default function Wizard({ valuacionId, initialData, guardarPaso, calcular
               </div>
             ))}
           </dl>
+        </div>
+      )}
+
+      {calcError && (
+        <div className="mt-6 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {calcError}
         </div>
       )}
 

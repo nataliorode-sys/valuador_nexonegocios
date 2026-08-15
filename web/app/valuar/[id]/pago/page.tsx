@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { assertOwner } from "@/lib/access";
-import { mpHabilitado } from "@/lib/mercadopago";
+import { mpHabilitado, mockPagoPermitido } from "@/lib/mercadopago";
 import { iniciarPagoMP, pagarMock } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,7 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
   if (!valuacion) notFound();
 
   const mp = mpHabilitado();
+  const mock = mockPagoPermitido();
   const pagarMercadoPago = iniciarPagoMP.bind(null, id);
   const pagar = pagarMock.bind(null, id);
 
@@ -61,7 +62,7 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
             </form>
             <p className="mt-2 text-center text-xs text-slate-400">Vas a ir al checkout seguro de Mercado Pago.</p>
           </>
-        ) : (
+        ) : mock ? (
           <>
             <form action={pagar} className="mt-6">
               <button type="submit" className="w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
@@ -72,6 +73,12 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
               Modo desarrollo: pago simulado. Configurá MP_ACCESS_TOKEN para cobrar con Mercado Pago.
             </p>
           </>
+        ) : (
+          // Producción sin MP configurado: fail-closed. Nunca ofrecer el mock.
+          <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
+            El pago no está disponible en este momento. Por favor, intentá de nuevo más tarde o
+            escribinos para ayudarte.
+          </div>
         )}
         </div>
       </div>

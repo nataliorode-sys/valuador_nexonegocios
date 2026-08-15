@@ -10,8 +10,9 @@ const DAY = 86_400_000;
 function autorizado(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
-  const url = new URL(req.url);
-  return req.headers.get("x-cron-secret") === secret || url.searchParams.get("secret") === secret;
+  // Solo por header (nunca por query string, que se filtra en logs/proxies).
+  const header = req.headers.get("x-cron-secret") || req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  return header === secret;
 }
 
 export async function GET(req: Request) {

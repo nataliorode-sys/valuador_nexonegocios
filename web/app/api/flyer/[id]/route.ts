@@ -1,6 +1,6 @@
 // Captura el flyer (pagina HTML) a PNG con Chromium. ?f=story|post
 import { prisma } from "@/lib/prisma";
-import { resolveChromium, internalOrigin } from "@/lib/chromium";
+import { resolveChromium, internalOrigin, adquirirSlotChromium, CHROMIUM_ARGS } from "@/lib/chromium";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -18,10 +18,11 @@ export async function GET(
   const W = 1080;
   const H = formato === "story" ? 1920 : 1080;
 
+  const liberarSlot = await adquirirSlotChromium();
   try {
     const { chromium } = await import("playwright-core");
     const executablePath = resolveChromium();
-    const browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
+    const browser = await chromium.launch({ headless: true, args: CHROMIUM_ARGS, ...(executablePath ? { executablePath } : {}) });
     try {
       const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
       await page.goto(url, { waitUntil: "networkidle", timeout: 30_000 });
@@ -38,7 +39,9 @@ export async function GET(
       await browser.close();
     }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Error generando el flyer";
-    return new Response(msg, { status: 500 });
+    console.error("[flyer] error generando flyer", id, err);
+    return new Response("No se pudo generar el flyer. Reintentá en unos segundos.", { status: 500 });
+  } finally {
+    liberarSlot();
   }
 }

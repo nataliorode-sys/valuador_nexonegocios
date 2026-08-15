@@ -2,6 +2,28 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
+// Argumentos de launch seguros para contenedores (evita crash por /dev/shm chico).
+export const CHROMIUM_ARGS = ["--disable-dev-shm-usage", "--no-sandbox"];
+
+// Semáforo de concurrencia: limita cuántos Chromium corren a la vez para no agotar
+// la memoria del contenedor (cada navegador consume mucho).
+const MAX = Number(process.env.CHROMIUM_MAX || "2");
+let activos = 0;
+const cola: Array<() => void> = [];
+
+/** Adquiere un slot; devuelve la función para liberarlo (llamar en finally). */
+export async function adquirirSlotChromium(): Promise<() => void> {
+  if (activos >= MAX) await new Promise<void>((resolve) => cola.push(resolve));
+  activos++;
+  let liberado = false;
+  return () => {
+    if (liberado) return;
+    liberado = true;
+    activos--;
+    cola.shift()?.();
+  };
+}
+
 /**
  * Origen interno para que Chromium (mismo contenedor) acceda a la app por HTTP
  * plano, sin pasar por el proxy público (evita ERR_SSL_PROTOCOL_ERROR).

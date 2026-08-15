@@ -71,6 +71,7 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
     create: {
       valuacionId,
       codigo: val.codigo,
+      estadoPub: "PAUSADA", // no pública hasta que moderación la apruebe
       titulo: data.titulo,
       descripcion: data.descripcion,
       precioPublicacion: data.precioUsd,

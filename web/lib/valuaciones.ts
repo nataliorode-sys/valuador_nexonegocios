@@ -22,13 +22,30 @@ const PRECIO_ARS = 150_000; // precio final (IVA incluido)
 const IVA_ARS = Math.round(150_000 - 150_000 / 1.21); // IVA contenido
 
 /** Marca la valuación como pagada (idempotente). Usada por webhook/retorno/mock. */
-export async function marcarPagada(valuacionId: string, externalId: string, proveedor = "mercadopago"): Promise<void> {
+export async function marcarPagada(
+  valuacionId: string,
+  externalId: string,
+  proveedor = "mercadopago",
+  montoArs: number = PRECIO_ARS,
+): Promise<void> {
+  const [pagoActual, val] = await Promise.all([
+    prisma.pago.findUnique({ where: { valuacionId }, select: { estado: true } }),
+    prisma.valuacion.findUnique({ where: { id: valuacionId }, select: { estado: true } }),
+  ]);
+
+  // No revertir un reembolso ya realizado ante un reenvío tardío del webhook.
+  if (pagoActual?.estado === "REEMBOLSADO") return;
+
   await prisma.pago.upsert({
     where: { valuacionId },
-    create: { valuacionId, proveedor, estado: "APROBADO", montoArs: PRECIO_ARS, ivaArs: IVA_ARS, externalId },
-    update: { estado: "APROBADO", externalId, proveedor },
+    create: { valuacionId, proveedor, estado: "APROBADO", montoArs, ivaArs: IVA_ARS, externalId },
+    update: { estado: "APROBADO", externalId, proveedor, montoArs },
   });
-  await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PAGA" } });
+
+  // Solo avanzar el estado si aún no fue procesada; nunca revertir PUBLICADA/EN_REVISION/etc.
+  if (!val || val.estado === "BORRADOR" || val.estado === "CALCULADA") {
+    await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PAGA" } });
+  }
 }
 
 /**

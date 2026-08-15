@@ -25,6 +25,7 @@ export default async function MarketplacePage({
   const where: Prisma.PublicacionWhereInput = {
     estadoPub: "PUBLICADA",
     fechaVencimiento: { gt: new Date() },
+    valuacion: { estado: "PUBLICADA" }, // solo aprobadas por moderación
   };
   if (sp.familia) where.familia = sp.familia;
   if (sp.provincia) where.provincia = sp.provincia;

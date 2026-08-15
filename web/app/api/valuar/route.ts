@@ -1,16 +1,17 @@
-// Endpoint de calculo: ejecuta el motor de valuacion.
-// Prueba de integracion web <-> @nexodirecto/engine.
-// (En la version final validara la sesion y persistira ResultadoCalculo.)
+// Endpoint de cálculo directo del motor. Requiere sesión (evita abuso de CPU).
 import { NextResponse } from "next/server";
 import { valuar, type EngineInput } from "@nexodirecto/engine";
+import { getUserId } from "@/lib/session";
 
 export async function POST(req: Request) {
+  const uid = await getUserId();
+  if (!uid) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   try {
     const input = (await req.json()) as EngineInput;
     const resultado = valuar(input);
     return NextResponse.json(resultado);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Error de calculo";
-    return NextResponse.json({ error: msg }, { status: 400 });
+    console.error("[api/valuar] error", err);
+    return NextResponse.json({ error: "No se pudo calcular." }, { status: 400 });
   }
 }

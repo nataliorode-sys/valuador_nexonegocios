@@ -41,7 +41,11 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
     where: { codigo },
     include: { valuacion: { include: { perfil: true } } },
   });
-  if (!p || p.estadoPub !== "PUBLICADA") notFound();
+  // La autoridad de moderación es valuacion.estado (solo "aprobar" la pone PUBLICADA).
+  // Exigimos además vigencia. Esto impide ver por URL directa publicaciones en armado,
+  // en revisión, rechazadas o vencidas.
+  const vigente = !!p?.fechaVencimiento && p.fechaVencimiento > new Date();
+  if (!p || p.estadoPub !== "PUBLICADA" || p.valuacion?.estado !== "PUBLICADA" || !vigente) notFound();
 
   // Contador de vistas (best-effort)
   await prisma.publicacion.update({ where: { id: p.id }, data: { vistas: { increment: 1 } } });

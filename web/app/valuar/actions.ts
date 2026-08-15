@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/session";
 import { assertOwner } from "@/lib/access";
 import { crearValuacion, marcarPagada } from "@/lib/valuaciones";
-import { crearPreferencia } from "@/lib/mercadopago";
+import { crearPreferencia, mockPagoPermitido } from "@/lib/mercadopago";
 import { baseUrl as siteBaseUrl } from "@/lib/seo";
 import { obtenerTcRef } from "@/lib/tc";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
@@ -161,6 +161,9 @@ export async function iniciarPagoMP(valuacionId: string): Promise<void> {
  * Marca el pago aprobado y desbloquea el resultado.
  */
 export async function pagarMock(valuacionId: string): Promise<void> {
+  // Gate de servidor: el pago simulado NUNCA debe poder invocarse en producción,
+  // aunque la UI oculte el botón (la server action es invocable por POST directo).
+  if (!mockPagoPermitido()) throw new Error("El pago simulado no está disponible.");
   await assertOwner(valuacionId);
   await marcarPagada(valuacionId, `mock-${valuacionId.slice(0, 8)}`, "mock");
   redirect(`/valuar/${valuacionId}/completo`);

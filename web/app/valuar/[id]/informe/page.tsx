@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { assertOwner } from "@/lib/access";
+import { verificarTokenInterno } from "@/lib/internalToken";
 import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
 import PrintButton from "@/components/PrintButton";
@@ -21,8 +23,19 @@ const LBL_ANIO: Record<string, string> = { normal: "Sí, fue normal", mejor: "Fu
 const LBL_TEND: Record<string, string> = { crece: "Va a crecer", estable: "Se mantiene", baja: "Va a bajar" };
 const LBL_DEP: Record<string, string> = { baja: "Sigue igual", media: "Se complica un poco", alta: "Depende mucho del dueño" };
 
-export default async function InformePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function InformePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ t?: string }>;
+}) {
   const { id } = await params;
+  const { t } = await searchParams;
+  // Acceso: o bien el render interno de Chromium con token efímero válido, o el dueño con sesión.
+  if (!(t && verificarTokenInterno(id, t))) {
+    await assertOwner(id); // lanza notFound() si no es el dueño
+  }
   const val = await prisma.valuacion.findUnique({ where: { id }, include: { resultado: true, perfil: true } });
   if (!val || !val.resultado) notFound();
   if (val.estado === "CALCULADA" || val.estado === "BORRADOR") redirect(`/valuar/${id}/resultado`);

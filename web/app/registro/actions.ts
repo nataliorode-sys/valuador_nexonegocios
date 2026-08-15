@@ -5,12 +5,16 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/auth";
 import { consumirPendiente } from "@/lib/valuaciones";
+import { permitir, clientIp } from "@/lib/rateLimit";
 
 export async function registrar(_prev: string | undefined, formData: FormData): Promise<string | undefined> {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const email = String(formData.get("email") ?? "").toLowerCase().trim();
   const password = String(formData.get("password") ?? "");
   const password2 = String(formData.get("password2") ?? "");
+
+  const ip = await clientIp();
+  if (!permitir(`registro:${ip}`, 6, 60 * 60_000)) return "Demasiados intentos. Probá de nuevo más tarde.";
 
   if (!email || !password) return "Completá email y contraseña.";
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return "El email no es válido.";

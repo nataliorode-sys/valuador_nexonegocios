@@ -4,6 +4,28 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { notificarModeracion } from "@/lib/notificaciones";
+import { reembolsarPago } from "@/lib/mercadopago";
+
+/**
+ * Reintegra el pago del vendedor. Para pagos reales de MP ejecuta el refund vía API
+ * y solo marca REEMBOLSADO si MP confirma; para pagos mock marca el estado local.
+ * Devuelve true si quedó reembolsado, false si el refund real falló (queda APROBADO).
+ */
+async function reembolsar(valuacionId: string): Promise<boolean> {
+  const pago = await prisma.pago.findUnique({ where: { valuacionId } });
+  if (!pago || pago.estado !== "APROBADO") return true; // nada que reintegrar
+  const esReal = pago.proveedor === "mercadopago" && !!pago.externalId && !pago.externalId.startsWith("mock-");
+  if (esReal) {
+    try {
+      await reembolsarPago(pago.externalId as string);
+    } catch (e) {
+      console.error("[refund] MP no confirmó el reembolso", valuacionId, e);
+      return false; // dejar APROBADO para reintento manual, no mentir con REEMBOLSADO
+    }
+  }
+  await prisma.pago.update({ where: { valuacionId }, data: { estado: "REEMBOLSADO" } });
+  return true;
+}
 
 const DIAS_PUBLICACION = 100;
 
@@ -51,9 +73,14 @@ export async function rechazarPublicacion(publicacionId: string, form: FormData)
   if (!pub) return;
 
   await prisma.valuacion.update({ where: { id: pub.valuacionId }, data: { estado: "RECHAZADA" } });
+  // Defensa en profundidad: sacar la publicación de estado público.
+  await prisma.publicacion.update({ where: { id: publicacionId }, data: { estadoPub: "PAUSADA" } });
   await prisma.moderacion.create({ data: { publicacionId, resultado: "RECHAZADA", motivo } });
-  // Reembolso (A2-D): evitar cliente insatisfecho.
-  await prisma.pago.updateMany({ where: { valuacionId: pub.valuacionId }, data: { estado: "REEMBOLSADO" } });
+  // Reembolso real (A2-D): reintegra en MP; si falla, queda APROBADO para reintento manual.
+  const reembolsado = await reembolsar(pub.valuacionId);
   await notificarModeracion(pub.valuacionId, false, motivo).catch(() => {});
   revalidatePath("/admin/moderacion");
+  if (!reembolsado) {
+    console.error("[moderacion] Publicación rechazada pero el reembolso falló:", pub.valuacionId);
+  }
 }

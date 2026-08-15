@@ -1,7 +1,9 @@
 // Genera el informe PDF renderizando la pagina HTML del informe con Chromium.
 // Requiere un navegador Chromium disponible (executablePath). Ver docs/05 §5.1.
 import { prisma } from "@/lib/prisma";
-import { resolveChromium, internalOrigin } from "@/lib/chromium";
+import { resolveChromium, internalOrigin, adquirirSlotChromium, CHROMIUM_ARGS } from "@/lib/chromium";
+import { assertOwner } from "@/lib/access";
+import { firmarTokenInterno } from "@/lib/internalToken";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -11,18 +13,22 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  await assertOwner(id); // solo el dueño puede descargar su informe
   const val = await prisma.valuacion.findUnique({ where: { id }, select: { codigo: true, estado: true } });
   if (!val) return new Response("No encontrado", { status: 404 });
   if (val.estado === "BORRADOR" || val.estado === "CALCULADA") {
     return new Response("El informe no está disponible hasta completar el pago.", { status: 402 });
   }
 
-  const url = `${internalOrigin()}/valuar/${id}/informe`;
+  // Chromium abre la página interna sin cookie: la autorizamos con un token efímero firmado.
+  const token = firmarTokenInterno(id);
+  const url = `${internalOrigin()}/valuar/${id}/informe?t=${token}`;
 
+  const liberarSlot = await adquirirSlotChromium();
   try {
     const { chromium } = await import("playwright-core");
     const executablePath = resolveChromium();
-    const browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
+    const browser = await chromium.launch({ headless: true, args: CHROMIUM_ARGS, ...(executablePath ? { executablePath } : {}) });
     try {
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: "networkidle", timeout: 30_000 });
@@ -41,10 +47,12 @@ export async function GET(
       await browser.close();
     }
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Error generando PDF";
+    console.error("[informe-pdf] error generando PDF", id, err);
     return new Response(
-      `No se pudo generar el PDF automáticamente (${msg}). Usá "Imprimir / Guardar PDF" desde el informe.`,
+      'No se pudo generar el PDF automáticamente. Usá "Imprimir / Guardar PDF" desde el informe.',
       { status: 500 },
     );
+  } finally {
+    liberarSlot();
   }
 }

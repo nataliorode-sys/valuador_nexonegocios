@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { assertOwner } from "@/lib/access";
 import { marcarPagada } from "@/lib/valuaciones";
-import { obtenerEstadoPago } from "@/lib/mercadopago";
+import { obtenerEstadoPago, pagoMontoValido } from "@/lib/mercadopago";
 
 export const dynamic = "force-dynamic";
 
@@ -30,8 +30,8 @@ export default async function RetornoPage({
   if (paymentId) {
     try {
       const estado = await obtenerEstadoPago(paymentId);
-      if (estado.aprobado && estado.externalReference === id) {
-        await marcarPagada(id, estado.externalId, "mercadopago");
+      if (estado.aprobado && estado.externalReference === id && pagoMontoValido(estado)) {
+        await marcarPagada(id, estado.externalId, "mercadopago", estado.montoPagado ?? undefined);
         redirect(`/valuar/${id}/completo`);
       }
     } catch {
