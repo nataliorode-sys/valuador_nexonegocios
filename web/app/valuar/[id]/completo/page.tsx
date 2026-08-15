@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
 import { assertOwner } from "@/lib/access";
+import FunnelHeader from "@/components/FunnelHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -37,10 +38,12 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
   const flags = r.flags as unknown as Flags;
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10">
-      <div className="flex items-center justify-between">
+    <>
+      <FunnelHeader />
+      <main className="mx-auto max-w-3xl px-6 py-10">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="text-sm text-slate-500">Informe {val.codigo}</div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link href={`/valuar/${id}`} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:text-nexo">
             Ajustar respuestas
           </Link>
@@ -148,7 +151,8 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
         Orientación basada en información provista por el propietario, no verificada. No constituye
         tasación ni asesoramiento. La decisión del precio de venta es del propietario.
       </p>
-    </main>
+      </main>
+    </>
   );
 }
 

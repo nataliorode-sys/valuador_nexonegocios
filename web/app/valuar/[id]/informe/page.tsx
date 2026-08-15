@@ -70,7 +70,7 @@ export default async function InformePage({
   };
 
   return (
-    <div className="mx-auto max-w-[820px] bg-white px-10 py-8 text-slate-800 print:px-0 print:py-0">
+    <div className="mx-auto max-w-[820px] bg-white px-4 py-8 text-slate-800 sm:px-10 print:px-0 print:py-0">
       <style>{`@media print { .no-print{display:none} @page{margin:15mm} .pb{page-break-before:always} } h2{color:#0B1C2E}`}</style>
 
       <div className="no-print mb-6 flex justify-between">
@@ -193,7 +193,7 @@ export default async function InformePage({
       <section className="mt-6 pb">
         <h2 className="text-lg font-bold">5. Cómo llegamos al valor</h2>
         <p className="mt-2 text-sm text-slate-600">{analisis.metodoTexto}</p>
-        <div className="mt-3 grid grid-cols-2 gap-4">
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             {(() => {
               const data = [
@@ -230,16 +230,18 @@ export default async function InformePage({
             por lo que va a generar en el futuro).
           </p>
           <div className="mt-3"><BarChart data={dcfData} height={130} /><BarLegend data={dcfData} /></div>
-          <table className="mt-3 w-full text-xs">
-            <thead><tr className="border-b text-left text-slate-500"><th className="py-1">Año</th><th>Ventas</th><th>EBITDA</th><th>Flujo</th><th>Valor presente</th></tr></thead>
-            <tbody>
-              {dcf.map((f) => (
-                <tr key={f.anio} className="border-b border-slate-100">
-                  <td className="py-1">{f.anio}</td><td>{u(f.ventas)}</td><td>{u(f.ebitda)}</td><td>{u(f.fcf)}</td><td>{u(f.vp)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full min-w-[440px] text-xs">
+              <thead><tr className="border-b text-left text-slate-500"><th className="py-1">Año</th><th>Ventas</th><th>EBITDA</th><th>Flujo</th><th>Valor presente</th></tr></thead>
+              <tbody>
+                {dcf.map((f) => (
+                  <tr key={f.anio} className="border-b border-slate-100">
+                    <td className="py-1">{f.anio}</td><td>{u(f.ventas)}</td><td>{u(f.ebitda)}</td><td>{u(f.fcf)}</td><td>{u(f.vp)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
@@ -257,7 +259,7 @@ export default async function InformePage({
       {/* 7. Análisis NexoNegocios */}
       <section className="mt-6 pb">
         <h2 className="text-lg font-bold">8. Nuestro análisis</h2>
-        <div className="mt-3 grid grid-cols-2 gap-4">
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
             <div className="text-sm font-semibold text-emerald-800">Fortalezas</div>
             <ul className="mt-2 space-y-1 text-xs text-emerald-900">

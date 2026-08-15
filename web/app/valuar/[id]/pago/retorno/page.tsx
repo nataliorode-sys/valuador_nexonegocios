@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { assertOwner } from "@/lib/access";
+import AutoRefresh from "@/components/AutoRefresh";
 import { marcarPagada } from "@/lib/valuaciones";
 import { obtenerEstadoPago, pagoMontoValido } from "@/lib/mercadopago";
 
@@ -42,12 +43,13 @@ export default async function RetornoPage({
   const status = sp.status ?? sp.collection_status;
   return (
     <main className="mx-auto max-w-lg px-6 py-16 text-center">
+      <AutoRefresh seconds={6} />
       <div className="text-4xl">⏳</div>
       <h1 className="mt-4 text-2xl font-bold text-nexo">Estamos confirmando tu pago</h1>
       <p className="mt-2 text-slate-600">
         {status === "pending"
-          ? "Tu pago quedó pendiente de acreditación. Te avisamos cuando se confirme."
-          : "Si ya pagaste, puede tardar unos segundos en acreditarse. Actualizá esta página en un momento."}
+          ? "Tu pago quedó pendiente de acreditación. Te avisamos por email y en tu panel cuando se confirme."
+          : "Si ya pagaste, puede tardar unos segundos en acreditarse. Esta página se actualiza sola; también te avisamos por email y en tu panel."}
       </p>
       <div className="mt-6 flex justify-center gap-3">
         <Link href={`/valuar/${id}/pago/retorno`} className="rounded-lg bg-nexo px-5 py-2.5 font-semibold text-white hover:bg-nexo-dark">

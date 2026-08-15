@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { assertOwner } from "@/lib/access";
 import { mpHabilitado, mockPagoPermitido } from "@/lib/mercadopago";
+import FunnelHeader from "@/components/FunnelHeader";
 import { iniciarPagoMP, pagarMock } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,9 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
   ];
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-12">
+    <>
+      <FunnelHeader />
+      <main className="mx-auto max-w-lg px-6 py-12">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-nexo">Desbloqueá tu valuación completa</h1>
         <p className="mt-2 text-slate-600">Un solo pago. Todo lo que necesitás para poner tu empresa en venta.</p>
@@ -86,10 +89,14 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
       <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-slate-400">
         <LockIcon /> Pago protegido · sin cargos ocultos
       </div>
+      <div className="mx-auto mt-3 max-w-sm rounded-lg bg-emerald-50 px-4 py-2 text-center text-xs text-emerald-800">
+        <strong>Garantía:</strong> si no aprobamos tu publicación, te devolvemos el pago.
+      </div>
       <div className="mt-3 text-center text-sm">
         <Link href={`/valuar/${id}/resultado`} className="text-slate-500 hover:text-nexo">← Volver</Link>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { fmtUSD } from "@/lib/formato";
-import { FAMILIAS } from "@/lib/wizard/steps";
+import { FAMILIAS, PROVINCIAS } from "@/lib/wizard/steps";
 import { familiaLabel } from "@/lib/publicacion";
 import SiteHeader from "@/components/SiteHeader";
 import type { Prisma } from "@prisma/client";
@@ -52,8 +52,10 @@ export default async function MarketplacePage({
           <option value="">Todos los rubros</option>
           {FAMILIAS.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
         </select>
-        <input name="provincia" defaultValue={sp.provincia ?? ""} placeholder="Provincia"
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+        <select name="provincia" defaultValue={sp.provincia ?? ""} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          <option value="">Todas las provincias</option>
+          {PROVINCIAS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+        </select>
         <input name="precioMax" type="number" defaultValue={sp.precioMax ?? ""} placeholder="Precio máx (USD)"
           className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
         <button className="rounded-lg bg-nexo px-4 py-2 text-sm font-medium text-white">Filtrar</button>

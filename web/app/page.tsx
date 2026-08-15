@@ -63,12 +63,12 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="mt-4 text-sm text-slate-500">
-              Servicio NexoDirecto · <span className="font-semibold text-nexo">$150.000</span> (precio final)
+              Servicio NexoDirecto · <span className="font-semibold text-nexo">$150.000 ARS</span> (precio final)
             </p>
           </div>
 
           {/* Tarjeta visual del hero (ejemplo ilustrativo) */}
-          <div className="relative hidden md:block">
+          <div className="relative">
             <div className="relative rounded-2xl border border-nexo-border bg-white p-6 shadow-lg">
               <span className="absolute right-4 top-4 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">
                 Ejemplo

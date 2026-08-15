@@ -1,0 +1,42 @@
+name: Backup diario de la base
+
+# Respaldo independiente del Postgres a Cloudflare R2 (además del backup nativo de Railway).
+# Requiere estos Secrets en el repo (Settings → Secrets and variables → Actions):
+#   DATABASE_URL     → connection string PÚBLICA del Postgres de Railway
+#   S3_ENDPOINT      → https://<accountid>.r2.cloudflarestorage.com
+#   S3_BUCKET        → nexodirecto
+#   S3_ACCESS_KEY    → Access Key de R2
+#   S3_SECRET_KEY    → Secret Key de R2
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # 06:00 UTC ≈ 03:00 AR, todos los días
+  workflow_dispatch: {} # permite dispararlo a mano desde la pestaña Actions
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    container: postgres:16 # garantiza pg_dump 16 (>= versión del servidor)
+    steps:
+      - name: Generar dump comprimido
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          STAMP=$(date +%Y%m%d-%H%M%S)
+          echo "FILE=backup-${STAMP}.sql.gz" >> "$GITHUB_ENV"
+          pg_dump "$DATABASE_URL" | gzip > "backup-${STAMP}.sql.gz"
+          ls -lh "backup-${STAMP}.sql.gz"
+
+      - name: Subir a R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
+          AWS_DEFAULT_REGION: auto
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          set -euo pipefail
+          apt-get update -qq && apt-get install -y -qq awscli
+          aws s3 cp "$FILE" "s3://${S3_BUCKET}/backups/${FILE}" --endpoint-url "$S3_ENDPOINT"
+          echo "✅ Backup subido a R2: backups/${FILE}"

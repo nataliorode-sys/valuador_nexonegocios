@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { assertOwner } from "@/lib/access";
+import FunnelHeader from "@/components/FunnelHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,9 @@ export default async function TeaserPage({ params }: { params: Promise<{ id: str
   const perfil = valuacion.perfil?.datos as Record<string, unknown> | undefined;
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <>
+      <FunnelHeader />
+      <main className="mx-auto max-w-2xl px-6 py-12">
       <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
         <div className="text-4xl">✅</div>
         <h1 className="mt-4 text-2xl font-bold text-nexo">¡Tu valuación está lista!</h1>
@@ -55,7 +58,7 @@ export default async function TeaserPage({ params }: { params: Promise<{ id: str
         <div className="mt-8">
           <Link href={`/valuar/${id}/pago`}
             className="block w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
-            Desbloquear por $150.000
+            Desbloquear por $150.000 ARS
           </Link>
           <p className="mt-2 text-xs text-slate-400">Valor, informe PDF, publicación y flyer.</p>
         </div>
@@ -69,6 +72,7 @@ export default async function TeaserPage({ params }: { params: Promise<{ id: str
         Orientación basada en información provista por el propietario, no verificada. No constituye
         tasación ni asesoramiento.
       </p>
-    </main>
+      </main>
+    </>
   );
 }

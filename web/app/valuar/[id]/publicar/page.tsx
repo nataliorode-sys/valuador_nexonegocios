@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sugerirTitulo } from "@/lib/publicacion";
 import { assertOwner } from "@/lib/access";
 import PublicarForm from "@/components/publicar/PublicarForm";
+import FunnelHeader from "@/components/FunnelHeader";
 import { guardarPublicacion } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -26,6 +27,8 @@ export default async function PublicarPage({ params }: { params: Promise<{ id: s
   const verif = (pub?.datosVerificacion as { cuit?: string; googleUrl?: string; redesUrl?: string; webUrl?: string } | null) ?? null;
 
   return (
+    <>
+    <FunnelHeader />
     <PublicarForm
       valuacionId={id}
       guardar={guardarPublicacion}
@@ -47,5 +50,6 @@ export default async function PublicarPage({ params }: { params: Promise<{ id: s
       rangoMin={val.resultado.rangoMinUsd}
       rangoMax={val.resultado.rangoMaxUsd}
     />
+    </>
   );
 }
