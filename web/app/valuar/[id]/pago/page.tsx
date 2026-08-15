@@ -92,6 +92,11 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
       <div className="mx-auto mt-3 max-w-sm rounded-lg bg-emerald-50 px-4 py-2 text-center text-xs text-emerald-800">
         <strong>Garantía:</strong> si no aprobamos tu publicación, te devolvemos el pago.
       </div>
+      <p className="mx-auto mt-3 max-w-sm text-center text-[11px] leading-relaxed text-slate-400">
+        Al pagar aceptás los <Link href="/terminos" target="_blank" className="underline">Términos y Condiciones</Link>.
+        Tenés derecho de arrepentimiento por 10 días corridos (Ley 24.240). La valuación es orientativa y no
+        constituye una tasación ni asesoramiento.
+      </p>
       <div className="mt-3 text-center text-sm">
         <Link href={`/valuar/${id}/resultado`} className="text-slate-500 hover:text-nexo">← Volver</Link>
       </div>

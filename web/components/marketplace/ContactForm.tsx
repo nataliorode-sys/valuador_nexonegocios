@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { enviarContacto, type ContactoRevelado } from "@/app/empresa/[codigo]/actions";
 
 export default function ContactForm({ codigo }: { codigo: string }) {
-  const [d, setD] = useState({ nombre: "", email: "", telefono: "", mensaje: "" });
+  const [d, setD] = useState({ nombre: "", email: "", telefono: "", mensaje: "", consentimiento: false });
   const [revelado, setRevelado] = useState<ContactoRevelado | null>(null);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
@@ -14,6 +14,10 @@ export default function ContactForm({ codigo }: { codigo: string }) {
 
   const submit = () => {
     setError("");
+    if (!d.consentimiento) {
+      setError("Necesitamos tu consentimiento para compartir tus datos con el vendedor.");
+      return;
+    }
     start(async () => {
       const res = await enviarContacto(codigo, d);
       if ("error" in res) setError(res.error);
@@ -61,14 +65,18 @@ export default function ContactForm({ codigo }: { codigo: string }) {
           <label htmlFor="c-msg" className={lab}>Tu consulta</label>
           <textarea id="c-msg" className={inp} rows={3} value={d.mensaje} onChange={(e) => setD({ ...d, mensaje: e.target.value })} />
         </div>
+        <label className="flex items-start gap-2 text-[12px] text-slate-600">
+          <input type="checkbox" checked={d.consentimiento} onChange={(e) => setD({ ...d, consentimiento: e.target.checked })} className="mt-0.5" />
+          <span>
+            Acepto que mis datos se compartan con el vendedor para responder mi consulta, según la{" "}
+            <a href="/privacidad" target="_blank" rel="noopener" className="text-nexo underline">Política de Privacidad</a>.
+          </span>
+        </label>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button onClick={submit} disabled={pending}
           className="w-full rounded-lg bg-nexo px-6 py-2.5 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">
           {pending ? "Enviando…" : "Enviar consulta y ver contacto"}
         </button>
-        <p className="text-[11px] text-slate-400">
-          Al enviar, tus datos quedan registrados para el vendedor y verás su WhatsApp/email para contacto directo.
-        </p>
       </div>
     </div>
   );

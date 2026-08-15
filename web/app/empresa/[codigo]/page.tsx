@@ -7,6 +7,7 @@ import Gallery from "@/components/marketplace/Gallery";
 import SiteHeader from "@/components/SiteHeader";
 import { familiaLabel } from "@/lib/publicacion";
 import { fmtUSD } from "@/lib/formato";
+import { EMPRESA } from "@/lib/legal";
 
 export const dynamic = "force-dynamic";
 
@@ -179,7 +180,13 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
 
             <p className="mt-6 text-xs text-slate-400">
               La información comercial fue provista por el propietario. NexoNegocios verifica la existencia
-              del negocio, no sus números. No constituye una tasación ni asesoramiento.
+              del negocio, no sus números. No constituye una tasación ni asesoramiento.{" "}
+              <a
+                href={`mailto:${EMPRESA.email}?subject=Reporte%20de%20publicaci%C3%B3n%20${p.codigo}`}
+                className="underline hover:text-nexo"
+              >
+                Reportar esta publicación
+              </a>.
             </p>
           </div>
 

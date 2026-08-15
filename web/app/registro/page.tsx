@@ -29,6 +29,15 @@ export default function RegistroPage() {
           <label className="block text-sm font-medium text-slate-700">Repetí la contraseña</label>
           <input name="password2" type="password" required minLength={6} className={inp} placeholder="Volvé a escribir tu contraseña" />
         </div>
+        <label className="flex items-start gap-2 text-sm text-slate-600">
+          <input name="acepto" type="checkbox" required className="mt-1" />
+          <span>
+            Acepto los{" "}
+            <Link href="/terminos" target="_blank" className="text-nexo underline">Términos y Condiciones</Link>{" "}
+            y la{" "}
+            <Link href="/privacidad" target="_blank" className="text-nexo underline">Política de Privacidad</Link>.
+          </span>
+        </label>
         {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
         <button type="submit" disabled={pending}
           className="w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">

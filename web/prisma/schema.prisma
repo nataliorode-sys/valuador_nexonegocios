@@ -65,6 +65,8 @@ model User {
   nombre         String?
   telefono       String?
   emailVerificado Boolean     @default(false)
+  terminosAceptadosEn DateTime?
+  terminosVersion String?
   rol            Rol          @default(VENDEDOR)
   valuaciones    Valuacion[]
   createdAt      DateTime     @default(now())
@@ -241,6 +243,7 @@ model Lead {
   email         String?
   telefono      String?
   mensaje       String
+  consentimiento Boolean    @default(false)
   createdAt     DateTime    @default(now())
 
   @@index([publicacionId])

@@ -9,6 +9,7 @@ export interface ContactoInput {
   email: string;
   telefono: string;
   mensaje: string;
+  consentimiento: boolean;
 }
 
 export interface ContactoRevelado {
@@ -35,6 +36,9 @@ export async function enviarContacto(
   if (!pub || pub.estadoPub !== "PUBLICADA" || pub.valuacion?.estado !== "PUBLICADA" || !vigente) {
     return { error: "La publicación no está disponible." };
   }
+  if (!data.consentimiento) {
+    return { error: "Necesitamos tu consentimiento para compartir tus datos con el vendedor." };
+  }
   if (!data.nombre?.trim() || (!data.email?.trim() && !data.telefono?.trim())) {
     return { error: "Dejanos tu nombre y un dato de contacto." };
   }
@@ -44,6 +48,7 @@ export async function enviarContacto(
     email: data.email?.trim() || null,
     telefono: data.telefono?.trim() || null,
     mensaje: data.mensaje?.trim() || "",
+    consentimiento: true,
   };
   await prisma.lead.create({ data: { publicacionId: pub.id, ...lead } });
 

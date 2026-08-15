@@ -145,6 +145,11 @@ export default function LandingPage() {
             © NexoNegocios · NexoDirecto es una orientación basada en información provista por el
             propietario, no verificada. No constituye tasación ni asesoramiento.
           </p>
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <Link href="/terminos" className="text-slate-500 hover:text-nexo">Términos y Condiciones</Link>
+            <Link href="/privacidad" className="text-slate-500 hover:text-nexo">Política de Privacidad</Link>
+            <Link href="/marketplace" className="text-slate-500 hover:text-nexo">Empresas en venta</Link>
+          </div>
         </div>
       </footer>
     </main>

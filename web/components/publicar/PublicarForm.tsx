@@ -16,6 +16,8 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
   const [d, setD] = useState<PublicacionInput>(defaults);
   const [uploading, setUploading] = useState(false);
   const [fotoError, setFotoError] = useState("");
+  const [declara, setDeclara] = useState(false);
+  const [declaraError, setDeclaraError] = useState("");
   const [pending, start] = useTransition();
 
   const set = <K extends keyof PublicacionInput>(k: K, v: PublicacionInput[K]) =>
@@ -45,6 +47,11 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
   };
 
   const submit = () => {
+    if (!declara) {
+      setDeclaraError("Confirmá la declaración para continuar.");
+      return;
+    }
+    setDeclaraError("");
     start(() => void guardar(valuacionId, d));
   };
 
@@ -158,7 +165,16 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
         </fieldset>
       </div>
 
-      <div className="mt-8 flex justify-end">
+      <label className="mt-8 flex items-start gap-2 text-sm text-slate-600">
+        <input type="checkbox" checked={declara} onChange={(e) => setDeclara(e.target.checked)} className="mt-1" />
+        <span>
+          Declaro que la información y las fotos son veraces y que tengo derecho a publicarlas, y acepto los{" "}
+          <a href="/terminos" target="_blank" rel="noopener" className="text-nexo underline">Términos y Condiciones</a>.
+        </span>
+      </label>
+      {declaraError && <p className="mt-2 text-sm text-red-600">{declaraError}</p>}
+
+      <div className="mt-4 flex justify-end">
         <button onClick={submit} disabled={pending}
           className="rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">
           {pending ? "Guardando…" : "Ver vista previa →"}
