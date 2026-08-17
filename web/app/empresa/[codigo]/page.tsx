@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ContactForm from "@/components/marketplace/ContactForm";
 import Gallery from "@/components/marketplace/Gallery";
+import ReportForm from "@/components/marketplace/ReportForm";
 import SiteHeader from "@/components/SiteHeader";
 import JsonLd from "@/components/JsonLd";
 import { baseUrl } from "@/lib/seo";
 import { familiaLabel } from "@/lib/publicacion";
 import { fmtUSD } from "@/lib/formato";
-import { EMPRESA } from "@/lib/legal";
 
 export const dynamic = "force-dynamic";
 
@@ -197,14 +197,11 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
 
             <p className="mt-6 text-xs text-slate-400">
               La información comercial fue provista por el propietario. NexoNegocios verifica la existencia
-              del negocio, no sus números. No constituye una tasación ni asesoramiento.{" "}
-              <a
-                href={`mailto:${EMPRESA.email}?subject=Reporte%20de%20publicaci%C3%B3n%20${p.codigo}`}
-                className="underline hover:text-nexo"
-              >
-                Reportar esta publicación
-              </a>.
+              del negocio, no sus números. No constituye una tasación formal ni un informe pericial.
             </p>
+            <div className="mt-2">
+              <ReportForm codigo={p.codigo} />
+            </div>
           </div>
 
           {/* Columna de contacto (sticky en desktop) */}

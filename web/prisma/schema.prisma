@@ -220,12 +220,24 @@ model Publicacion {
 
   moderaciones     Moderacion[]
   leads            Lead[]
+  denuncias        Denuncia[]
 
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
   @@index([estadoPub])
   @@index([fechaVencimiento])
+}
+
+model Denuncia {
+  id            String      @id @default(uuid())
+  publicacion   Publicacion @relation(fields: [publicacionId], references: [id], onDelete: Cascade)
+  publicacionId String
+  motivo        String
+  email         String?
+  createdAt     DateTime    @default(now())
+
+  @@index([publicacionId])
 }
 
 model Flyer {

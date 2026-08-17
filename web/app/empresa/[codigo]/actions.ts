@@ -57,3 +57,22 @@ export async function enviarContacto(
 
   return { nombre: pub.contactoNombre, whatsapp: pub.contactoWhatsapp, email: pub.contactoEmail };
 }
+
+/** Denuncia de una publicación (comprador o tercero). Se ve en el panel de moderación. */
+export async function reportarPublicacion(
+  codigo: string,
+  motivo: string,
+  email: string,
+): Promise<{ ok: true } | { error: string }> {
+  const ip = await clientIp();
+  if (!permitir(`denuncia:${ip}`, 5, 30 * 60_000)) {
+    return { error: "Recibimos varios reportes desde tu conexión. Probá más tarde." };
+  }
+  if (!motivo?.trim() || motivo.trim().length < 5) return { error: "Contanos brevemente el motivo." };
+  const pub = await prisma.publicacion.findUnique({ where: { codigo }, select: { id: true } });
+  if (!pub) return { error: "La publicación no existe." };
+  await prisma.denuncia.create({
+    data: { publicacionId: pub.id, motivo: motivo.trim().slice(0, 1000), email: email?.trim() || null },
+  });
+  return { ok: true };
+}

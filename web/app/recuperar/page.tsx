@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
 import { pedirReset } from "./actions";
 
 export default function RecuperarPage() {
@@ -9,6 +10,8 @@ export default function RecuperarPage() {
   const inp = "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2";
 
   return (
+    <>
+    <SiteHeader />
     <main className="mx-auto max-w-md px-6 py-16">
       <h1 className="text-2xl font-bold text-nexo">¿Olvidaste tu contraseña?</h1>
       <p className="mt-1 text-slate-600">Dejanos tu email y te enviamos un enlace para crear una nueva.</p>
@@ -27,5 +30,6 @@ export default function RecuperarPage() {
         <Link href="/ingresar" className="text-nexo underline">Volver a ingresar</Link>
       </p>
     </main>
+    </>
   );
 }

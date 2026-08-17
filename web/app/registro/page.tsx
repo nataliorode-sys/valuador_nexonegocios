@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
 import { registrar } from "./actions";
 
 export default function RegistroPage() {
@@ -9,6 +10,8 @@ export default function RegistroPage() {
   const inp = "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2";
 
   return (
+    <>
+    <SiteHeader />
     <main className="mx-auto max-w-md px-6 py-16">
       <h1 className="text-2xl font-bold text-nexo">Creá tu cuenta</h1>
       <p className="mt-1 text-slate-600">Para guardar tu avance y gestionar tu publicación.</p>
@@ -48,5 +51,6 @@ export default function RegistroPage() {
         ¿Ya tenés cuenta? <Link href="/ingresar" className="text-nexo underline">Ingresá</Link>
       </p>
     </main>
+    </>
   );
 }

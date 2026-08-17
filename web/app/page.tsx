@@ -106,7 +106,7 @@ export default function LandingPage() {
       {/* Cómo funciona */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <h2 className="text-center text-2xl font-bold text-slate-900">¿Cómo funciona?</h2>
-        <p className="mt-2 text-center text-slate-500">En 4 pasos simples, desde tu compu.</p>
+        <p className="mt-2 text-center text-slate-500">En 4 pasos simples, desde tu computadora o celular.</p>
         <div className="mt-10 grid gap-6 md:grid-cols-4">
           {PASOS.map((s, i) => (
             <div key={s.t} className="relative rounded-xl border border-nexo-border bg-white p-6 transition hover:shadow-md">
@@ -130,18 +130,27 @@ export default function LandingPage() {
               <div className="text-sm font-bold text-nexo-accent">NEXODIRECTO</div>
               <h3 className="mt-2 text-xl font-bold text-nexo">Autogestión, contacto directo</h3>
               <p className="mt-3 text-slate-600">
-                Para negocios más chicos que quieren valuar y vender por su cuenta. Vos cargás la
-                información, nosotros te damos la orientación y las herramientas.
+                Para empresas de menor escala o estructura simple que buscan valuar y gestionar su
+                venta de forma directa. Vos cargás la información, nosotros te damos la orientación y
+                las herramientas.
               </p>
             </div>
-            <div className="rounded-xl border border-nexo-border bg-white p-8">
+            <a
+              href="https://nexonegocios.com.ar/vender-mi-empresa/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block rounded-xl border border-nexo-border bg-white p-8 transition hover:border-nexo hover:shadow-md"
+            >
               <div className="text-sm font-semibold text-slate-500">SERVICIO FULL</div>
               <h3 className="mt-2 text-xl font-bold text-nexo">Intermediación profesional</h3>
               <p className="mt-3 text-slate-600">
                 Para operaciones que necesitan acompañamiento: información verificada, un asesor
                 dedicado y gestión completa de la venta.
               </p>
-            </div>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-nexo group-hover:gap-2">
+                Conocer el Servicio Full →
+              </span>
+            </a>
           </div>
         </div>
       </section>

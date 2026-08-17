@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { use } from "react";
+import SiteHeader from "@/components/SiteHeader";
 import { restablecer } from "./actions";
 
 export default function RestablecerPage({
@@ -16,6 +17,8 @@ export default function RestablecerPage({
   const ok = msg === "OK";
 
   return (
+    <>
+    <SiteHeader />
     <main className="mx-auto max-w-md px-6 py-16">
       <h1 className="text-2xl font-bold text-nexo">Creá tu nueva contraseña</h1>
 
@@ -44,5 +47,6 @@ export default function RestablecerPage({
         </form>
       )}
     </main>
+    </>
   );
 }

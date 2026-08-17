@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
 import { ingresar } from "./actions";
 
 export default function IngresarPage() {
@@ -9,6 +10,8 @@ export default function IngresarPage() {
   const inp = "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2";
 
   return (
+    <>
+    <SiteHeader />
     <main className="mx-auto max-w-md px-6 py-16">
       <h1 className="text-2xl font-bold text-nexo">Ingresá</h1>
       <form action={action} className="mt-8 space-y-4">
@@ -33,5 +36,6 @@ export default function IngresarPage() {
         ¿No tenés cuenta? <Link href="/registro" className="text-nexo underline">Registrate</Link>
       </p>
     </main>
+    </>
   );
 }
