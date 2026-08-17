@@ -5,6 +5,9 @@ import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
 import { assertOwner } from "@/lib/access";
 import FunnelHeader from "@/components/FunnelHeader";
+import { simularPalancas } from "@nexodirecto/engine";
+import { toEngineInput } from "@/lib/wizard/toEngineInput";
+import type { FormData } from "@/lib/wizard/types";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +39,9 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
   const dcf = (r.tablaDcf as unknown as FilaDcf[] | null) ?? null;
   const drivers = (r.drivers as unknown as Driver[]) ?? [];
   const flags = r.flags as unknown as Flags;
+
+  const datos = (val.perfil?.datos ?? {}) as FormData & Record<string, unknown>;
+  const sim = simularPalancas(toEngineInput(datos, val.tcRef ?? 1200));
 
   return (
     <>
@@ -133,6 +139,29 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
         <section className="mt-6 rounded-xl border border-slate-100 p-5">
           <h3 className="text-sm font-semibold text-slate-700">Qué influye en tu valor</h3>
           <div className="mt-4"><DriversChart drivers={drivers} /></div>
+        </section>
+      )}
+
+      {/* Cómo aumentar el valor (simulador what-if) */}
+      {sim.palancas.length > 0 && (
+        <section className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50/50 p-5">
+          <h3 className="text-sm font-semibold text-emerald-900">Cuánto más podría valer tu empresa</h3>
+          <p className="mt-1 text-xs text-emerald-800">Impacto estimado de cada mejora, por separado (mismo método, cambiando una variable).</p>
+          <div className="mt-3 space-y-2">
+            {sim.palancas.map((p) => (
+              <div key={p.clave} className="flex items-center justify-between gap-4 rounded-lg bg-white px-4 py-2.5">
+                <div>
+                  <div className="text-sm font-medium text-slate-800">{p.titulo}</div>
+                  <div className="text-xs text-slate-500">{p.descripcion}</div>
+                </div>
+                <div className="whitespace-nowrap text-right text-emerald-700">
+                  <div className="text-sm font-bold">+{fmtUSD(p.delta)}</div>
+                  <div className="text-[10px]">llegaría a {fmtUSD(p.valorNuevo)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[10px] text-emerald-700">Estimaciones orientativas; no garantizan un resultado. El detalle está en tu informe PDF.</p>
         </section>
       )}
 

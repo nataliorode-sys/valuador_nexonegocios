@@ -6,7 +6,7 @@ import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
 import PrintButton from "@/components/PrintButton";
 import Logo from "@/components/Logo";
-import { desglosar } from "@nexodirecto/engine";
+import { desglosar, simularPalancas } from "@nexodirecto/engine";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import { interpretar } from "@/lib/interpretacion";
 import type { FormData } from "@/lib/wizard/types";
@@ -44,7 +44,9 @@ export default async function InformePage({
   const r = val.resultado;
   const datos = (val.perfil?.datos ?? {}) as FormData & Record<string, unknown>;
   const tcRef = val.tcRef ?? 1200;
-  const g = desglosar(toEngineInput(datos, tcRef));
+  const engineInput = toEngineInput(datos, tcRef);
+  const g = desglosar(engineInput);
+  const sim = simularPalancas(engineInput);
   const esc = r.escenarios as unknown as Escenarios;
   const dcf = (r.tablaDcf as unknown as FilaDcf[] | null) ?? null;
   const drivers = (r.drivers as unknown as Driver[]) ?? [];
@@ -285,7 +287,35 @@ export default async function InformePage({
       {/* 8. Recomendaciones */}
       <section className="mt-6">
         <h2 className="text-lg font-bold">9. Cómo aumentar el valor de tu empresa</h2>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-700">
+
+        {sim.palancas.length > 0 && (
+          <>
+            <p className="mt-2 text-sm text-slate-600">
+              Estimamos cuánto más podría valer tu empresa si trabajás sobre estas palancas
+              (calculado con el mismo método, cambiando una variable por vez):
+            </p>
+            <div className="mt-3 space-y-2">
+              {sim.palancas.map((p) => (
+                <div key={p.clave} className="flex items-center justify-between gap-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
+                  <div>
+                    <div className="text-sm font-semibold text-emerald-900">{p.titulo}</div>
+                    <div className="text-xs text-emerald-800">{p.descripcion}</div>
+                  </div>
+                  <div className="whitespace-nowrap text-right">
+                    <div className="text-sm font-bold text-emerald-700">+{u(p.delta)}</div>
+                    <div className="text-[10px] text-emerald-700">llegaría a {u(p.valorNuevo)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] text-slate-400">
+              Estimaciones orientativas: muestran el impacto potencial de cada mejora por separado, no garantizan un resultado.
+            </p>
+          </>
+        )}
+
+        <h3 className="mt-4 text-sm font-semibold text-slate-700">Además, te recomendamos</h3>
+        <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm text-slate-700">
           {analisis.recomendaciones.map((rc, i) => <li key={i}>{rc}</li>)}
         </ol>
       </section>

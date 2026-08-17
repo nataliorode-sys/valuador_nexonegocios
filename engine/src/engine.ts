@@ -58,6 +58,88 @@ export function desglosar(input: EngineInput, params: EngineParams = DEFAULT_PAR
   };
 }
 
+export interface Palanca {
+  clave: string;
+  titulo: string;
+  descripcion: string;
+  valorNuevo: number; // USD, valor central si se aplica la mejora
+  delta: number; // USD, cuánto sube vs. el valor base
+}
+
+/**
+ * Simulador "what-if": re-corre el motor aplicando mejoras concretas y devuelve
+ * cuánto subiría el valor con cada una. Solo incluye palancas que apliquen y sumen.
+ * Determinístico (se apoya en valuar()).
+ */
+export function simularPalancas(
+  input: EngineInput,
+  params: EngineParams = DEFAULT_PARAMS,
+): { base: number; palancas: Palanca[] } {
+  const base = valuar(input, params).valorCentralUSD;
+  const palancas: Palanca[] = [];
+
+  const empujar = (clave: string, titulo: string, descripcion: string, mod: EngineInput) => {
+    const valorNuevo = valuar(mod, params).valorCentralUSD;
+    const delta = valorNuevo - base;
+    if (delta > base * 0.01) palancas.push({ clave, titulo, descripcion, valorNuevo, delta });
+  };
+
+  // 1) Mejorar la rentabilidad 5 puntos (SDE +5% de las ventas, reduciendo costos).
+  {
+    const reduccion = 0.05 * input.ventasAnual;
+    let gastos = input.gastosFijosAnual;
+    let cogsMonto =
+      input.cogsModo === "monto"
+        ? input.cogsMonto ?? 0
+        : ((input.cogsPct ?? 0) / 100) * input.ventasAnual;
+    let resto = reduccion;
+    const dGastos = Math.min(gastos, resto);
+    gastos -= dGastos;
+    resto -= dGastos;
+    cogsMonto = Math.max(0, cogsMonto - resto);
+    empujar(
+      "margen",
+      "Mejorar tu rentabilidad 5 puntos",
+      "Si bajaras costos (o subieras precios) para ganar 5 puntos más de margen sobre las ventas.",
+      { ...input, gastosFijosAnual: gastos, cogsModo: "monto", cogsMonto },
+    );
+  }
+
+  // 2) Reducir la dependencia del dueño (un escalón).
+  if (input.dependenciaDueno === "alta" || input.dependenciaDueno === "media") {
+    const mejor = input.dependenciaDueno === "alta" ? "media" : "baja";
+    empujar(
+      "dependencia",
+      "Reducir la dependencia del dueño",
+      "Si delegaras tareas y documentaras procesos para que el negocio funcione sin vos.",
+      { ...input, dependenciaDueno: mejor },
+    );
+  }
+
+  // 3) Sumar ingresos recurrentes.
+  if (input.recurrencia !== true) {
+    empujar(
+      "recurrencia",
+      "Sumar ingresos recurrentes",
+      "Si incorporaras abonos, contratos o clientes que vuelven, para tener ingresos previsibles.",
+      { ...input, recurrencia: true },
+    );
+  }
+
+  // 4) Diversificar clientes (si hay mucha concentración).
+  if ((input.concentracionClientePct ?? 0) > 30) {
+    empujar(
+      "concentracion",
+      "Diversificar tu cartera de clientes",
+      "Si tu cliente más grande pesara menos del 30% de las ventas, bajaría el riesgo para el comprador.",
+      { ...input, concentracionClientePct: 25 },
+    );
+  }
+
+  palancas.sort((a, b) => b.delta - a.delta);
+  return { base, palancas };
+}
+
 export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS): EngineResult {
   const n = normalize(input);
   const e = computeEarnings(n);

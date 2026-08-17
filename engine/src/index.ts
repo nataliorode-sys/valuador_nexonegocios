@@ -3,7 +3,7 @@
  * Motor de valuacion de NexoDirecto (NexoNegocios).
  * Punto de entrada publico.
  */
-export { valuar, desglosar, type Desglose } from "./engine.js";
+export { valuar, desglosar, simularPalancas, type Desglose, type Palanca } from "./engine.js";
 export { DEFAULT_PARAMS } from "./params.js";
 export { annualize } from "./util.js";
 export type {
