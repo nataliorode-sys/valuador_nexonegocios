@@ -14,12 +14,12 @@ export default function PrivacidadPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl font-bold text-nexo">Política de Privacidad</h1>
-        <p className="mt-1 text-sm text-slate-500">Vigencia: {EMPRESA.vigenciaDesde} · Versión {VERSION_LEGAL}</p>
+        <h1 className="text-base font-semibold text-slate-500">Política de Privacidad</h1>
+        <p className="mt-0.5 text-[10px] text-slate-400">Vigencia: {EMPRESA.vigenciaDesde} · Versión {VERSION_LEGAL}</p>
 
-        <div className="mt-6 space-y-6 text-sm leading-relaxed text-slate-700">
+        <div className="mt-3 space-y-2 text-[11px] leading-snug text-slate-400 [&_a]:text-slate-500 [&_a]:underline">
           <section>
-            <h2 className="text-lg font-bold text-nexo">1. Responsable de la base de datos</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">1. Responsable de la base de datos</h2>
             <p>
               {EMPRESA.razonSocial} (CUIT {EMPRESA.cuit}), domicilio {EMPRESA.domicilio}, es responsable del
               tratamiento de los datos personales recolectados a través de {EMPRESA.producto}. Consultas sobre
@@ -28,8 +28,8 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-nexo">2. Qué datos recolectamos</h2>
-            <ul className="ml-5 list-disc space-y-1">
+            <h2 className="text-[11px] font-semibold text-slate-500">2. Qué datos recolectamos</h2>
+            <ul className="ml-4 list-disc space-y-0.5">
               <li><strong>De la cuenta:</strong> nombre, email y contraseña (almacenada cifrada).</li>
               <li><strong>Del negocio:</strong> datos económicos y operativos que cargás para la valuación.</li>
               <li><strong>De la publicación:</strong> descripción, fotos, datos de contacto y de verificación
@@ -40,7 +40,7 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-nexo">3. Para qué los usamos (finalidad)</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">3. Para qué los usamos (finalidad)</h2>
             <p>
               Para prestar el servicio de valuación y publicación, gestionar tu cuenta y el pago, moderar
               publicaciones, poner en contacto a compradores y vendedores, y cumplir obligaciones legales.
@@ -49,7 +49,7 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-nexo">4. Cesión y proveedores</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">4. Cesión y proveedores</h2>
             <p>
               Cuando enviás una consulta a un vendedor, <strong>tus datos de contacto se comparten con ese
               vendedor</strong> con la finalidad de que pueda responderte. Utilizamos proveedores que procesan
@@ -60,7 +60,7 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-nexo">5. Conservación</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">5. Conservación</h2>
             <p>
               Conservamos los datos mientras exista la relación y durante los plazos legales aplicables; luego
               se eliminan o anonimizan.
@@ -68,7 +68,7 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-nexo">6. Tus derechos (ARCO)</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">6. Tus derechos (ARCO)</h2>
             <p>
               Podés solicitar el <strong>acceso, rectificación, actualización y supresión</strong> de tus datos
               escribiendo a {EMPRESA.email}. La AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, órgano de control de
@@ -78,7 +78,7 @@ export default function PrivacidadPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-nexo">7. Seguridad</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">7. Seguridad</h2>
             <p>
               Aplicamos medidas técnicas y organizativas razonables para proteger tus datos. Ningún sistema es
               100% infalible; te pedimos cuidar tu contraseña.

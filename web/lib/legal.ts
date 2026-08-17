@@ -8,12 +8,12 @@
 export const EMPRESA = {
   nombreFantasia: "NexoNegocios",
   producto: "NexoDirecto",
-  razonSocial: "[COMPLETAR: razón social]",
-  cuit: "[COMPLETAR: CUIT]",
-  domicilio: "[COMPLETAR: domicilio legal]",
-  email: "contacto@nexonegocios.com.ar", // [CONFIRMAR: email de contacto/atención al consumidor]
+  razonSocial: "NEXO NEGOCIOS SAS",
+  cuit: "30-71935898-1",
+  domicilio: "Armenia 2319 2C, C.A.B.A.",
+  email: "contacto@nexonegocios.com.ar",
   sitioWeb: "https://www.nexonegocios.com.ar",
-  jurisdiccion: "[COMPLETAR: p. ej. los tribunales ordinarios de la Ciudad de Córdoba]",
+  jurisdiccion: "los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires",
   vigenciaDesde: "agosto de 2026",
 } as const;
 
