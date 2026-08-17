@@ -16,7 +16,7 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    container: postgres:16 # garantiza pg_dump 16 (>= versión del servidor)
+    container: postgres:18 # pg_dump debe ser >= versión del servidor (Railway usa PG 18)
     steps:
       - name: Generar dump comprimido
         env:
