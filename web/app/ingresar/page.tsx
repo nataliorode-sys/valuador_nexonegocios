@@ -26,6 +26,9 @@ export default function IngresarPage() {
           {pending ? "Ingresando…" : "Ingresar"}
         </button>
       </form>
+      <p className="mt-3 text-center text-sm">
+        <Link href="/recuperar" className="text-slate-500 hover:text-nexo">¿Olvidaste tu contraseña?</Link>
+      </p>
       <p className="mt-4 text-center text-sm text-slate-500">
         ¿No tenés cuenta? <Link href="/registro" className="text-nexo underline">Registrate</Link>
       </p>

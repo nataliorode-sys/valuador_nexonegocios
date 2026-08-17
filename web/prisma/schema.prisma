@@ -67,6 +67,8 @@ model User {
   emailVerificado Boolean     @default(false)
   terminosAceptadosEn DateTime?
   terminosVersion String?
+  resetTokenHash String?
+  resetTokenExp  DateTime?
   rol            Rol          @default(VENDEDOR)
   valuaciones    Valuacion[]
   createdAt      DateTime     @default(now())

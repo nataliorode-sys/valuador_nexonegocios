@@ -1,6 +1,7 @@
 // Utilidades de dominio para valuaciones (funciones normales, no server actions).
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { notificarPagoAprobado } from "@/lib/notificaciones";
 import type { FormData } from "@/lib/wizard/types";
 
 /** Crea la valuación + su perfil inicial. */
@@ -45,6 +46,8 @@ export async function marcarPagada(
   // Solo avanzar el estado si aún no fue procesada; nunca revertir PUBLICADA/EN_REVISION/etc.
   if (!val || val.estado === "BORRADOR" || val.estado === "CALCULADA") {
     await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PAGA" } });
+    // Comprobante por email (solo en la transición real a PAGA → no se duplica con webhook+retorno).
+    await notificarPagoAprobado(valuacionId).catch(() => {});
   }
 }
 
