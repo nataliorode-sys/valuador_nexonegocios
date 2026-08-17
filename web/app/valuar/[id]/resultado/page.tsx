@@ -55,12 +55,26 @@ export default async function TeaserPage({ params }: { params: Promise<{ id: str
           </ul>
         </div>
 
-        <div className="mt-8">
+        <ul className="mt-6 space-y-2 text-left text-sm">
+          {[
+            "El valor de tu empresa en USD y ARS, con 3 escenarios",
+            "Informe profesional en PDF: tus números, cómo se llega al valor y cómo mejorarlo",
+            "Publicación 100 días en el Marketplace de NexoNegocios",
+            "Flyer listo para difundir por WhatsApp y redes",
+          ].map((b) => (
+            <li key={b} className="flex items-start gap-2">
+              <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 flex-none text-nexo-accent" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
+              <span className="text-slate-700">{b}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-6">
           <Link href={`/valuar/${id}/pago`}
             className="block w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
             Desbloquear por $150.000 ARS
           </Link>
-          <p className="mt-2 text-xs text-slate-400">Valor, informe PDF, publicación y flyer.</p>
+          <p className="mt-2 text-xs text-slate-400">Pago único · precio final.</p>
         </div>
 
         <div className="mt-6 text-sm">

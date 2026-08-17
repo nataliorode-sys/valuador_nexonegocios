@@ -13,7 +13,7 @@ function Check() {
 }
 
 const PASOS = [
-  { Icon: IconCargar, t: "Cargá tu negocio", d: "Respondé en criollo: ventas, costos, activos. Sin tecnicismos." },
+  { Icon: IconCargar, t: "Cargá tu negocio", d: "Respondé simple: ventas, costos, activos. Sin tecnicismos." },
   { Icon: IconValor, t: "Obtené tu valor", d: "Calculamos un rango de valuación en USD y ARS con método profesional." },
   { Icon: IconPublicar, t: "Publicá 100 días", d: "Tu empresa aparece en el Marketplace de NexoNegocios." },
   { Icon: IconDifundir, t: "Difundí y vendé", d: "Compartí tu flyer y recibí consultas directas de compradores." },
@@ -62,9 +62,6 @@ export default function LandingPage() {
                 Ver empresas en venta
               </Link>
             </div>
-            <p className="mt-4 text-sm text-slate-500">
-              Servicio NexoDirecto · <span className="font-semibold text-nexo">$150.000 ARS</span> (precio final)
-            </p>
           </div>
 
           {/* Tarjeta visual del hero (ejemplo ilustrativo) */}

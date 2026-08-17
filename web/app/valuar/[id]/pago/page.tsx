@@ -21,10 +21,10 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
   const pagar = pagarMock.bind(null, id);
 
   const incluye = [
-    { t: "Valor orientativo y rango", d: "En USD y ARS, con escenarios." },
-    { t: "Informe profesional en PDF", d: "Análisis completo, listo para compartir." },
+    { t: "Valor orientativo y rango", d: "En USD y ARS, con 3 escenarios y precisión estimada." },
+    { t: "Informe profesional en PDF", d: "Desglose de tus números, cómo se llega al valor y recomendaciones para mejorarlo." },
     { t: "Publicación 100 días en el Marketplace", d: "Te encuentran compradores reales." },
-    { t: "Flyer para difundir", d: "Para redes y WhatsApp." },
+    { t: "Flyer para difundir", d: "Listo para compartir por WhatsApp y redes." },
   ];
 
   return (
@@ -95,7 +95,7 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
       <p className="mx-auto mt-3 max-w-sm text-center text-[11px] leading-relaxed text-slate-400">
         Al pagar aceptás los <Link href="/terminos" target="_blank" className="underline">Términos y Condiciones</Link>.
         Tenés derecho de arrepentimiento por 10 días corridos (Ley 24.240). La valuación es orientativa y no
-        constituye una tasación ni asesoramiento.
+        constituye una tasación formal ni un informe pericial.
       </p>
       <div className="mt-3 text-center text-sm">
         <Link href={`/valuar/${id}/resultado`} className="text-slate-500 hover:text-nexo">← Volver</Link>

@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { iniciarValuacion } from "./actions";
 import { FAMILIAS } from "@/lib/wizard/steps";
+import SiteHeader from "@/components/SiteHeader";
 
 // S5 — Elegibilidad. Al enviar, crea la valuacion y entra al wizard.
 export default function ElegibilidadPage() {
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-2xl px-6 py-12">
       <Link href="/" className="text-sm text-slate-500 hover:text-nexo">← Volver</Link>
       <h1 className="mt-4 text-3xl font-bold text-nexo">Empecemos por lo básico</h1>
       <p className="mt-2 text-slate-600">
@@ -62,6 +65,7 @@ export default function ElegibilidadPage() {
           Continuar
         </button>
       </form>
-    </main>
+      </main>
+    </>
   );
 }
