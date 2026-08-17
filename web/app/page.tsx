@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import SiteHeader from "@/components/SiteHeader";
+import JsonLd from "@/components/JsonLd";
 import { IconCargar, IconValor, IconPublicar, IconDifundir } from "@/components/StepIcons";
+import { baseUrl } from "@/lib/seo";
 
 function Check() {
   return (
@@ -27,8 +29,17 @@ const INCLUYE = [
 ];
 
 export default function LandingPage() {
+  const base = baseUrl();
   return (
     <main>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "NexoNegocios",
+        url: base,
+        logo: `${base}/icon.svg`,
+        description: "Valuación de empresas y marketplace de negocios en venta en Argentina.",
+      }} />
       <SiteHeader />
 
       {/* Hero */}

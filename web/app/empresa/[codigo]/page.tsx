@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import ContactForm from "@/components/marketplace/ContactForm";
 import Gallery from "@/components/marketplace/Gallery";
 import SiteHeader from "@/components/SiteHeader";
+import JsonLd from "@/components/JsonLd";
+import { baseUrl } from "@/lib/seo";
 import { familiaLabel } from "@/lib/publicacion";
 import { fmtUSD } from "@/lib/formato";
 import { EMPRESA } from "@/lib/legal";
@@ -70,6 +72,21 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
 
   return (
     <>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: p.titulo,
+        description: p.descripcion?.slice(0, 300),
+        category: familiaLabel(p.familia),
+        ...(p.fotos?.[0] ? { image: p.fotos[0] } : {}),
+        offers: {
+          "@type": "Offer",
+          price: Math.round(p.precioPublicacion),
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: `${baseUrl()}/empresa/${codigo}`,
+        },
+      }} />
       <SiteHeader />
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <Link href="/marketplace" className="text-sm text-slate-500 hover:text-nexo">← Volver a empresas en venta</Link>
