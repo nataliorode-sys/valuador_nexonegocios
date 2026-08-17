@@ -22,6 +22,7 @@ const u = (v: number) => fmtUSD(Math.round(v));
 const LBL_ANIO: Record<string, string> = { normal: "Sí, fue normal", mejor: "Fue mejor de lo normal", peor: "Fue peor de lo normal" };
 const LBL_TEND: Record<string, string> = { crece: "Va a crecer", estable: "Se mantiene", baja: "Va a bajar" };
 const LBL_DEP: Record<string, string> = { baja: "Sigue igual", media: "Se complica un poco", alta: "Depende mucho del dueño" };
+const LBL_CLIENTE: Record<string, string> = { consumidor: "Consumidor final (B2C)", empresas: "Otras empresas (B2B)", mixto: "Mixto" };
 
 export default async function InformePage({
   params,
@@ -137,6 +138,7 @@ export default async function InformePage({
             <TR k={datos.ventasCargaModo === "promedio" ? "Ventas de un mes típico" : "Ventas de los últimos 12 meses"}
               v={datos.ventasCargaModo === "promedio" ? money(datos.ventasProm) + " /mes" : money(datos.ventasAnual)} />
             <TR k="¿El último año fue normal?" v={LBL_ANIO[String(datos.anioRepresentativo ?? "")] ?? "—"} />
+            {datos.tipoCliente ? <TR k="Le vende a" v={LBL_CLIENTE[String(datos.tipoCliente)] ?? "—"} /> : null}
             {datos.concentracionClientePct != null && datos.concentracionClientePct !== "" &&
               <TR k="Ventas del cliente más grande" v={`${Number(datos.concentracionClientePct)}%`} />}
           </tbody>
@@ -161,6 +163,9 @@ export default async function InformePage({
               <TR k="Crecimiento esperado por año" v={`${Number(datos.crecimientoPct)}% (real)`} />}
             <TR k="Si el dueño se va…" v={LBL_DEP[String(datos.dependenciaDueno ?? "")] ?? "—"} />
             <TR k="¿Tiene ventas recurrentes?" v={datos.recurrencia === true ? "Sí" : "No"} />
+            {datos.requiereInversion === true && (
+              <TR k="Inversión necesaria próx. año" v={Number(datos.inversionMonto) > 0 ? money(datos.inversionMonto) : "Sí"} />
+            )}
           </tbody>
         </table>
       </section>
