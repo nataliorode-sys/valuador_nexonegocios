@@ -2,7 +2,7 @@
 // Requiere un navegador Chromium disponible (executablePath). Ver docs/05 §5.1.
 import { prisma } from "@/lib/prisma";
 import { resolveChromium, internalOrigin, adquirirSlotChromium, CHROMIUM_ARGS } from "@/lib/chromium";
-import { assertOwner } from "@/lib/access";
+import { assertOwnerOrAdmin } from "@/lib/access";
 import { firmarTokenInterno } from "@/lib/internalToken";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +13,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  await assertOwner(id); // solo el dueño puede descargar su informe
+  const { admin } = await assertOwnerOrAdmin(id); // el dueño o un moderador (admin)
   const val = await prisma.valuacion.findUnique({ where: { id }, select: { codigo: true, estado: true } });
   if (!val) return new Response("No encontrado", { status: 404 });
-  if (val.estado === "BORRADOR" || val.estado === "CALCULADA") {
+  // Gate de pago para el dueño; el moderador puede inspeccionar aunque no esté paga.
+  if ((val.estado === "BORRADOR" || val.estado === "CALCULADA") && !admin) {
     return new Response("El informe no está disponible hasta completar el pago.", { status: 402 });
   }
 

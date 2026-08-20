@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { assertOwner } from "@/lib/access";
+import { assertOwnerOrAdmin } from "@/lib/access";
 import { verificarTokenInterno } from "@/lib/internalToken";
 import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
@@ -33,13 +33,16 @@ export default async function InformePage({
 }) {
   const { id } = await params;
   const { t } = await searchParams;
-  // Acceso: o bien el render interno de Chromium con token efímero válido, o el dueño con sesión.
-  if (!(t && verificarTokenInterno(id, t))) {
-    await assertOwner(id); // lanza notFound() si no es el dueño
+  // Acceso: o bien el render interno de Chromium con token efímero válido, o el dueño/admin con sesión.
+  let admin = false;
+  const viaInterno = !!(t && verificarTokenInterno(id, t));
+  if (!viaInterno) {
+    ({ admin } = await assertOwnerOrAdmin(id)); // lanza notFound() si no es dueño ni admin
   }
   const val = await prisma.valuacion.findUnique({ where: { id }, include: { resultado: true, perfil: true } });
   if (!val || !val.resultado) notFound();
-  if (val.estado === "CALCULADA" || val.estado === "BORRADOR") redirect(`/valuar/${id}/resultado`);
+  // El gate de pago aplica al dueño; el moderador (admin) —o el render interno del PDF— puede inspeccionar aunque no esté paga.
+  if ((val.estado === "CALCULADA" || val.estado === "BORRADOR") && !admin && !viaInterno) redirect(`/valuar/${id}/resultado`);
 
   const r = val.resultado;
   const datos = (val.perfil?.datos ?? {}) as FormData & Record<string, unknown>;

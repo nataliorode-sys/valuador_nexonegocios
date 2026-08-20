@@ -141,14 +141,14 @@ export default function LandingPage() {
               rel="noopener noreferrer"
               className="group block rounded-xl border border-nexo-border bg-white p-8 transition hover:border-nexo hover:shadow-md"
             >
-              <div className="text-sm font-semibold text-slate-500">SERVICIO FULL</div>
-              <h3 className="mt-2 text-xl font-bold text-nexo">Intermediación profesional</h3>
+              <div className="text-sm font-semibold text-slate-500">INTERMEDIACIÓN PROFESIONAL</div>
+              <h3 className="mt-2 text-xl font-bold text-nexo">Con asesor dedicado y gestión completa</h3>
               <p className="mt-3 text-slate-600">
                 Para operaciones que necesitan acompañamiento: información verificada, un asesor
                 dedicado y gestión completa de la venta.
               </p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-nexo group-hover:gap-2">
-                Conocer el Servicio Full →
+                Conocer la Intermediación Profesional →
               </span>
             </a>
           </div>

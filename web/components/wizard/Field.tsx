@@ -45,8 +45,9 @@ export default function Field({ field, data, error, onChange }: Props) {
           <input type="number" name={field.id} inputMode="decimal" value={value === undefined ? "" : (value as number)}
             placeholder={field.ejemplo} min={field.min} max={field.max}
             onChange={(e) => onChange(field.id, e.target.value === "" ? undefined : Number(e.target.value))}
-            className={inputClass} />
-          {field.type === "percent" && <span className="absolute right-3 top-2.5 text-slate-400">%</span>}
+            className={inputClass + (field.type === "percent" ? " pr-12" : "")} />
+          {/* pointer-events-none: el % no debe tapar las flechitas del spinner (si no, el clic para subir/bajar no funciona). */}
+          {field.type === "percent" && <span className="pointer-events-none absolute right-8 top-2.5 text-slate-400">%</span>}
         </div>
       )}
 

@@ -328,12 +328,12 @@ function construirDrivers(
   noRentable: boolean,
 ): Driver[] {
   const etiquetas: Record<string, string> = {
-    tamanio: "Tamanio de la empresa",
+    tamanio: "Tamaño de la empresa",
     crecimiento: "Perspectiva de crecimiento",
-    dependencia_dueno: "Dependencia del duenio",
+    dependencia_dueno: "Dependencia del dueño",
     recurrencia: "Ingresos recurrentes",
-    concentracion_clientes: "Concentracion de clientes",
-    antiguedad: "Antiguedad del negocio",
+    concentracion_clientes: "Concentración de clientes",
+    antiguedad: "Antigüedad del negocio",
     margen_vs_rubro: "Margen vs. el rubro",
   };
   const drivers: Driver[] = ajustes
@@ -346,7 +346,7 @@ function construirDrivers(
         " el valor (" +
         (a.delta > 0 ? "+" : "") +
         Math.round(a.delta * 100) +
-        "% sobre el multiplo)",
+        "% sobre el múltiplo)",
     }));
   if (noRentable) {
     drivers.unshift({
@@ -358,7 +358,7 @@ function construirDrivers(
     drivers.push({
       factor: "Activos del negocio",
       efecto: "neutro",
-      detalle: "Rubro intensivo en activos: los bienes pesan en la valuacion.",
+      detalle: "Rubro intensivo en activos: los bienes pesan en la valuación.",
     });
   }
   return drivers;

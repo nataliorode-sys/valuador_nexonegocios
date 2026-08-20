@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Ficha from "@/components/marketplace/Ficha";
 import { requireAdmin } from "@/lib/session";
+import { fmtUSD } from "@/lib/formato";
 import { signOut } from "@/auth";
 import { aprobarPublicacion, rechazarPublicacion } from "./actions";
 
@@ -12,9 +13,23 @@ const ESTADO_LABEL: Record<string, { t: string; c: string }> = {
   EN_REVISION: { t: "En revisión", c: "bg-amber-100 text-amber-800" },
   RECHAZADA: { t: "Rechazada", c: "bg-red-100 text-red-700" },
   PAGA: { t: "Pagada", c: "bg-slate-100 text-slate-600" },
-  PUBLICACION_EN_ARMADO: { t: "Armando", c: "bg-slate-100 text-slate-600" },
+  PUBLICACION_EN_ARMADO: { t: "Armando publicación", c: "bg-indigo-100 text-indigo-700" },
+  CALCULADA: { t: "Valuación calculada (sin pagar)", c: "bg-sky-100 text-sky-700" },
+  BORRADOR: { t: "En carga del formulario", c: "bg-slate-100 text-slate-500" },
 };
 const DAY = 86_400_000;
+
+// Links al informe (respuestas + resultados) para el moderador. Solo si ya hay
+// resultado calculado; el admin puede abrirlo aunque la valuación no esté paga.
+function InformeLinks({ id, hasResultado }: { id: string; hasResultado: boolean }) {
+  if (!hasResultado) return <span className="text-xs text-slate-300">sin cálculo aún</span>;
+  return (
+    <span className="flex items-center justify-end gap-3 text-xs">
+      <Link href={`/valuar/${id}/informe`} target="_blank" className="text-nexo underline">Ver informe</Link>
+      <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className="text-slate-500 underline">PDF</a>
+    </span>
+  );
+}
 
 // A1 — Cola de moderación + tablero de publicaciones. Solo ADMIN.
 export default async function ModeracionPage() {
@@ -23,6 +38,19 @@ export default async function ModeracionPage() {
     where: { estado: "EN_REVISION" },
     include: { publicacion: true },
     orderBy: { updatedAt: "asc" },
+  });
+
+  // Valuaciones en proceso: cargando el formulario o ya calculadas/pagas pero
+  // que todavía no llegaron a la cola de revisión ni se publicaron.
+  const enProceso = await prisma.valuacion.findMany({
+    where: { estado: { in: ["BORRADOR", "CALCULADA", "PAGA", "PUBLICACION_EN_ARMADO"] } },
+    include: {
+      user: { select: { email: true, nombre: true } },
+      resultado: { select: { valorCentralUsd: true } },
+      perfil: { select: { familia: true, provincia: true, localidad: true } },
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 100,
   });
 
   // Tablero: todas las publicaciones que llegaron a armarse, con métricas.
@@ -62,7 +90,10 @@ export default async function ModeracionPage() {
           const provistos = [verif.cuit, verif.googleUrl, verif.redesUrl, verif.webUrl].filter(Boolean).length;
           return (
             <div key={v.id} className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="text-xs text-slate-400">{p.codigo}</div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-xs text-slate-400">{p.codigo}</div>
+                <InformeLinks id={v.id} hasResultado />
+              </div>
               <Ficha p={p} />
 
               {/* Datos de verificación provistos por el dueño */}
@@ -115,6 +146,57 @@ export default async function ModeracionPage() {
         })}
       </div>
 
+      {/* Valuaciones en proceso (funnel, aún no publicadas ni en revisión) */}
+      <h2 className="mt-12 text-xl font-bold text-nexo">Valuaciones en proceso</h2>
+      <p className="mt-1 text-sm text-slate-500">
+        {enProceso.length} en curso · en carga del formulario, calculadas o pagas sin llegar a revisión.
+      </p>
+
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
+        <table className="w-full min-w-[820px] text-sm">
+          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <tr>
+              <th className="px-3 py-2">Valuación</th>
+              <th className="px-3 py-2">Usuario</th>
+              <th className="px-3 py-2">Estado</th>
+              <th className="px-3 py-2 text-right">Valor central</th>
+              <th className="px-3 py-2">Actualizada</th>
+              <th className="px-3 py-2 text-right">Informe</th>
+            </tr>
+          </thead>
+          <tbody>
+            {enProceso.map((v) => {
+              const est = ESTADO_LABEL[v.estado] ?? { t: v.estado, c: "bg-slate-100 text-slate-600" };
+              const rubro = v.perfil?.familia ?? "—";
+              const ubic = [v.perfil?.localidad, v.perfil?.provincia].filter(Boolean).join(", ");
+              return (
+                <tr key={v.id} className="border-t border-slate-100">
+                  <td className="px-3 py-2">
+                    <div className="font-medium text-slate-800">{rubro}{ubic ? ` · ${ubic}` : ""}</div>
+                    <div className="text-xs text-slate-400">{v.codigo}</div>
+                  </td>
+                  <td className="px-3 py-2 text-slate-600">
+                    <div>{v.user?.nombre ?? "—"}</div>
+                    <div className="text-xs text-slate-400">{v.user?.email}</div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <span className={"rounded-full px-2 py-0.5 text-xs font-medium " + est.c}>{est.t}</span>
+                  </td>
+                  <td className="px-3 py-2 text-right tabular-nums text-slate-700">
+                    {v.resultado ? fmtUSD(v.resultado.valorCentralUsd) : "—"}
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-500">{v.updatedAt.toLocaleDateString("es-AR")}</td>
+                  <td className="px-3 py-2 text-right"><InformeLinks id={v.id} hasResultado={!!v.resultado} /></td>
+                </tr>
+              );
+            })}
+            {enProceso.length === 0 && (
+              <tr><td colSpan={6} className="px-3 py-8 text-center text-slate-400">No hay valuaciones en proceso.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
       {/* Tablero de publicaciones */}
       <h2 className="mt-12 text-xl font-bold text-nexo">Todas las publicaciones</h2>
       <p className="mt-1 text-sm text-slate-500">{publicaciones.length} en total · estado y métricas de cada una.</p>
@@ -160,9 +242,12 @@ export default async function ModeracionPage() {
                     {p._count.denuncias}
                   </td>
                   <td className="px-3 py-2 text-right">
-                    {publicada && (
-                      <Link href={`/empresa/${p.codigo}`} className="text-xs text-nexo underline">Ver</Link>
-                    )}
+                    <div className="flex items-center justify-end gap-3">
+                      {publicada && (
+                        <Link href={`/empresa/${p.codigo}`} className="text-xs text-nexo underline">Ver</Link>
+                      )}
+                      <InformeLinks id={p.valuacionId} hasResultado />
+                    </div>
                   </td>
                 </tr>
               );
