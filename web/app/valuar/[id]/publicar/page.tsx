@@ -18,8 +18,6 @@ export default async function PublicarPage({ params }: { params: Promise<{ id: s
   });
   if (!val || !val.perfil || !val.resultado) notFound();
   if (val.estado === "BORRADOR" || val.estado === "CALCULADA") redirect(`/valuar/${id}/resultado`);
-  // Rechazada = alta inicial rechazada y reembolsada: no se re-edita (requeriría volver a contratar).
-  if (val.estado === "RECHAZADA") redirect(`/panel/${id}`);
 
   const datos = (val.perfil.datos ?? {}) as Record<string, unknown>;
   const anioInicio = Number(datos.anioInicio ?? 0);

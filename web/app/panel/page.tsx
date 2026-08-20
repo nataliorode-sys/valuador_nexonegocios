@@ -121,6 +121,7 @@ function Accion({ v }: { v: { id: string; estado: string; publicacion: { codigo:
       return (
         <>
           <span className="text-slate-400">Esperando aprobación…</span>
+          <Link href={`/valuar/${id}/publicar`} className={btnSoft}>Editar publicación</Link>
           <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
         </>
       );
@@ -128,6 +129,7 @@ function Accion({ v }: { v: { id: string; estado: string; publicacion: { codigo:
       return (
         <>
           <Link href={`/empresa/${v.publicacion?.codigo}`} className={btn}>Ver publicación</Link>
+          <Link href={`/valuar/${id}/publicar`} className={btnSoft}>Editar publicación</Link>
           <Link href={`/panel/${id}`} className={btnSoft}>Ver consultas</Link>
           <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
           <a href={`/api/flyer/${id}?f=story`} target="_blank" rel="noopener" className={btnSoft}>Flyer story</a>
