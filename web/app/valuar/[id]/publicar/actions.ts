@@ -43,7 +43,7 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
   await assertOwner(valuacionId);
   const val = await prisma.valuacion.findUnique({
     where: { id: valuacionId },
-    include: { perfil: true, resultado: true },
+    include: { perfil: true, resultado: true, publicacion: { select: { fechaPublicacion: true } } },
   });
   if (!val || !val.perfil || !val.resultado) redirect("/");
 
@@ -103,8 +103,19 @@ export async function guardarPublicacion(valuacionId: string, data: PublicacionI
       contactoWhatsapp: data.contactoWhatsapp || null,
       contactoEmail: data.contactoEmail || null,
       datosVerificacion: verificacion,
+      // El contenido editado no vuelve a estar público hasta que moderación lo re-apruebe.
+      estadoPub: "PAUSADA",
     },
   });
+
+  // Si la publicación ya estuvo online alguna vez, esto es una EDICIÓN: vuelve directo
+  // a la cola de moderación (Opción A: se oculta hasta re-aprobar). Si nunca se publicó,
+  // sigue el flujo normal de armado inicial (vista previa → enviar a revisión).
+  const yaPublicada = !!val.publicacion?.fechaPublicacion;
+  if (yaPublicada) {
+    await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "EN_REVISION" } });
+    redirect(`/panel/${valuacionId}?revision=1`);
+  }
 
   await prisma.valuacion.update({ where: { id: valuacionId }, data: { estado: "PUBLICACION_EN_ARMADO" } });
   redirect(`/valuar/${valuacionId}/publicacion`);

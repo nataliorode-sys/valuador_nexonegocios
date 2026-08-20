@@ -10,9 +10,11 @@ interface Props {
   defaults: PublicacionInput & { fotos: string[] };
   rangoMin: number;
   rangoMax: number;
+  /** true cuando se edita una publicación ya moderada: al guardar vuelve directo a revisión. */
+  modoEdicion?: boolean;
 }
 
-export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin, rangoMax }: Props) {
+export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin, rangoMax, modoEdicion }: Props) {
   const [d, setD] = useState<PublicacionInput>(defaults);
   const [uploading, setUploading] = useState(false);
   const [fotoError, setFotoError] = useState("");
@@ -174,10 +176,15 @@ export default function PublicarForm({ valuacionId, guardar, defaults, rangoMin,
       </label>
       {declaraError && <p className="mt-2 text-sm text-red-600">{declaraError}</p>}
 
+      {modoEdicion && (
+        <p className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          Al guardar, tus cambios pasan por moderación y tu publicación no se mostrará en el listado hasta que se aprueben.
+        </p>
+      )}
       <div className="mt-4 flex justify-end">
         <button onClick={submit} disabled={pending}
           className="rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">
-          {pending ? "Guardando…" : "Ver vista previa →"}
+          {pending ? "Guardando…" : modoEdicion ? "Guardar y enviar a revisión →" : "Ver vista previa →"}
         </button>
       </div>
     </main>

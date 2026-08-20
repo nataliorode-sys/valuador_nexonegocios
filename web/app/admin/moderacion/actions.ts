@@ -46,13 +46,15 @@ export async function aprobarPublicacion(publicacionId: string, form: FormData):
 
   const ahora = new Date();
   const vence = new Date(ahora.getTime() + DIAS_PUBLICACION * 86_400_000);
+  // En re-aprobaciones (edición) se conserva la fecha de publicación/vencimiento original,
+  // para no reiniciar el reloj de 100 días con cada edición.
+  const primeraVez = !pub.fechaPublicacion;
 
   await prisma.publicacion.update({
     where: { id: publicacionId },
     data: {
       estadoPub: "PUBLICADA",
-      fechaPublicacion: ahora,
-      fechaVencimiento: vence,
+      ...(primeraVez ? { fechaPublicacion: ahora, fechaVencimiento: vence } : {}),
       selloExistencia,
       selloFuente: JSON.stringify(checklist),
     },
@@ -72,11 +74,24 @@ export async function rechazarPublicacion(publicacionId: string, form: FormData)
   const pub = await prisma.publicacion.findUnique({ where: { id: publicacionId } });
   if (!pub) return;
 
-  await prisma.valuacion.update({ where: { id: pub.valuacionId }, data: { estado: "RECHAZADA" } });
+  // Si ya estuvo publicada, esto es el rechazo de una EDICIÓN (no del alta inicial):
+  // no se reembolsa (el servicio ya se prestó) ni se marca RECHAZADA.
+  const esEdicion = !!pub.fechaPublicacion;
+
   // Defensa en profundidad: sacar la publicación de estado público.
   await prisma.publicacion.update({ where: { id: publicacionId }, data: { estadoPub: "PAUSADA" } });
   await prisma.moderacion.create({ data: { publicacionId, resultado: "RECHAZADA", motivo } });
-  // Reembolso real (A2-D): reintegra en MP; si falla, queda APROBADO para reintento manual.
+
+  if (esEdicion) {
+    // Vuelve a estado editable para que el dueño corrija los cambios y reenvíe.
+    await prisma.valuacion.update({ where: { id: pub.valuacionId }, data: { estado: "PUBLICACION_EN_ARMADO" } });
+    await notificarModeracion(pub.valuacionId, false, motivo).catch(() => {});
+    revalidatePath("/admin/moderacion");
+    return;
+  }
+
+  // Rechazo del alta inicial: marca RECHAZADA y reembolsa (A2-D).
+  await prisma.valuacion.update({ where: { id: pub.valuacionId }, data: { estado: "RECHAZADA" } });
   const reembolsado = await reembolsar(pub.valuacionId);
   await notificarModeracion(pub.valuacionId, false, motivo).catch(() => {});
   revalidatePath("/admin/moderacion");
