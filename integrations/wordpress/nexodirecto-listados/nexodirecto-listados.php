@@ -3,7 +3,7 @@
  * Plugin Name:       NexoDirecto — Listados
  * Plugin URI:        https://nexonegocios.com.ar
  * Description:        Muestra las publicaciones del marketplace NexoDirecto dentro de una página de WordPress mediante el shortcode [nexodirecto]. Pensado para una sección separada, debajo de las oportunidades exclusivas/intermediadas.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            NexoNegocios
  * License:           GPL-2.0-or-later
  * Text Domain:       nexodirecto-listados
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit; // Sin acceso directo.
 }
 
-define('NDX_VERSION', '1.0.0');
+define('NDX_VERSION', '1.1.0');
 define('NDX_DEFAULT_API', 'https://nexodirecto.nexonegocios.com.ar');
 define('NDX_CACHE_TTL', 5 * MINUTE_IN_SECONDS); // Coincide con el s-maxage de la API.
 
@@ -159,7 +159,7 @@ function ndx_shortcode($atts): string
       <div class="ndx-wrap">
         <header class="ndx-head">
           <p class="ndx-eye"><?php echo esc_html($a['titulo']); ?></p>
-          <h2 class="ndx-title">Empresas publicadas por sus dueños</h2>
+          <h2 class="ndx-title">Empresas publicadas en NexoDirecto</h2>
           <p class="ndx-sub"><?php echo esc_html($a['subtitulo']); ?></p>
         </header>
 
@@ -277,9 +277,11 @@ function ndx_styles(int $columnas): void
     $done = true;
     ?>
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
     .ndx{--ndx-navy:#0b1c2e;--ndx-green:#2f8f38;--ndx-accent:#15314d;--ndx-ink:#1b2733;--ndx-muted:#69788a;--ndx-line:#e4e9ee;--ndx-soft:#f6f8fa;
-      font-family:'Montserrat',-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ndx-ink);width:100%}
-    .ndx *{box-sizing:border-box}
+      color:var(--ndx-ink);width:100%}
+    /* Forzamos Montserrat en toda la sección para que el tema (Astra) no pise la fuente del título. */
+    .ndx,.ndx *{box-sizing:border-box;font-family:'Montserrat',-apple-system,Segoe UI,Roboto,Arial,sans-serif!important}
     .ndx-wrap{width:min(1240px,calc(100% - 48px));margin:auto;padding:22px 0 8px}
     .ndx-head{padding:8px 0 22px;border-top:1px solid var(--ndx-line);margin-top:8px}
     .ndx-eye{margin:22px 0 6px;color:var(--ndx-green);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
