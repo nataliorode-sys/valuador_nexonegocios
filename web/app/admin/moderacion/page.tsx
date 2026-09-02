@@ -4,7 +4,7 @@ import Ficha from "@/components/marketplace/Ficha";
 import { requireAdmin } from "@/lib/session";
 import { fmtUSD } from "@/lib/formato";
 import { signOut } from "@/auth";
-import { aprobarPublicacion, rechazarPublicacion } from "./actions";
+import { aprobarPublicacion, rechazarPublicacion, darDeBajaPublicacionAdmin, reactivarPublicacionAdmin } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -221,6 +221,8 @@ export default async function ModeracionPage() {
               const diasPub = p.fechaPublicacion ? Math.floor((ahora - p.fechaPublicacion.getTime()) / DAY) : null;
               const diasRest = p.fechaVencimiento && !vencida ? Math.ceil((p.fechaVencimiento.getTime() - ahora) / DAY) : null;
               const publicada = p.valuacion?.estado === "PUBLICADA" && !vencida;
+              const live = p.valuacion?.estado === "PUBLICADA" && p.estadoPub === "PUBLICADA" && !vencida;
+              const pausadaDueno = p.valuacion?.estado === "PUBLICADA" && p.estadoPub === "PAUSADA";
               return (
                 <tr key={p.id} className="border-t border-slate-100">
                   <td className="px-3 py-2">
@@ -229,7 +231,7 @@ export default async function ModeracionPage() {
                   </td>
                   <td className="px-3 py-2">
                     <span className={"rounded-full px-2 py-0.5 text-xs font-medium " + est.c}>
-                      {vencida ? "Vencida" : est.t}
+                      {vencida ? "Vencida" : pausadaDueno ? "Dada de baja" : est.t}
                     </span>
                   </td>
                   <td className="px-3 py-2 text-right tabular-nums">{p.vistas}</td>
@@ -245,6 +247,16 @@ export default async function ModeracionPage() {
                     <div className="flex items-center justify-end gap-3">
                       {publicada && (
                         <Link href={`/empresa/${p.codigo}`} className="text-xs text-nexo underline">Ver</Link>
+                      )}
+                      {live && (
+                        <form action={darDeBajaPublicacionAdmin.bind(null, p.id)}>
+                          <button className="text-xs text-red-500 underline hover:text-red-700">Dar de baja</button>
+                        </form>
+                      )}
+                      {pausadaDueno && !vencida && (
+                        <form action={reactivarPublicacionAdmin.bind(null, p.id)}>
+                          <button className="text-xs text-emerald-600 underline hover:text-emerald-800">Reactivar</button>
+                        </form>
                       )}
                       <InformeLinks id={p.valuacionId} hasResultado />
                     </div>

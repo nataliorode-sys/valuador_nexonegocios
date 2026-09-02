@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
+import { darDeBajaPublicacion, reactivarPublicacion } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,7 @@ export default async function PanelDetallePage({
   const estado = PUB_ESTADO[val.estado] ?? null;
   const ultimaMod = pub?.moderaciones[0];
   const online = val.estado === "PUBLICADA" && pub?.estadoPub === "PUBLICADA";
+  const bajaDelDueno = val.estado === "PUBLICADA" && pub?.estadoPub === "PAUSADA";
   // Motivo visible cuando el último dictamen fue un rechazo y la publicación no está online.
   const motivoRechazo = !online && ultimaMod?.resultado === "RECHAZADA" ? ultimaMod.motivo : null;
   const puedeEditar = !!pub && ["PUBLICADA", "EN_REVISION", "PUBLICACION_EN_ARMADO"].includes(val.estado);
@@ -50,8 +52,16 @@ export default async function PanelDetallePage({
       <Link href="/panel" className="text-sm text-slate-500 hover:text-nexo">← Mis valuaciones</Link>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold text-nexo">{pub?.titulo ?? val.codigo}</h1>
-        {estado && <span className={"rounded-full px-2.5 py-0.5 text-xs font-semibold " + estado.c}>{estado.t}</span>}
+        {bajaDelDueno
+          ? <span className="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-600">Dada de baja</span>
+          : estado && <span className={"rounded-full px-2.5 py-0.5 text-xs font-semibold " + estado.c}>{estado.t}</span>}
       </div>
+
+      {bajaDelDueno && (
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          Tu publicación está <span className="font-semibold">dada de baja</span> y no se muestra en NexoDirecto. Podés reactivarla cuando quieras (mientras siga vigente).
+        </div>
+      )}
 
       {revision && (
         <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
@@ -78,9 +88,19 @@ export default async function PanelDetallePage({
           {online && (
             <Link href={`/empresa/${pub.codigo}`} className="rounded-lg border border-nexo px-3 py-1.5 text-nexo hover:bg-nexo-soft">Ver publicación</Link>
           )}
+          {bajaDelDueno && (
+            <form action={reactivarPublicacion.bind(null, id)}>
+              <button className="rounded-lg border border-nexo px-3 py-1.5 font-medium text-nexo hover:bg-nexo-soft">Reactivar publicación</button>
+            </form>
+          )}
           <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className="rounded-lg px-3 py-1.5 text-slate-500 hover:text-nexo">Informe PDF</a>
           <a href={`/api/flyer/${id}?f=story`} target="_blank" rel="noopener" className="rounded-lg px-3 py-1.5 text-slate-500 hover:text-nexo">Flyer story</a>
           <a href={`/api/flyer/${id}?f=post`} target="_blank" rel="noopener" className="rounded-lg px-3 py-1.5 text-slate-500 hover:text-nexo">Flyer post</a>
+          {online && (
+            <form action={darDeBajaPublicacion.bind(null, id)}>
+              <button className="rounded-lg px-3 py-1.5 text-red-500 hover:text-red-700">Dar de baja</button>
+            </form>
+          )}
         </div>
       )}
 

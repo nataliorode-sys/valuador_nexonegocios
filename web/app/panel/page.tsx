@@ -4,6 +4,7 @@ import { requireUserId, getRol } from "@/lib/session";
 import { signOut } from "@/auth";
 import { fmtUSD } from "@/lib/formato";
 import Logo from "@/components/Logo";
+import { darDeBajaPublicacion, reactivarPublicacion } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -59,8 +60,9 @@ export default async function PanelPage() {
       <div className="mt-6 space-y-4">
         {valuaciones.map((v) => {
           const pub = v.publicacion;
+          const bajaDelDueno = v.estado === "PUBLICADA" && pub?.estadoPub === "PAUSADA";
           const dias =
-            pub?.fechaVencimiento && v.estado === "PUBLICADA"
+            pub?.fechaVencimiento && v.estado === "PUBLICADA" && !bajaDelDueno
               ? Math.max(0, Math.ceil((pub.fechaVencimiento.getTime() - Date.now()) / 86400000))
               : null;
           return (
@@ -70,7 +72,7 @@ export default async function PanelPage() {
                   <div className="text-xs text-slate-400">{v.codigo}</div>
                   <div className="font-semibold text-slate-900">{pub?.titulo ?? "Valuación en progreso"}</div>
                   <div className="mt-1 flex items-center gap-2 text-sm">
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{ESTADO_LABEL[v.estado]}</span>
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{bajaDelDueno ? "Dada de baja" : ESTADO_LABEL[v.estado]}</span>
                     {v.resultado && v.estado !== "BORRADOR" && v.estado !== "CALCULADA" && (
                       <span className="text-slate-500">{fmtUSD(v.resultado.valorCentralUsd)}</span>
                     )}
@@ -80,8 +82,8 @@ export default async function PanelPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-3 text-sm">
-                <Accion v={v} />
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+                <Accion v={v} bajaDelDueno={bajaDelDueno} />
               </div>
             </div>
           );
@@ -91,10 +93,11 @@ export default async function PanelPage() {
   );
 }
 
-function Accion({ v }: { v: { id: string; estado: string; publicacion: { codigo: string } | null } }) {
+function Accion({ v, bajaDelDueno }: { v: { id: string; estado: string; publicacion: { codigo: string } | null }; bajaDelDueno: boolean }) {
   const id = v.id;
   const btn = "rounded-lg border border-nexo px-3 py-1.5 text-nexo hover:bg-nexo-soft";
   const btnSoft = "rounded-lg px-3 py-1.5 text-slate-500 hover:text-nexo";
+  const btnBaja = "rounded-lg px-3 py-1.5 text-red-500 hover:text-red-700";
   switch (v.estado) {
     case "BORRADOR":
       return <Link href={`/valuar/${id}`} className={btn}>Continuar</Link>;
@@ -126,6 +129,19 @@ function Accion({ v }: { v: { id: string; estado: string; publicacion: { codigo:
         </>
       );
     case "PUBLICADA":
+      if (bajaDelDueno) {
+        // Dada de baja por el dueño: ofrecer reactivar (contenido ya aprobado, sin re-moderar).
+        return (
+          <>
+            <form action={reactivarPublicacion.bind(null, id)}>
+              <button className={btn}>Reactivar publicación</button>
+            </form>
+            <Link href={`/valuar/${id}/publicar`} className={btnSoft}>Editar publicación</Link>
+            <Link href={`/panel/${id}`} className={btnSoft}>Ver consultas</Link>
+            <a href={`/api/informe/${id}/pdf`} target="_blank" rel="noopener" className={btnSoft}>Informe PDF</a>
+          </>
+        );
+      }
       return (
         <>
           <Link href={`/empresa/${v.publicacion?.codigo}`} className={btn}>Ver publicación</Link>
@@ -135,6 +151,9 @@ function Accion({ v }: { v: { id: string; estado: string; publicacion: { codigo:
           <a href={`/api/flyer/${id}?f=story`} target="_blank" rel="noopener" className={btnSoft}>Flyer story</a>
           <a href={`/api/flyer/${id}?f=post`} target="_blank" rel="noopener" className={btnSoft}>Flyer post</a>
           <Link href={`/valuar/${id}`} className={btnSoft}>Ajustar respuestas</Link>
+          <form action={darDeBajaPublicacion.bind(null, id)}>
+            <button className={btnBaja}>Dar de baja</button>
+          </form>
         </>
       );
     case "RECHAZADA":

@@ -67,6 +67,29 @@ export async function aprobarPublicacion(publicacionId: string, form: FormData):
   revalidatePath("/admin/moderacion");
 }
 
+// Dar de baja (reversible) una publicación desde moderación: la oculta de NexoDirecto
+// conservando consultas, denuncias e historial. No reembolsa ni cambia la valuación.
+export async function darDeBajaPublicacionAdmin(publicacionId: string): Promise<void> {
+  await requireAdmin();
+  await prisma.publicacion.update({ where: { id: publicacionId }, data: { estadoPub: "PAUSADA" } });
+  revalidatePath("/admin/moderacion");
+}
+
+// Reactivar una publicación aprobada que está pausada (dada de baja) y sigue vigente.
+export async function reactivarPublicacionAdmin(publicacionId: string): Promise<void> {
+  await requireAdmin();
+  const pub = await prisma.publicacion.findUnique({
+    where: { id: publicacionId },
+    select: { estadoPub: true, fechaVencimiento: true, valuacion: { select: { estado: true } } },
+  });
+  if (!pub) return;
+  const vigente = !!pub.fechaVencimiento && pub.fechaVencimiento > new Date();
+  if (pub.valuacion?.estado === "PUBLICADA" && pub.estadoPub === "PAUSADA" && vigente) {
+    await prisma.publicacion.update({ where: { id: publicacionId }, data: { estadoPub: "PUBLICADA" } });
+  }
+  revalidatePath("/admin/moderacion");
+}
+
 // A1 — Rechazar: con motivo. Reembolsa el pago (A2-D).
 export async function rechazarPublicacion(publicacionId: string, form: FormData): Promise<void> {
   await requireAdmin();
