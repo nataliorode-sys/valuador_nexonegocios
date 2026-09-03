@@ -112,7 +112,7 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
             <Gallery fotos={p.fotos} titulo={p.titulo} />
 
             {/* Precio + facturación */}
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="rounded-xl border border-nexo-border bg-white p-5">
                 <div className="text-xs uppercase tracking-wide text-slate-400">Precio de venta</div>
                 <div className="mt-1 text-2xl font-bold text-nexo">{fmtUSD(p.precioPublicacion)}</div>

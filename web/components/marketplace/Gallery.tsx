@@ -22,7 +22,7 @@ export default function Gallery({ fotos, titulo }: { fotos: string[]; titulo: st
       <img
         src={principal}
         alt={titulo}
-        className="h-72 w-full rounded-2xl border border-nexo-border object-cover sm:h-96"
+        className="h-auto max-h-[75vh] w-full rounded-2xl border border-nexo-border bg-slate-50 object-contain"
       />
       {fotos.length > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
