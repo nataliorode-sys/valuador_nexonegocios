@@ -106,8 +106,9 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
         <p className="mt-1 text-slate-500">{familiaLabel(p.familia)} · {ubicacion}{p.antiguedad ? ` · ${p.antiguedad} años` : ""}</p>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_340px]">
-          {/* Columna principal */}
-          <div>
+          {/* Columna principal. min-w-0: sin esto, la foto (ancho intrínseco grande) impide
+              que la columna encoja y desborda horizontalmente en mobile. */}
+          <div className="min-w-0">
             <Gallery fotos={p.fotos} titulo={p.titulo} />
 
             {/* Precio + facturación */}
@@ -205,7 +206,7 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
           </div>
 
           {/* Columna de contacto (sticky en desktop) */}
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="min-w-0 lg:sticky lg:top-6 lg:self-start">
             <ContactForm codigo={codigo} />
             <div className="mt-4 rounded-xl border border-nexo-border bg-white p-4 text-xs text-slate-500">
               <div className="font-semibold text-slate-700">¿Por qué NexoDirecto?</div>
