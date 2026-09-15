@@ -72,7 +72,7 @@ export default async function TeaserPage({ params }: { params: Promise<{ id: str
         <div className="mt-6">
           <Link href={`/valuar/${id}/pago`}
             className="block w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
-            Desbloquear por $150.000 ARS
+            Desbloquear por $35.000 ARS
           </Link>
           <p className="mt-2 text-xs text-slate-400">Pago único · precio final.</p>
         </div>

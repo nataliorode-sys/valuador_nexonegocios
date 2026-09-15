@@ -3,7 +3,7 @@
 // pago simulado (desarrollo). Con el token, cobra de verdad.
 import { MercadoPagoConfig, Preference, Payment, PaymentRefund } from "mercadopago";
 
-export const MONTO_TOTAL = 150_000; // precio final (IVA incluido)
+export const MONTO_TOTAL = 35_000; // precio final (IVA incluido)
 
 export function mpHabilitado(): boolean {
   return !!process.env.MP_ACCESS_TOKEN;

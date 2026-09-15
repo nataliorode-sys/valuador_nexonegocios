@@ -65,7 +65,7 @@ export async function notificarPagoAprobado(valuacionId: string): Promise<void> 
     include: { user: true, pago: true },
   });
   if (!val) return;
-  const monto = val.pago?.montoArs ?? 150_000;
+  const monto = val.pago?.montoArs ?? 35_000;
   const montoTxt = "$" + Math.round(monto).toLocaleString("es-AR");
   const fecha = new Date().toLocaleDateString("es-AR");
   const url = APP ? `${APP}/valuar/${valuacionId}/completo` : "tu panel de NexoDirecto";

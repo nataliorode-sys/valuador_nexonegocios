@@ -52,7 +52,7 @@ export default function TerminosPage() {
           <section>
             <h2 className="text-[11px] font-semibold text-slate-500">4. Precio, pago y facturación</h2>
             <p>
-              El precio del servicio es de $150.000 ARS (precio final, IVA incluido), abonado a través de
+              El precio del servicio es de $35.000 ARS (precio final, IVA incluido), abonado a través de
               Mercado Pago. El importe se informa antes de contratar. Se emitirá el comprobante fiscal
               correspondiente conforme la normativa vigente.
             </p>
