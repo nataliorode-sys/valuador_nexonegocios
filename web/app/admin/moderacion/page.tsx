@@ -19,6 +19,39 @@ const ESTADO_LABEL: Record<string, { t: string; c: string }> = {
 };
 const DAY = 86_400_000;
 
+// Links de contacto (email + WhatsApp con mensaje prellenado) para reactivar a
+// quienes empezaron la valuación y no avanzaron.
+function waNumero(tel: string | null | undefined): string | null {
+  if (!tel) return null;
+  let d = tel.replace(/\D/g, "");
+  if (!d) return null;
+  if (d.startsWith("00")) d = d.slice(2);
+  if (d.startsWith("0")) d = d.slice(1); // saca el 0 nacional
+  if (!d.startsWith("54")) d = "54" + d; // Argentina por defecto
+  return d;
+}
+
+function mensajeContacto(nombre?: string | null): string {
+  const hola = nombre ? `Hola ${nombre}` : "Hola";
+  return `${hola}, soy del equipo de NexoNegocios. Vimos que empezaste la valuación de tu empresa en NexoDirecto y quedó a un paso. ¿Te ayudo a terminarla? El informe completo y la publicación tienen un precio de $35.000.`;
+}
+
+function ContactoLinks({ nombre, email, telefono }: { nombre?: string | null; email?: string | null; telefono?: string | null }) {
+  const texto = mensajeContacto(nombre);
+  const wa = waNumero(telefono);
+  if (!email && !wa) return <span className="text-xs text-slate-300">sin contacto</span>;
+  return (
+    <span className="flex items-center justify-end gap-3 text-xs">
+      {email && (
+        <a href={`mailto:${email}?subject=${encodeURIComponent("Tu valuación en NexoDirecto")}&body=${encodeURIComponent(texto)}`} className="text-nexo underline">✉ Email</a>
+      )}
+      {wa && (
+        <a href={`https://wa.me/${wa}?text=${encodeURIComponent(texto)}`} target="_blank" rel="noopener" className="text-emerald-600 underline">WhatsApp</a>
+      )}
+    </span>
+  );
+}
+
 // Links al informe (respuestas + resultados) para el moderador. Solo si ya hay
 // resultado calculado; el admin puede abrirlo aunque la valuación no esté paga.
 function InformeLinks({ id, hasResultado }: { id: string; hasResultado: boolean }) {
@@ -45,7 +78,7 @@ export default async function ModeracionPage() {
   const enProceso = await prisma.valuacion.findMany({
     where: { estado: { in: ["BORRADOR", "CALCULADA", "PAGA", "PUBLICACION_EN_ARMADO"] } },
     include: {
-      user: { select: { email: true, nombre: true } },
+      user: { select: { email: true, nombre: true, telefono: true } },
       resultado: { select: { valorCentralUsd: true } },
       perfil: { select: { familia: true, provincia: true, localidad: true } },
     },
@@ -153,7 +186,7 @@ export default async function ModeracionPage() {
       </p>
 
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
-        <table className="w-full min-w-[820px] text-sm">
+        <table className="w-full min-w-[960px] text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
             <tr>
               <th className="px-3 py-2">Valuación</th>
@@ -161,6 +194,7 @@ export default async function ModeracionPage() {
               <th className="px-3 py-2">Estado</th>
               <th className="px-3 py-2 text-right">Valor central</th>
               <th className="px-3 py-2">Actualizada</th>
+              <th className="px-3 py-2 text-right">Contactar</th>
               <th className="px-3 py-2 text-right">Informe</th>
             </tr>
           </thead>
@@ -186,12 +220,13 @@ export default async function ModeracionPage() {
                     {v.resultado ? fmtUSD(v.resultado.valorCentralUsd) : "—"}
                   </td>
                   <td className="px-3 py-2 text-xs text-slate-500">{v.updatedAt.toLocaleDateString("es-AR")}</td>
+                  <td className="px-3 py-2 text-right"><ContactoLinks nombre={v.user?.nombre} email={v.user?.email} telefono={v.user?.telefono} /></td>
                   <td className="px-3 py-2 text-right"><InformeLinks id={v.id} hasResultado={!!v.resultado} /></td>
                 </tr>
               );
             })}
             {enProceso.length === 0 && (
-              <tr><td colSpan={6} className="px-3 py-8 text-center text-slate-400">No hay valuaciones en proceso.</td></tr>
+              <tr><td colSpan={7} className="px-3 py-8 text-center text-slate-400">No hay valuaciones en proceso.</td></tr>
             )}
           </tbody>
         </table>
