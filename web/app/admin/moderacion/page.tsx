@@ -309,6 +309,15 @@ export default async function ModeracionPage() {
   );
 }
 
+// Asegura que un dato de verificación cargado por el dueño abra como URL externa.
+// Si no trae esquema (http/https), el navegador lo tomaría como ruta relativa del
+// propio sitio (…/admin/loquesea) → 404. Le anteponemos https:// y codificamos espacios.
+function urlExterna(v: string): string {
+  const t = v.trim();
+  if (/^https?:\/\//i.test(t)) return t;
+  return "https://" + t.replace(/\s+/g, "");
+}
+
 function VerifRow({ k, v, link }: { k: string; v?: string; link?: boolean }) {
   return (
     <div className="flex justify-between gap-4">
@@ -316,7 +325,7 @@ function VerifRow({ k, v, link }: { k: string; v?: string; link?: boolean }) {
       <dd className="text-right font-medium">
         {v
           ? link
-            ? <a href={v} target="_blank" rel="noopener noreferrer" className="text-nexo underline break-all">Abrir ↗</a>
+            ? <a href={urlExterna(v)} target="_blank" rel="noopener noreferrer" className="text-nexo underline break-all">{v} ↗</a>
             : <span className="text-slate-700 break-all">{v}</span>
           : <span className="text-slate-300">no aportado</span>}
       </dd>
