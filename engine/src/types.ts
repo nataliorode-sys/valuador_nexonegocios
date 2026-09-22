@@ -119,6 +119,12 @@ export interface EngineFlags {
   datosAtipicos: boolean;
   dcfAplicado: boolean;
   pisoActivosAplicado: boolean;
+  // Datos sospechosos: los gastos operativos (COGS + fijos) superan a las ventas.
+  // Típicamente un monto mensual cargado como anual, o un cero de más.
+  gastosSuperanVentas: boolean;
+  // Margen SDE muy por encima del típico del rubro: probablemente faltan gastos
+  // (alquiler, sueldos, servicios) o el COGS quedó bajo.
+  margenSospechoso: boolean;
 }
 
 export interface EngineResult {

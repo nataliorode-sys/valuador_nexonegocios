@@ -60,7 +60,32 @@ export function softWarnings(data: FormData): SoftWarning[] {
     const cogs = data.cogsModo === "monto" ? toNum(data.cogsMonto) : (toNum(data.cogsPct) / 100) * ventas;
     const gastos = sumaGastos(data);
     if (Number.isFinite(cogs) && cogs + gastos > ventas) {
-      w.push({ mensaje: "Según los números, el negocio estaría dando pérdida operativa. ¿Es correcto?" });
+      w.push({
+        mensaje:
+          "Tus gastos son mayores que tus ventas: así la valuación va a dar muy baja o en cero. " +
+          "Revisá que no hayas cargado un monto mensual como anual (o al revés) ni un cero de más en algún gasto.",
+      });
+    }
+  }
+
+  // Gasto individual desproporcionado: alguna línea de gasto anual supera las ventas del año.
+  if (Number.isFinite(ventas) && ventas > 0) {
+    const LINEAS: { id: string; label: string }[] = [
+      { id: "gAlquiler", label: "Alquiler del local" },
+      { id: "gSueldos", label: "Sueldos de empleados" },
+      { id: "gServicios", label: "Servicios" },
+      { id: "gLogistica", label: "Logística / fletes" },
+      { id: "gPublicidad", label: "Publicidad" },
+      { id: "gComisiones", label: "Comisiones" },
+      { id: "gImpuestos", label: "Impuestos y tasas" },
+      { id: "gOtros", label: "Otros gastos" },
+    ];
+    for (const l of LINEAS) {
+      if (!has(l.id)) continue;
+      const anual = toNum(data[l.id]) * (data[`${l.id}Periodo`] === "anual" ? 1 : 12);
+      if (Number.isFinite(anual) && anual > ventas) {
+        w.push({ fieldId: l.id, mensaje: `"${l.label}" por año supera tus ventas. ¿El monto es correcto (revisá ceros de más o mensual/anual)?` });
+      }
     }
   }
 

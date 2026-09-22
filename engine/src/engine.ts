@@ -211,6 +211,9 @@ export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS
   const margenTipico = familia.margenTipico;
   const margenDev = margenTipico > 0 ? Math.abs(e.margenSde - margenTipico) / margenTipico : 0;
   const datosAtipicos = margenDev > 0.6 || e.margenSde < 0;
+  // Señales de datos sospechosos (no bloquean; bajan la precisión y disparan avisos en el informe).
+  const gastosSuperanVentas = e.resultadoOperativoAntesDueno < 0; // costos operativos > ventas
+  const margenSospechoso = margenTipico > 0 && e.margenSde > margenTipico * 2.5;
 
   const fCompletitud = 1 + (1 - completitud) * 0.8;
   const fAtipicidad = 1 + Math.min(0.6, margenDev) * 0.5;
@@ -264,6 +267,8 @@ export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS
     datosAtipicos,
     dcfAplicado,
     pisoActivosAplicado,
+    gastosSuperanVentas,
+    margenSospechoso,
   };
 
   return {
@@ -298,7 +303,13 @@ export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS
     metodoPredominante: metodo,
     drivers,
     ajustesMultiplo: mult.ajustes,
-    precisionPct: Math.round(50 + completitud * 50),
+    // La precisión parte de la completitud, pero baja si los datos son sospechosos:
+    // no tiene sentido mostrar "91%" sobre una valuación con gastos > ventas.
+    precisionPct: gastosSuperanVentas
+      ? Math.min(35, Math.round(50 + completitud * 50))
+      : margenSospechoso
+        ? Math.min(75, Math.round(50 + completitud * 50))
+        : Math.round(50 + completitud * 50),
     flags,
   };
 }

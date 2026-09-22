@@ -23,6 +23,16 @@ const LBL_ANIO: Record<string, string> = { normal: "Sí, fue normal", mejor: "Fu
 const LBL_TEND: Record<string, string> = { crece: "Va a crecer", estable: "Se mantiene", baja: "Va a bajar" };
 const LBL_DEP: Record<string, string> = { baja: "Sigue igual", media: "Se complica un poco", alta: "Depende mucho del dueño" };
 const LBL_CLIENTE: Record<string, string> = { consumidor: "Consumidor final (B2C)", empresas: "Otras empresas (B2B)", mixto: "Mixto" };
+const GASTOS_FIJOS: { k: string; id: string }[] = [
+  { k: "Alquiler del local", id: "gAlquiler" },
+  { k: "Sueldos de empleados", id: "gSueldos" },
+  { k: "Servicios (luz, gas, internet)", id: "gServicios" },
+  { k: "Logística / fletes / combustible", id: "gLogistica" },
+  { k: "Publicidad y marketing", id: "gPublicidad" },
+  { k: "Comisiones", id: "gComisiones" },
+  { k: "Impuestos y tasas", id: "gImpuestos" },
+  { k: "Otros gastos", id: "gOtros" },
+];
 
 export default async function InformePage({
   params,
@@ -60,6 +70,12 @@ export default async function InformePage({
   );
   const dcfData = dcf?.map((f) => ({ label: `Año ${f.anio}`, value: Math.max(0, f.fcf) })) ?? [];
   const antiguedad = Number(datos.anioInicio) > 0 ? 2026 - Number(datos.anioInicio) : null;
+
+  // Datos sospechosos: se derivan del desglose recalculado en vivo (gastos > ventas)
+  // y de los flags guardados por el motor (margen sospechoso). Disparan avisos.
+  const flags = (r.flags ?? {}) as { gastosSuperanVentas?: boolean; margenSospechoso?: boolean };
+  const gastosSuperanVentas = g.resultadoOperativo < 0 || flags.gastosSuperanVentas === true;
+  const margenSospechoso = flags.margenSospechoso === true;
 
   // Resumen de respuestas: formateo en la moneda cargada por el dueño.
   const monedaCarga = String(datos.monedaCarga ?? "ARS");
@@ -100,6 +116,22 @@ export default async function InformePage({
         Documento <strong>orientativo</strong> basado en información provista por el propietario,
         <strong> no verificada</strong>. No es una tasación, pericia ni asesoramiento. Ver disclaimer al final.
       </p>
+
+      {gastosSuperanVentas && (
+        <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>⚠️ Revisá tus datos antes de usar este número.</strong> Según lo que cargaste, tus
+          gastos son mayores que tus ventas, por eso la valuación da muy baja o en cero. Suele pasar
+          por cargar un monto <strong>mensual como anual</strong> (o al revés), o por un <strong>cero
+          de más</strong> en algún gasto. Corregilo en “Ajustar respuestas” y el valor se recalcula.
+        </div>
+      )}
+      {!gastosSuperanVentas && margenSospechoso && (
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <strong>Nota:</strong> tu rentabilidad quedó muy por encima del promedio del rubro. Puede ser
+          real, pero revisá que hayas incluido <strong>todos los gastos</strong> (alquiler, sueldos,
+          servicios): si falta alguno, el valor puede quedar sobrestimado.
+        </div>
+      )}
 
       {/* 1. Resumen ejecutivo */}
       <section className="mt-6">
@@ -157,6 +189,17 @@ export default async function InformePage({
             <TR k="Retiro de los dueños" v={moneyP("retiroDuenos")} />
             <TR k="Sueldo de mercado del dueño" v={moneyP("sueldoMercadoDueno")} />
             {Number(datos.gastosPersonales) > 0 && <TR k="Gastos personales por la empresa" v={money(datos.gastosPersonales)} />}
+          </tbody>
+        </table>
+
+        <h3 className="mt-4 text-sm font-semibold text-slate-700">Gastos fijos cargados</h3>
+        <table className="mt-1 w-full text-sm">
+          <tbody>
+            {GASTOS_FIJOS.filter((gf) => Number(datos[gf.id]) > 0 || (gf.id === "gAlquiler" && datos.local === "alquilado"))
+              .map((gf) => <TR key={gf.id} k={gf.k} v={moneyP(gf.id)} />)}
+            {GASTOS_FIJOS.every((gf) => !(Number(datos[gf.id]) > 0)) && datos.local !== "alquilado" && (
+              <TR k="Gastos fijos" v="— (no cargaste ninguno)" />
+            )}
           </tbody>
         </table>
 
