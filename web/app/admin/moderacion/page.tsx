@@ -221,7 +221,12 @@ export default async function ModeracionPage() {
                   </td>
                   <td className="px-3 py-2 text-xs text-slate-500">{v.updatedAt.toLocaleDateString("es-AR")}</td>
                   <td className="px-3 py-2 text-right"><ContactoLinks nombre={v.user?.nombre} email={v.user?.email} telefono={v.user?.telefono} /></td>
-                  <td className="px-3 py-2 text-right"><InformeLinks id={v.id} hasResultado={!!v.resultado} /></td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="flex flex-col items-end gap-1">
+                      <InformeLinks id={v.id} hasResultado={!!v.resultado} />
+                      <Link href={`/admin/valuacion/${v.id}`} className="text-xs text-nexo underline">Editar datos</Link>
+                    </div>
+                  </td>
                 </tr>
               );
             })}
@@ -293,6 +298,7 @@ export default async function ModeracionPage() {
                           <button className="text-xs text-emerald-600 underline hover:text-emerald-800">Reactivar</button>
                         </form>
                       )}
+                      <Link href={`/admin/valuacion/${p.valuacionId}`} className="text-xs text-nexo underline">Editar</Link>
                       <InformeLinks id={p.valuacionId} hasResultado />
                     </div>
                   </td>

@@ -2,15 +2,14 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { valuar } from "@nexodirecto/engine";
 import { prisma } from "@/lib/prisma";
 import { getUserId } from "@/lib/session";
 import { assertOwner } from "@/lib/access";
 import { crearValuacion, marcarPagada } from "@/lib/valuaciones";
+import { recalcularYPersistir } from "@/lib/recalculo";
 import { crearPreferencia, mockPagoPermitido } from "@/lib/mercadopago";
 import { baseUrl as siteBaseUrl } from "@/lib/seo";
 import { obtenerTcRef } from "@/lib/tc";
-import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import type { FormData } from "@/lib/wizard/types";
 
 /**
@@ -65,69 +64,8 @@ export async function guardarPaso(valuacionId: string, data: FormData): Promise<
  */
 export async function calcular(valuacionId: string, data: FormData): Promise<void> {
   await guardarPaso(valuacionId, data);
-  const actual = await prisma.valuacion.findUnique({ where: { id: valuacionId }, select: { estado: true } });
-  const yaProcesada = actual != null && actual.estado !== "BORRADOR" && actual.estado !== "CALCULADA";
   const tcRef = await obtenerTcRef();
-  const input = toEngineInput(data, tcRef);
-  const r = valuar(input);
-
-  await prisma.resultadoCalculo.upsert({
-    where: { valuacionId },
-    create: {
-      valuacionId,
-      sdeUsd: r.sdeUSD,
-      ebitdaUsd: r.ebitdaUSD,
-      claseTamanio: r.claseTamanio,
-      familia: r.familia,
-      baseGanancia: r.baseGanancia,
-      multiploFinal: r.multiploFinal,
-      valorMultiplosUsd: r.valorMultiplosUSD,
-      valorDcfUsd: r.valorDcfUSD,
-      valorActivosUsd: r.valorActivosUSD,
-      valorCentralUsd: r.valorCentralUSD,
-      rangoMinUsd: r.rangoMinUSD,
-      rangoMaxUsd: r.rangoMaxUSD,
-      valorCentralArs: r.valorCentralARS,
-      rangoMinArs: r.rangoMinARS,
-      rangoMaxArs: r.rangoMaxARS,
-      metodoPredominante: r.metodoPredominante,
-      escenarios: r.escenariosUSD as object,
-      tablaDcf: (r.tablaDcf ?? undefined) as object | undefined,
-      drivers: r.drivers as object,
-      flags: r.flags as object,
-      engineVersion: r.engineVersion,
-    },
-    update: {
-      sdeUsd: r.sdeUSD,
-      ebitdaUsd: r.ebitdaUSD,
-      claseTamanio: r.claseTamanio,
-      familia: r.familia,
-      baseGanancia: r.baseGanancia,
-      multiploFinal: r.multiploFinal,
-      valorMultiplosUsd: r.valorMultiplosUSD,
-      valorDcfUsd: r.valorDcfUSD,
-      valorActivosUsd: r.valorActivosUSD,
-      valorCentralUsd: r.valorCentralUSD,
-      rangoMinUsd: r.rangoMinUSD,
-      rangoMaxUsd: r.rangoMaxUSD,
-      valorCentralArs: r.valorCentralARS,
-      rangoMinArs: r.rangoMinARS,
-      rangoMaxArs: r.rangoMaxARS,
-      metodoPredominante: r.metodoPredominante,
-      escenarios: r.escenariosUSD as object,
-      tablaDcf: (r.tablaDcf ?? undefined) as object | undefined,
-      drivers: r.drivers as object,
-      flags: r.flags as object,
-      engineVersion: r.engineVersion,
-    },
-  });
-
-  await prisma.valuacion.update({
-    where: { id: valuacionId },
-    // Si ya estaba pagada/publicada, conserva el estado (no revierte a CALCULADA ni recobra).
-    data: { estado: yaProcesada ? undefined : "CALCULADA", engineVersion: r.engineVersion, tcRef, precisionPct: r.precisionPct },
-  });
-
+  const { yaProcesada } = await recalcularYPersistir(valuacionId, data, tcRef);
   redirect(yaProcesada ? `/valuar/${valuacionId}/completo` : `/valuar/${valuacionId}/resultado`);
 }
 
