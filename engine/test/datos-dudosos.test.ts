@@ -50,9 +50,24 @@ describe("flags de datos sospechosos", () => {
     expect(r.precisionPct).toBeLessThanOrEqual(75);
   });
 
+  it("moneda cambiada (montos en pesos con moneda USD): marca magnitudSospechosa", () => {
+    // Caso real ND-014: eligió USD pero cargó pesos → activos ≫ ventas.
+    const r = valuar(
+      makeInput({
+        familia: "industria_manufactura", monedaCarga: "USD", tcRef: 1525,
+        ventasAnual: 420_000, cogsModo: "monto", cogsMonto: 435_000_000,
+        equipamiento: 80_000_000, inventario: 50_000_000, inventarioMinimo: 50_000_000,
+        retiroDuenosAnual: 9_000_000, sueldoMercadoDuenoAnual: 3_000_000,
+      }),
+    );
+    expect(r.flags.magnitudSospechosa).toBe(true);
+    expect(r.precisionPct).toBeLessThanOrEqual(35);
+  });
+
   it("negocio bien cargado: no dispara ninguna alerta de datos", () => {
     const r = valuar(makeInput());
     expect(r.flags.gastosSuperanVentas).toBe(false);
     expect(r.flags.margenSospechoso).toBe(false);
+    expect(r.flags.magnitudSospechosa).toBe(false);
   });
 });

@@ -73,9 +73,10 @@ export default async function InformePage({
 
   // Datos sospechosos: se derivan del desglose recalculado en vivo (gastos > ventas)
   // y de los flags guardados por el motor (margen sospechoso). Disparan avisos.
-  const flags = (r.flags ?? {}) as { gastosSuperanVentas?: boolean; margenSospechoso?: boolean };
+  const flags = (r.flags ?? {}) as { gastosSuperanVentas?: boolean; margenSospechoso?: boolean; magnitudSospechosa?: boolean };
   const gastosSuperanVentas = g.resultadoOperativo < 0 || flags.gastosSuperanVentas === true;
   const margenSospechoso = flags.margenSospechoso === true;
+  const magnitudSospechosa = flags.magnitudSospechosa === true;
 
   // Resumen de respuestas: formateo en la moneda cargada por el dueño.
   const monedaCarga = String(datos.monedaCarga ?? "ARS");
@@ -117,6 +118,14 @@ export default async function InformePage({
         <strong> no verificada</strong>. No es una tasación, pericia ni asesoramiento. Ver disclaimer al final.
       </p>
 
+      {magnitudSospechosa && (
+        <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>⚠️ Revisá los montos y la moneda.</strong> Algunas cifras son desproporcionadas para
+          el tamaño del negocio. El error más común es elegir <strong>dólares</strong> pero cargar los
+          montos <strong>en pesos</strong> (o al revés). Verificá la moneda y los importes en “Ajustar
+          respuestas”.
+        </div>
+      )}
       {gastosSuperanVentas && (
         <div className="mt-4 rounded-lg border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
           <strong>⚠️ Revisá tus datos antes de usar este número.</strong> Según lo que cargaste, tus

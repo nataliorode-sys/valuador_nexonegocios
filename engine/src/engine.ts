@@ -214,6 +214,10 @@ export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS
   // Señales de datos sospechosos (no bloquean; bajan la precisión y disparan avisos en el informe).
   const gastosSuperanVentas = e.resultadoOperativoAntesDueno < 0; // costos operativos > ventas
   const margenSospechoso = margenTipico > 0 && e.margenSde > margenTipico * 2.5;
+  // Magnitudes imposibles para una PyME: activos ≫ ventas o costo ≫ ventas.
+  // Caso típico: montos en pesos con la moneda en USD (todo queda ~1500× inflado).
+  const magnitudSospechosa =
+    n.ventas > 0 && (activosNetos > n.ventas * 25 || n.cogs > n.ventas * 5);
 
   const fCompletitud = 1 + (1 - completitud) * 0.8;
   const fAtipicidad = 1 + Math.min(0.6, margenDev) * 0.5;
@@ -269,6 +273,7 @@ export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS
     pisoActivosAplicado,
     gastosSuperanVentas,
     margenSospechoso,
+    magnitudSospechosa,
   };
 
   return {
@@ -305,7 +310,7 @@ export function valuar(input: EngineInput, params: EngineParams = DEFAULT_PARAMS
     ajustesMultiplo: mult.ajustes,
     // La precisión parte de la completitud, pero baja si los datos son sospechosos:
     // no tiene sentido mostrar "91%" sobre una valuación con gastos > ventas.
-    precisionPct: gastosSuperanVentas
+    precisionPct: gastosSuperanVentas || magnitudSospechosa
       ? Math.min(35, Math.round(50 + completitud * 50))
       : margenSospechoso
         ? Math.min(75, Math.round(50 + completitud * 50))

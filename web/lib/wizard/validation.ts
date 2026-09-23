@@ -105,6 +105,15 @@ export function softWarnings(data: FormData): SoftWarning[] {
       w.push({ fieldId: "retiroDuenos", mensaje: "¿Los dueños no retiran nada? Cargá lo que se llevan para una mejor estimación." });
     }
   }
+
+  // Moneda: si cargó en USD pero los montos parecen pesos (cifras enormes para dólares).
+  if (data.monedaCarga === "USD") {
+    const grandes = [ventas, toNum(data.cogsMonto), toNum(data.equipamiento), toNum(data.inventario)]
+      .some((x) => Number.isFinite(x) && x > 5_000_000);
+    if (grandes) {
+      w.push({ mensaje: "Elegiste dólares (USD), pero algunos montos parecen estar en pesos. Revisá la moneda o los importes." });
+    }
+  }
   return w;
 }
 

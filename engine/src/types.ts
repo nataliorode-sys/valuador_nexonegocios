@@ -125,6 +125,9 @@ export interface EngineFlags {
   // Margen SDE muy por encima del típico del rubro: probablemente faltan gastos
   // (alquiler, sueldos, servicios) o el COGS quedó bajo.
   margenSospechoso: boolean;
+  // Magnitudes imposibles para una PyME: activos o costos desproporcionados vs las
+  // ventas. Caso típico: cargar montos en pesos con la moneda en USD (o al revés).
+  magnitudSospechosa: boolean;
 }
 
 export interface EngineResult {
