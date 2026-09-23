@@ -29,7 +29,7 @@ const familias: Record<Familia, FamiliaParams> = {
   gastronomia: F(1.2, 1.8, 2.5, 0.15, 0.03, 0.02),
   comercio_minorista: F(1.5, 2.0, 2.8, 0.12, 0.15, 0.01),
   mayorista_distribucion: F(2.0, 2.6, 3.5, 0.1, 0.2, 0.02),
-  industria_manufactura: F(2.2, 3.0, 4.2, 0.15, 0.18, 0.03),
+  industria_manufactura: F(2.2, 3.0, 3.5, 0.15, 0.18, 0.03),
   salud_bienestar: F(2.0, 2.6, 3.5, 0.25, 0.05, 0.02),
   tecnologia_digital: F(3.0, 4.0, 6.0, 0.3, 0.05, 0.01),
   ecommerce: F(1.8, 2.4, 3.5, 0.12, 0.15, 0.02),
