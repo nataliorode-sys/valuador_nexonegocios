@@ -3,7 +3,7 @@
  * Plugin Name:       NexoDirecto — Listados
  * Plugin URI:        https://nexonegocios.com.ar
  * Description:        Muestra las publicaciones del marketplace NexoDirecto dentro de una página de WordPress mediante el shortcode [nexodirecto]. Pensado para una sección separada, debajo de las oportunidades exclusivas/intermediadas.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            NexoNegocios
  * License:           GPL-2.0-or-later
  * Text Domain:       nexodirecto-listados
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit; // Sin acceso directo.
 }
 
-define('NDX_VERSION', '1.1.0');
+define('NDX_VERSION', '1.2.0');
 define('NDX_DEFAULT_API', 'https://nexodirecto.nexonegocios.com.ar');
 define('NDX_CACHE_TTL', 5 * MINUTE_IN_SECONDS); // Coincide con el s-maxage de la API.
 
@@ -312,7 +312,7 @@ function ndx_styles(int $columnas): void
     .ndx-empty,.ndx-noresults{margin:8px 0 28px;padding:34px;border:1px dashed var(--ndx-line);border-radius:12px;text-align:center;color:var(--ndx-muted);font-size:14px}
     @media(max-width:1080px){.ndx-grid{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:820px){.ndx-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:520px){.ndx-wrap{width:calc(100% - 24px)}.ndx-grid{grid-template-columns:1fr}.ndx-prov{margin-left:0;width:100%}}
+    @media(max-width:520px){.ndx-wrap{width:calc(100% - 24px)}.ndx-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ndx-prov{margin-left:0;width:100%}.ndx-body{padding:11px}.ndx-name{font-size:14px}.ndx-price{font-size:14px}.ndx-badge{font-size:9px;padding:3px 7px}}
     </style>
     <?php
 }
