@@ -5,8 +5,9 @@ import Logo from "@/components/Logo";
 // sin JS de cliente) para que los botones no se desborden en pantallas chicas.
 export default function SiteHeader() {
   const links = [
-    { href: "/marketplace", label: "Marketplace" },
-    { href: "/panel", label: "Mi panel" },
+    // "Empresas en venta" del sitio principal: muestra TODAS (exclusivas + NexoDirecto vía plugin).
+    { href: "https://nexonegocios.com.ar/empresas-en-venta/", label: "Empresas en venta", external: true },
+    { href: "/panel", label: "Mi panel", external: false },
   ];
   return (
     <header className="border-b border-nexo-border bg-white">
@@ -19,7 +20,9 @@ export default function SiteHeader() {
         {/* Desktop */}
         <nav className="hidden items-center gap-6 text-sm sm:flex">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="text-slate-600 hover:text-nexo">{l.label}</Link>
+            l.external
+              ? <a key={l.href} href={l.href} className="text-slate-600 hover:text-nexo">{l.label}</a>
+              : <Link key={l.href} href={l.href} className="text-slate-600 hover:text-nexo">{l.label}</Link>
           ))}
           <Link href="/valuar" className="rounded-lg bg-nexo px-4 py-2 font-medium text-white hover:bg-nexo-dark">
             Valuá tu empresa
@@ -35,7 +38,9 @@ export default function SiteHeader() {
           </summary>
           <div className="absolute right-0 z-30 mt-2 w-52 rounded-xl border border-nexo-border bg-white p-2 shadow-lg">
             {links.map((l) => (
-              <Link key={l.href} href={l.href} className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-nexo-soft">{l.label}</Link>
+              l.external
+                ? <a key={l.href} href={l.href} className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-nexo-soft">{l.label}</a>
+                : <Link key={l.href} href={l.href} className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-nexo-soft">{l.label}</Link>
             ))}
             <Link href="/valuar" className="mt-1 block rounded-lg bg-nexo px-3 py-2 text-center text-sm font-medium text-white hover:bg-nexo-dark">
               Valuá tu empresa
