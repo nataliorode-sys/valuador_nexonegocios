@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { assertOwner } from "@/lib/access";
-import { mpHabilitado, mockPagoPermitido } from "@/lib/mercadopago";
+import { mpHabilitado, mockPagoPermitido, GRATIS } from "@/lib/mercadopago";
 import FunnelHeader from "@/components/FunnelHeader";
-import { iniciarPagoMP, pagarMock } from "../../actions";
+import { iniciarPagoMP, pagarMock, desbloquearGratis } from "../../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +19,7 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
   const mock = mockPagoPermitido();
   const pagarMercadoPago = iniciarPagoMP.bind(null, id);
   const pagar = pagarMock.bind(null, id);
+  const gratis = desbloquearGratis.bind(null, id);
 
   const incluye = [
     { t: "Valor orientativo y rango", d: "En USD y ARS, con 3 escenarios y precisión estimada." },
@@ -32,8 +33,8 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
       <FunnelHeader />
       <main className="mx-auto max-w-lg px-6 py-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-nexo">Desbloqueá tu valuación completa</h1>
-        <p className="mt-2 text-slate-600">Un solo pago. Todo lo que necesitás para poner tu empresa en venta.</p>
+        <h1 className="text-3xl font-bold text-nexo">{GRATIS ? "Tu valuación completa, gratis" : "Desbloqueá tu valuación completa"}</h1>
+        <p className="mt-2 text-slate-600">{GRATIS ? "Un último paso y accedés a todo, sin costo." : "Un solo pago. Todo lo que necesitás para poner tu empresa en venta."}</p>
       </div>
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -53,10 +54,19 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
           </ul>
           <div className="mt-6 flex items-baseline justify-between rounded-xl bg-nexo-soft px-4 py-3">
             <span className="font-medium text-slate-600">Total</span>
-            <span className="text-3xl font-bold text-nexo">$35.000 <span className="text-sm font-normal text-slate-500">precio final</span></span>
+            <span className="text-3xl font-bold text-nexo">{GRATIS ? "Gratis" : <>$35.000 <span className="text-sm font-normal text-slate-500">precio final</span></>}</span>
           </div>
 
-        {mp ? (
+        {GRATIS ? (
+          <>
+            <form action={gratis} className="mt-6">
+              <button type="submit" className="w-full rounded-lg bg-nexo px-6 py-3 font-semibold text-white hover:bg-nexo-dark">
+                Continuar gratis
+              </button>
+            </form>
+            <p className="mt-2 text-center text-xs text-slate-400">Sin costo · acceso inmediato.</p>
+          </>
+        ) : mp ? (
           <>
             <form action={pagarMercadoPago} className="mt-6">
               <button type="submit" className="w-full rounded-lg bg-[#009ee3] px-6 py-3 font-semibold text-white hover:brightness-95">
@@ -86,16 +96,19 @@ export default async function PagoPage({ params }: { params: Promise<{ id: strin
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-slate-400">
-        <LockIcon /> Pago protegido · sin cargos ocultos
-      </div>
-      <div className="mx-auto mt-3 max-w-sm rounded-lg bg-emerald-50 px-4 py-2 text-center text-xs text-emerald-800">
-        <strong>Garantía:</strong> si no aprobamos tu publicación, te devolvemos el pago.
-      </div>
+      {!GRATIS && (
+        <>
+          <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-slate-400">
+            <LockIcon /> Pago protegido · sin cargos ocultos
+          </div>
+          <div className="mx-auto mt-3 max-w-sm rounded-lg bg-emerald-50 px-4 py-2 text-center text-xs text-emerald-800">
+            <strong>Garantía:</strong> si no aprobamos tu publicación, te devolvemos el pago.
+          </div>
+        </>
+      )}
       <p className="mx-auto mt-3 max-w-sm text-center text-[11px] leading-relaxed text-slate-400">
-        Al pagar aceptás los <Link href="/terminos" target="_blank" className="underline">Términos y Condiciones</Link>.
-        Tenés derecho de arrepentimiento por 10 días corridos (Ley 24.240). La valuación es orientativa y no
-        constituye una tasación formal ni un informe pericial.
+        Al continuar aceptás los <Link href="/terminos" target="_blank" className="underline">Términos y Condiciones</Link>.
+        La valuación es orientativa y no constituye una tasación formal ni un informe pericial.
       </p>
       <div className="mt-3 text-center text-sm">
         <Link href={`/valuar/${id}/resultado`} className="text-slate-500 hover:text-nexo">← Volver</Link>

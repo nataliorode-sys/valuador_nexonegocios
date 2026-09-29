@@ -3,7 +3,12 @@
 // pago simulado (desarrollo). Con el token, cobra de verdad.
 import { MercadoPagoConfig, Preference, Payment, PaymentRefund } from "mercadopago";
 
-export const MONTO_TOTAL = 35_000; // precio final (IVA incluido)
+export const MONTO_TOTAL = 35_000; // precio final (IVA incluido) — no se usa mientras GRATIS = true
+
+// Modo gratuito del funnel: la app es gratis (nuevo embudo). Con GRATIS = true no
+// se cobra: la pantalla de pago muestra "Gratis" y desbloquea sin pasar por MP
+// (MP no procesa $0). Para volver a cobrar, poner GRATIS = false.
+export const GRATIS = true;
 
 export function mpHabilitado(): boolean {
   return !!process.env.MP_ACCESS_TOKEN;

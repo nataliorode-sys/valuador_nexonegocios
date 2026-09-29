@@ -52,9 +52,9 @@ export default function TerminosPage() {
           <section>
             <h2 className="text-[11px] font-semibold text-slate-500">4. Precio, pago y facturación</h2>
             <p>
-              El precio del servicio es de $35.000 ARS (precio final, IVA incluido), abonado a través de
-              Mercado Pago. El importe se informa antes de contratar. Se emitirá el comprobante fiscal
-              correspondiente conforme la normativa vigente.
+              Actualmente el servicio de valuación orientativa y publicación es <strong>gratuito</strong>,
+              sin costo para el usuario. El importe aplicable, si lo hubiera, se informa siempre antes de
+              contratar. NexoNegocios se reserva el derecho de modificar las condiciones a futuro.
             </p>
           </section>
 

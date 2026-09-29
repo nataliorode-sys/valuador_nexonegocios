@@ -121,40 +121,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Diferenciación */}
-      <section className="border-t border-nexo-border bg-nexo-soft">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-center text-2xl font-bold text-slate-900">Un servicio pensado para cada tipo de empresa</h2>
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <div className="rounded-xl border-2 border-nexo-accent bg-white p-8 shadow-sm">
-              <div className="text-sm font-bold text-nexo-accent">NEXODIRECTO</div>
-              <h3 className="mt-2 text-xl font-bold text-nexo">Autogestión, contacto directo</h3>
-              <p className="mt-3 text-slate-600">
-                Para empresas de menor escala o estructura simple que buscan valuar y gestionar su
-                venta de forma directa. Vos cargás la información, nosotros te damos la orientación y
-                las herramientas.
-              </p>
-            </div>
-            <a
-              href="https://nexonegocios.com.ar/vender-mi-empresa/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block rounded-xl border border-nexo-border bg-white p-8 transition hover:border-nexo hover:shadow-md"
-            >
-              <div className="text-sm font-semibold text-slate-500">INTERMEDIACIÓN PROFESIONAL</div>
-              <h3 className="mt-2 text-xl font-bold text-nexo">Con asesor dedicado y gestión completa</h3>
-              <p className="mt-3 text-slate-600">
-                Para operaciones que necesitan acompañamiento: información verificada, un asesor
-                dedicado y gestión completa de la venta.
-              </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-nexo group-hover:gap-2">
-                Conocer la Intermediación Profesional →
-              </span>
-            </a>
-          </div>
-        </div>
-      </section>
-
       <footer className="border-t border-nexo-border bg-white">
         <div className="mx-auto max-w-6xl px-6 py-8">
           <Logo className="text-base" />

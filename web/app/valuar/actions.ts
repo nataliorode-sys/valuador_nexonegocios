@@ -7,7 +7,7 @@ import { getUserId } from "@/lib/session";
 import { assertOwner } from "@/lib/access";
 import { crearValuacion, marcarPagada } from "@/lib/valuaciones";
 import { recalcularYPersistir } from "@/lib/recalculo";
-import { crearPreferencia, mockPagoPermitido } from "@/lib/mercadopago";
+import { crearPreferencia, mockPagoPermitido, GRATIS } from "@/lib/mercadopago";
 import { baseUrl as siteBaseUrl } from "@/lib/seo";
 import { obtenerTcRef } from "@/lib/tc";
 import type { FormData } from "@/lib/wizard/types";
@@ -67,6 +67,17 @@ export async function calcular(valuacionId: string, data: FormData): Promise<voi
   const tcRef = await obtenerTcRef();
   const { yaProcesada } = await recalcularYPersistir(valuacionId, data, tcRef);
   redirect(yaProcesada ? `/valuar/${valuacionId}/completo` : `/valuar/${valuacionId}/resultado`);
+}
+
+/**
+ * Desbloqueo GRATIS (nuevo funnel): sin pago real. Marca la valuación como
+ * desbloqueada (monto 0) y lleva al resultado completo. Solo si GRATIS está activo.
+ */
+export async function desbloquearGratis(valuacionId: string): Promise<void> {
+  if (!GRATIS) throw new Error("El modo gratis no está disponible.");
+  await assertOwner(valuacionId);
+  await marcarPagada(valuacionId, `gratis-${valuacionId.slice(0, 8)}`, "gratis", 0);
+  redirect(`/valuar/${valuacionId}/completo`);
 }
 
 /**
