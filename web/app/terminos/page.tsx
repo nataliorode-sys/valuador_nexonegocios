@@ -32,7 +32,7 @@ export default function TerminosPage() {
               {EMPRESA.producto} ofrece una <strong>orientación de valuación</strong> de empresas y fondos de
               comercio generada automáticamente a partir de la información que provee el usuario, y la
               posibilidad de <strong>publicar</strong> el negocio en venta en el Marketplace de {EMPRESA.nombreFantasia}
-              con herramientas de difusión (informe, flyer). El servicio se contrata por un pago único.
+              con herramientas de difusión (informe, flyer). Actualmente el servicio es gratuito.
             </p>
           </section>
 
@@ -59,14 +59,14 @@ export default function TerminosPage() {
           </section>
 
           <section>
-            <h2 className="text-[11px] font-semibold text-slate-500">5. Derecho de arrepentimiento y reembolsos</h2>
+            <h2 className="text-[11px] font-semibold text-slate-500">5. Bajas y moderación</h2>
             <p>
-              De acuerdo con el art. 34 de la Ley 24.240 y los arts. 1110-1111 del Código Civil y Comercial,
-              el usuario consumidor puede <strong>revocar la contratación dentro de los 10 días corridos</strong>.
-              Para ejercerlo, escribí a {EMPRESA.email}. Adicionalmente, si {EMPRESA.nombreFantasia} <strong>no
-              aprueba la publicación</strong> del negocio en la moderación, se reintegra el pago. El usuario
-              reconoce que, al solicitar la generación inmediata del informe, presta conformidad para que el
-              servicio comience a ejecutarse; ello no limita los derechos que la ley le reconoce.
+              Como el servicio es <strong>gratuito</strong>, no hay cobros ni reembolsos.
+              {EMPRESA.nombreFantasia} se reserva el derecho de <strong>no aprobar o dar de baja</strong> una
+              publicación en la moderación (por datos inexactos, contenido no apto u otros motivos razonables).
+              El usuario puede solicitar la baja de su publicación o la eliminación de sus datos escribiendo a {EMPRESA.email}.
+              Si en el futuro el servicio pasara a ser pago, se informará el precio antes de contratar y regirán
+              los derechos del consumidor aplicables (incluido el de arrepentimiento, art. 34 Ley 24.240).
             </p>
           </section>
 

@@ -33,7 +33,7 @@ function waNumero(tel: string | null | undefined): string | null {
 
 function mensajeContacto(nombre?: string | null): string {
   const hola = nombre ? `Hola ${nombre}` : "Hola";
-  return `${hola}, soy del equipo de NexoNegocios. Vimos que empezaste la valuación de tu empresa en NexoDirecto y quedó a un paso. ¿Te ayudo a terminarla? El informe completo y la publicación tienen un precio de $35.000.`;
+  return `${hola}, soy del equipo de NexoNegocios. Vimos que empezaste la valuación de tu empresa en NexoDirecto y quedó a un paso. ¿Te ayudo a terminarla? Es gratis.`;
 }
 
 function ContactoLinks({ nombre, email, telefono }: { nombre?: string | null; email?: string | null; telefono?: string | null }) {
