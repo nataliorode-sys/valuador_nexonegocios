@@ -123,6 +123,7 @@ export default async function PanelDetallePage({
                 {[l.email, l.telefono].filter(Boolean).join(" · ") || "sin datos de contacto"}
               </div>
               {l.mensaje && <p className="mt-2 text-sm text-slate-700">{l.mensaje}</p>}
+              <p className="mt-2 text-xs text-slate-400">Escribile vos con estos datos. Tu contacto no se comparte con nadie.</p>
             </div>
           ))}
         </div>

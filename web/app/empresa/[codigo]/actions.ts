@@ -12,17 +12,12 @@ export interface ContactoInput {
   consentimiento: boolean;
 }
 
-export interface ContactoRevelado {
-  nombre: string | null;
-  whatsapp: string | null;
-  email: string | null;
-}
-
-// S3b — Relay: registra el lead y revela el contacto del vendedor (A2-F).
+// S3b — Doble opt-in: registra la consulta (PENDIENTE) y avisa al dueño. NO revela
+// el contacto del vendedor: el dueño decide autorizarlo desde su panel.
 export async function enviarContacto(
   codigo: string,
   data: ContactoInput,
-): Promise<ContactoRevelado | { error: string }> {
+): Promise<{ ok: true } | { error: string }> {
   const ip = await clientIp();
   if (!permitir(`contacto:${ip}`, 6, 10 * 60_000)) {
     return { error: "Enviaste muchas consultas seguidas. Esperá unos minutos." };
@@ -37,7 +32,7 @@ export async function enviarContacto(
     return { error: "La publicación no está disponible." };
   }
   if (!data.consentimiento) {
-    return { error: "Necesitamos tu consentimiento para compartir tus datos con el vendedor." };
+    return { error: "Necesitamos tu consentimiento para que el vendedor pueda responderte." };
   }
   if (!data.nombre?.trim() || (!data.email?.trim() && !data.telefono?.trim())) {
     return { error: "Dejanos tu nombre y un dato de contacto." };
@@ -55,7 +50,7 @@ export async function enviarContacto(
   // Aviso al vendedor (no bloquea la respuesta al comprador).
   await notificarNuevoLead(pub.id, lead).catch(() => {});
 
-  return { nombre: pub.contactoNombre, whatsapp: pub.contactoWhatsapp, email: pub.contactoEmail };
+  return { ok: true };
 }
 
 /** Denuncia de una publicación (comprador o tercero). Se ve en el panel de moderación. */

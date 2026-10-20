@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { enviarContacto, type ContactoRevelado } from "@/app/empresa/[codigo]/actions";
+import { enviarContacto } from "@/app/empresa/[codigo]/actions";
 
 export default function ContactForm({ codigo }: { codigo: string }) {
   const [d, setD] = useState({ nombre: "", email: "", telefono: "", mensaje: "", consentimiento: false });
-  const [revelado, setRevelado] = useState<ContactoRevelado | null>(null);
+  const [enviado, setEnviado] = useState(false);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
 
@@ -15,30 +15,24 @@ export default function ContactForm({ codigo }: { codigo: string }) {
   const submit = () => {
     setError("");
     if (!d.consentimiento) {
-      setError("Necesitamos tu consentimiento para compartir tus datos con el vendedor.");
+      setError("Necesitamos tu consentimiento para que el vendedor pueda responderte.");
       return;
     }
     start(async () => {
       const res = await enviarContacto(codigo, d);
       if ("error" in res) setError(res.error);
-      else setRevelado(res);
+      else setEnviado(true);
     });
   };
 
-  if (revelado) {
-    const wa = revelado.whatsapp?.replace(/[^\d]/g, "");
+  if (enviado) {
     return (
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-        <div className="font-semibold text-emerald-800">¡Listo! Contactá al vendedor</div>
-        <p className="mt-1 text-sm text-emerald-900">Le avisamos de tu consulta. También podés escribirle directo:</p>
-        <div className="mt-3 space-y-1 text-sm">
-          {revelado.nombre && <div>👤 {revelado.nombre}</div>}
-          {revelado.whatsapp && (
-            <div>📱 <a className="text-nexo underline" href={`https://wa.me/${wa}`} target="_blank" rel="noopener">{revelado.whatsapp}</a></div>
-          )}
-          {revelado.email && <div>✉️ <a className="text-nexo underline" href={`mailto:${revelado.email}`}>{revelado.email}</a></div>}
-          {!revelado.whatsapp && !revelado.email && <div className="text-slate-500">El vendedor te contactará a partir de tus datos.</div>}
-        </div>
+        <div className="font-semibold text-emerald-800">¡Consulta enviada! ✅</div>
+        <p className="mt-2 text-sm text-emerald-900">
+          Le avisamos al vendedor de tu interés con los datos que dejaste. Si decide avanzar, se va a
+          poner en contacto con vos. Por tu tranquilidad y la del vendedor, los contactos no se publican.
+        </p>
       </div>
     );
   }
@@ -75,7 +69,7 @@ export default function ContactForm({ codigo }: { codigo: string }) {
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button onClick={submit} disabled={pending}
           className="w-full rounded-lg bg-nexo px-6 py-2.5 font-semibold text-white hover:bg-nexo-dark disabled:opacity-60">
-          {pending ? "Enviando…" : "Enviar consulta y ver contacto"}
+          {pending ? "Enviando…" : "Enviar consulta"}
         </button>
       </div>
     </div>

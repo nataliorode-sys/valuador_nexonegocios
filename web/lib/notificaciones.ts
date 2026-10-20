@@ -23,8 +23,8 @@ export async function notificarNuevoLead(
     html: layout("Tenés una nueva consulta 🎉", `
       <p><strong>${lead.nombre}</strong> está interesado en tu empresa publicada en NexoDirecto.</p>
       <p style="background:#f8fafc;border-radius:8px;padding:12px">${lead.mensaje || "(sin mensaje)"}</p>
-      <p>Contacto: ${contacto}</p>
-      <p>Respondele cuanto antes para no perder la oportunidad.</p>`),
+      <p>Contacto del interesado: ${contacto}</p>
+      <p>Escribile vos con esos datos para avanzar. Tu contacto no se comparte: lo manejás vos.</p>`),
   });
 }
 
