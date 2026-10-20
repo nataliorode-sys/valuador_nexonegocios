@@ -1,4 +1,5 @@
 import { fmtUSD } from "@/lib/formato";
+import { highlightsPublicos } from "@/lib/publicacion";
 
 export interface FichaData {
   titulo: string;
@@ -19,7 +20,7 @@ export interface FichaData {
 export default function Ficha({ p }: { p: FichaData }) {
   const anon = p.nivelPrivacidad === "ANONIMA";
   const ubicacion = anon ? p.provincia ?? "—" : [p.localidad, p.provincia].filter(Boolean).join(", ");
-  const highlights = Array.isArray(p.highlights) ? (p.highlights as string[]) : [];
+  const highlights = highlightsPublicos(p.highlights);
 
   return (
     <div>

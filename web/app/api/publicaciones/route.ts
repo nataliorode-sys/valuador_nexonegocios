@@ -9,7 +9,7 @@
 // absolutas para foto y ficha, de modo que carguen bien en otro dominio.
 import { prisma } from "@/lib/prisma";
 import { fmtUSD, fmtARS } from "@/lib/formato";
-import { familiaLabel } from "@/lib/publicacion";
+import { familiaLabel, highlightsPublicos } from "@/lib/publicacion";
 import { baseUrl } from "@/lib/seo";
 import { FAMILIAS, PROVINCIAS } from "@/lib/wizard/steps";
 import type { Prisma } from "@prisma/client";
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
     const ubicacion = anon
       ? p.provincia ?? null
       : [p.localidad, p.provincia].filter(Boolean).join(", ") || null;
-    const highlights = Array.isArray(p.highlights) ? (p.highlights as string[]) : [];
+    const highlights = highlightsPublicos(p.highlights);
     const precioLabel = p.moneda === "ARS" ? fmtARS(p.precioPublicacion) : fmtUSD(p.precioPublicacion);
     return {
       codigo: p.codigo,

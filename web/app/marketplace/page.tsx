@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { fmtUSD } from "@/lib/formato";
 import { FAMILIAS, PROVINCIAS } from "@/lib/wizard/steps";
-import { familiaLabel } from "@/lib/publicacion";
+import { familiaLabel, highlightsPublicos } from "@/lib/publicacion";
 import SiteHeader from "@/components/SiteHeader";
 import type { Prisma } from "@prisma/client";
 
@@ -70,7 +70,7 @@ export default async function MarketplacePage({
           {publicaciones.map((p) => {
             const anon = p.nivelPrivacidad === "ANONIMA";
             const ubic = anon ? p.provincia ?? "—" : [p.localidad, p.provincia].filter(Boolean).join(", ");
-            const highlights = Array.isArray(p.highlights) ? (p.highlights as string[]) : [];
+            const highlights = highlightsPublicos(p.highlights);
             return (
               <Link key={p.id} href={`/empresa/${p.codigo}`}
                 className="overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:shadow-md">

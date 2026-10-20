@@ -91,7 +91,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                {["Rentabilidad demostrada", "8 años en marcha", "Baja dependencia"].map((c) => (
+                {["Ingresos recurrentes", "8 años en marcha", "Baja dependencia"].map((c) => (
                   <span key={c} className="rounded-full border border-nexo-border px-2.5 py-1 text-xs text-slate-600">✓ {c}</span>
                 ))}
               </div>

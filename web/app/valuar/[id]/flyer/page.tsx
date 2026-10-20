@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { prisma } from "@/lib/prisma";
 import { acentoPara } from "@/lib/flyerTheme";
 import { fmtUSD } from "@/lib/formato";
+import { highlightsPublicos } from "@/lib/publicacion";
 import { baseUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +29,7 @@ export default async function FlyerPage({
   const accent = acentoPara(p.familia);
   const anon = p.nivelPrivacidad === "ANONIMA";
   const ubic = anon ? p.provincia ?? "" : [p.localidad, p.provincia].filter(Boolean).join(", ");
-  const highlights = (Array.isArray(p.highlights) ? (p.highlights as string[]) : []).slice(0, 4);
+  const highlights = highlightsPublicos(p.highlights).slice(0, 4);
   const W = 1080;
   const H = formato === "story" ? 1920 : 1080;
   const INK = "#132033";

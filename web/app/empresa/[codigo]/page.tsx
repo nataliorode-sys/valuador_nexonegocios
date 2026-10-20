@@ -8,7 +8,7 @@ import ReportForm from "@/components/marketplace/ReportForm";
 import SiteHeader from "@/components/SiteHeader";
 import JsonLd from "@/components/JsonLd";
 import { baseUrl } from "@/lib/seo";
-import { familiaLabel } from "@/lib/publicacion";
+import { familiaLabel, highlightsPublicos } from "@/lib/publicacion";
 import { fmtUSD } from "@/lib/formato";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +56,7 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
   const datos = (p.valuacion?.perfil?.datos ?? {}) as Record<string, unknown>;
   const anon = p.nivelPrivacidad === "ANONIMA";
   const ubicacion = anon ? p.provincia ?? "—" : [p.localidad, p.provincia].filter(Boolean).join(", ");
-  const highlights = Array.isArray(p.highlights) ? (p.highlights as string[]) : [];
+  const highlights = highlightsPublicos(p.highlights);
   const incluyeVenta = Array.isArray(datos.incluyeVenta) ? (datos.incluyeVenta as string[]) : [];
   const intangibles = Array.isArray(datos.intangibles) ? (datos.intangibles as string[]) : [];
   const empleados = typeof datos.empleados === "number" ? datos.empleados : null;

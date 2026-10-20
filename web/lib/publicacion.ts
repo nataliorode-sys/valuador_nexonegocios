@@ -38,7 +38,8 @@ export function buildHighlights(
 ): string[] {
   const h: string[] = [];
   if (opts.antiguedad && opts.antiguedad >= 3) h.push(`En marcha hace ${opts.antiguedad} años`);
-  if (!opts.noRentable) h.push("Rentabilidad demostrada");
+  // "Rentabilidad demostrada" se removió: es una afirmación no verificable sobre datos
+  // autodeclarados por el dueño (protege al titular y a NexoNegocios).
   if (p.recurrencia) h.push("Ingresos recurrentes");
   if (p.dependenciaDueno === "baja") h.push("Baja dependencia del dueño");
   if (p.intangibles?.includes("Marca registrada")) h.push("Incluye marca registrada");
@@ -46,4 +47,13 @@ export function buildHighlights(
   if (p.local === "propio" && p.inmuebleIncluido) h.push("Local propio incluido");
   if (p.incluyeVenta?.includes("Stock")) h.push("Stock incluido");
   return h.slice(0, 6);
+}
+
+/**
+ * Filtra las etiquetas que no deben mostrarse públicamente (afirmaciones no
+ * verificables). Se aplica al RENDER, así también limpia publicaciones ya guardadas.
+ */
+const HIGHLIGHTS_OCULTOS = new Set(["Rentabilidad demostrada"]);
+export function highlightsPublicos(raw: unknown): string[] {
+  return Array.isArray(raw) ? (raw as string[]).filter((x) => !HIGHLIGHTS_OCULTOS.has(x)) : [];
 }
