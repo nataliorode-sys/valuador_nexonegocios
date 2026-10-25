@@ -12,8 +12,8 @@ export interface ContactoInput {
   consentimiento: boolean;
 }
 
-// S3b — Doble opt-in: registra la consulta (PENDIENTE) y avisa al dueño. NO revela
-// el contacto del vendedor: el dueño decide autorizarlo desde su panel.
+// Registra la consulta y avisa al vendedor. NexoDirecto NO expone el contacto del
+// vendedor al interesado: el vendedor recibe los datos del interesado y lo contacta él.
 export async function enviarContacto(
   codigo: string,
   data: ContactoInput,
