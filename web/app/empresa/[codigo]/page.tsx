@@ -109,7 +109,7 @@ export default async function EmpresaPage({ params }: { params: Promise<{ codigo
           {/* Columna principal. min-w-0: sin esto, la foto (ancho intrínseco grande) impide
               que la columna encoja y desborda horizontalmente en mobile. */}
           <div className="min-w-0">
-            <Gallery fotos={p.fotos} titulo={p.titulo} />
+            <Gallery fotos={p.fotos} titulo={p.titulo} fallback={`/api/cover/${p.codigo}`} />
 
             {/* Precio + facturación */}
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">

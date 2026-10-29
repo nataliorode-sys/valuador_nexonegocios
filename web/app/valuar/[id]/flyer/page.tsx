@@ -69,10 +69,8 @@ export default async function FlyerPage({
           </div>
           {ubic && <div style={{ fontSize: 36, color: "#607083", marginTop: 14 }}>📍 {ubic}</div>}
 
-          {p.fotos[0] && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={p.fotos[0]} alt="" style={{ width: "100%", height: formato === "story" ? 560 : 340, objectFit: "cover", borderRadius: 24, marginTop: 40 }} />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={p.fotos[0] ?? `${baseUrl()}/api/cover/${p.codigo}`} alt="" style={{ width: "100%", height: formato === "story" ? 560 : 340, objectFit: "cover", borderRadius: 24, marginTop: 40 }} />
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 40 }}>
             {highlights.map((hl, i) => (

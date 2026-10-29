@@ -3,10 +3,21 @@
 import { useState } from "react";
 
 // Galería de fotos de la publicación: imagen principal grande + miniaturas.
-export default function Gallery({ fotos, titulo }: { fotos: string[]; titulo: string }) {
+// Si no hay fotos, muestra la portada de marca (`fallback`, de /api/cover).
+export default function Gallery({ fotos, titulo, fallback }: { fotos: string[]; titulo: string; fallback?: string }) {
   const [activa, setActiva] = useState(0);
 
   if (!fotos || fotos.length === 0) {
+    if (fallback) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={fallback}
+          alt={titulo}
+          className="w-full rounded-2xl border border-nexo-border bg-slate-50 object-cover"
+        />
+      );
+    }
     return (
       <div className="flex h-64 items-center justify-center rounded-2xl border border-nexo-border bg-slate-100 text-slate-400">
         Sin fotos

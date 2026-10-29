@@ -74,12 +74,9 @@ export default async function MarketplacePage({
             return (
               <Link key={p.id} href={`/empresa/${p.codigo}`}
                 className="overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:shadow-md">
-                {p.fotos[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.fotos[0]} alt="" className="h-40 w-full object-cover" />
-                ) : (
-                  <div className="flex h-40 items-center justify-center bg-slate-100 text-4xl">🏢</div>
-                )}
+                {/* Sin foto propia → portada de marca generada (/api/cover). */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.fotos[0] ?? `/api/cover/${p.codigo}`} alt="" className="h-40 w-full object-cover" />
                 <div className="p-4">
                   <span className="rounded-full bg-nexo-accent/10 px-2 py-0.5 text-[10px] font-medium text-nexo-accent">NexoDirecto</span>
                   <h3 className="mt-2 font-semibold text-slate-900">{p.titulo}</h3>

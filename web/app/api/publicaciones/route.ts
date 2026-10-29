@@ -69,7 +69,7 @@ export async function GET(req: Request) {
       moneda: p.moneda,
       precioLabel,
       facturacion: p.facturacionPublica ?? null,
-      foto: urlAbsoluta(p.fotos[0]),
+      foto: urlAbsoluta(p.fotos[0]) ?? `${base}/api/cover/${p.codigo}`,
       highlights: highlights.slice(0, 3),
       url: `${base}/empresa/${p.codigo}`,
       tipo: "nexodirecto" as const,
