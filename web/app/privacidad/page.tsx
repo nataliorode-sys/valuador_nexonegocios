@@ -56,6 +56,8 @@ export default function PrivacidadPage() {
               datos por nuestra cuenta (por ejemplo, procesador de pagos Mercado Pago, alojamiento y
               almacenamiento en la nube, y envío de emails), que pueden implicar transferencias
               internacionales con los recaudos legales correspondientes. No vendemos tus datos.
+              {" "}{EMPRESA.nombreFantasia} <strong>no verifica la identidad ni los antecedentes</strong> de
+              quienes envían consultas.
             </p>
           </section>
 

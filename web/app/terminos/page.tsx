@@ -83,6 +83,21 @@ export default function TerminosPage() {
           </section>
 
           <section>
+            <h2 className="text-[11px] font-semibold text-slate-500">6 bis. Contacto directo entre usuarios</h2>
+            <p>
+              {EMPRESA.producto} es un <strong>canal de contacto directo</strong> entre vendedores e interesados.
+              {" "}{EMPRESA.nombreFantasia} <strong>no actúa como intermediario</strong> en estas operaciones, no
+              participa en las negociaciones y <strong>no verifica la identidad, solvencia, antecedentes ni
+              intenciones</strong> de los interesados que realizan consultas. Los datos de cada interesado son los
+              que este declara. La evaluación de los interesados, la decisión de qué información compartir y la
+              negociación quedan bajo <strong>exclusiva responsabilidad del vendedor</strong>.
+              {" "}{EMPRESA.nombreFantasia} no será responsable por el uso que los interesados hagan de la
+              información que el vendedor decida compartirles. Si el vendedor desea acompañamiento profesional,
+              puede contratar por separado el <strong>servicio de intermediación</strong> de {EMPRESA.nombreFantasia}.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-[11px] font-semibold text-slate-500">7. Datos personales</h2>
             <p>
               El tratamiento de datos personales se rige por nuestra{" "}

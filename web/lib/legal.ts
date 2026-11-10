@@ -14,8 +14,8 @@ export const EMPRESA = {
   email: "contacto@nexonegocios.com.ar",
   sitioWeb: "https://www.nexonegocios.com.ar",
   jurisdiccion: "los tribunales ordinarios de la Ciudad Autónoma de Buenos Aires",
-  vigenciaDesde: "agosto de 2026",
+  vigenciaDesde: "noviembre de 2026",
 } as const;
 
 // Versión de los documentos legales (para registrar qué versión aceptó cada usuario).
-export const VERSION_LEGAL = "2026-08-1";
+export const VERSION_LEGAL = "2026-11-1";
