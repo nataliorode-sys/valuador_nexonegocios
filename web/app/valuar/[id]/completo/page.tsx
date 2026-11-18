@@ -5,7 +5,7 @@ import { fmtUSD, fmtARS } from "@/lib/formato";
 import { RangoBar, BarChart, BarLegend, DriversChart } from "@/components/charts";
 import { assertOwner } from "@/lib/access";
 import FunnelHeader from "@/components/FunnelHeader";
-import { simularPalancas } from "@nexodirecto/engine";
+import { desglosar, simularPalancas } from "@nexodirecto/engine";
 import { toEngineInput } from "@/lib/wizard/toEngineInput";
 import type { FormData } from "@/lib/wizard/types";
 
@@ -41,7 +41,15 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
   const flags = r.flags as unknown as Flags;
 
   const datos = (val.perfil?.datos ?? {}) as FormData & Record<string, unknown>;
-  const sim = simularPalancas(toEngineInput(datos, val.tcRef ?? 1200));
+  const engineInput = toEngineInput(datos, val.tcRef ?? 1200);
+  const g = desglosar(engineInput);
+  const sim = simularPalancas(engineInput);
+
+  // Separación negocio vs. inmueble (ver informe): el inmueble incluido se suma aparte.
+  const totalUsd = r.valorCentralUsd;
+  const inmuebleUsd = Math.min(Math.max(0, g.inmuebleUSD), totalUsd);
+  const negocioUsd = Math.max(0, totalUsd - inmuebleUsd);
+  const tieneInmueble = inmuebleUsd > 0;
 
   return (
     <>
@@ -67,6 +75,24 @@ export default async function CompletoPage({ params }: { params: Promise<{ id: s
         <div className="mt-6">
           <RangoBar min={r.rangoMinUsd} central={r.valorCentralUsd} max={r.rangoMaxUsd} />
         </div>
+        {tieneInmueble && (
+          <>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="text-xs text-slate-500">Valor del negocio (operación)</div>
+                <div className="text-xl font-bold text-nexo">{fmtUSD(Math.round(negocioUsd))}</div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="text-xs text-slate-500">+ Valor del inmueble</div>
+                <div className="text-xl font-bold text-nexo">{fmtUSD(Math.round(inmuebleUsd))}</div>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-slate-600">
+              El valor total incluye el inmueble. Si vendés <strong>solo el negocio</strong> (sin la
+              propiedad), es <strong>{fmtUSD(Math.round(negocioUsd))}</strong>.
+            </p>
+          </>
+        )}
         <p className="mt-4 text-sm text-slate-500">
           Método predominante: <strong>{METODO_LABEL[r.metodoPredominante] ?? r.metodoPredominante}</strong> ·
           Precisión de la estimación: {val.precisionPct}%

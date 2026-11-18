@@ -35,6 +35,10 @@ export interface Desglose {
   sueldoMercadoDueno: number;
   ebitda: number;
   margenSde: number;
+  /** Valor del inmueble incluido en la venta (USD; 0 si no se incluye). */
+  inmuebleUSD: number;
+  /** ¿El local es propio y el inmueble se incluye en la venta? */
+  inmuebleIncluido: boolean;
 }
 
 /** Desglose del P&L normalizado en USD (para el informe). Determinístico. */
@@ -55,6 +59,8 @@ export function desglosar(input: EngineInput, params: EngineParams = DEFAULT_PAR
     sueldoMercadoDueno: n.sueldoMercadoDueno,
     ebitda: e.ebitda,
     margenSde: e.margenSde,
+    inmuebleUSD: n.inmuebleIncluido ? n.inmuebleValor : 0,
+    inmuebleIncluido: n.inmuebleIncluido,
   };
 }
 

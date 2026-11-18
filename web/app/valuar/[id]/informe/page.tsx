@@ -71,6 +71,15 @@ export default async function InformePage({
   const dcfData = dcf?.map((f) => ({ label: `Año ${f.anio}`, value: Math.max(0, f.fcf) })) ?? [];
   const antiguedad = Number(datos.anioInicio) > 0 ? 2026 - Number(datos.anioInicio) : null;
 
+  // Separación negocio vs. inmueble (A): los métodos operativos (múltiplos/flujo)
+  // valúan la OPERACIÓN; el inmueble incluido en la venta se suma aparte como activo.
+  // Se calcula sobre el valor central ya guardado para que la suma cierre exacto, y
+  // funciona también para valuaciones viejas (g.inmuebleUSD se recalcula en vivo).
+  const totalUsd = r.valorCentralUsd;
+  const inmuebleUsd = Math.min(Math.max(0, g.inmuebleUSD), totalUsd);
+  const negocioUsd = Math.max(0, totalUsd - inmuebleUsd);
+  const tieneInmueble = inmuebleUsd > 0;
+
   // Datos sospechosos: se derivan del desglose recalculado en vivo (gastos > ventas)
   // y de los flags guardados por el motor (margen sospechoso). Disparan avisos.
   const flags = (r.flags ?? {}) as { gastosSuperanVentas?: boolean; margenSospechoso?: boolean; magnitudSospechosa?: boolean };
@@ -151,6 +160,27 @@ export default async function InformePage({
           <div className="text-slate-500">≈ {fmtARS(r.valorCentralArs)}</div>
           <div className="mt-4"><RangoBar min={r.rangoMinUsd} central={r.valorCentralUsd} max={r.rangoMaxUsd} /></div>
           <p className="mt-3 text-sm text-slate-600">Rango estimado: {u(r.rangoMinUsd)} – {u(r.rangoMaxUsd)}. Precisión: {val.precisionPct}%.</p>
+
+          {tieneInmueble && (
+            <>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <div className="text-xs text-slate-500">Valor del negocio (operación)</div>
+                  <div className="text-xl font-bold text-nexo">{u(negocioUsd)}</div>
+                  <div className="mt-0.5 text-[10px] text-slate-400">Fondo de comercio: por rentabilidad y flujo.</div>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <div className="text-xs text-slate-500">+ Valor del inmueble</div>
+                  <div className="text-xl font-bold text-nexo">{u(inmuebleUsd)}</div>
+                  <div className="mt-0.5 text-[10px] text-slate-400">Propiedad incluida, valuada como activo.</div>
+                </div>
+              </div>
+              <p className="mt-3 text-sm text-slate-600">
+                El valor total <strong>incluye el inmueble</strong>. Si vendés <strong>solo el negocio</strong>
+                {" "}(sin la propiedad), el valor orientativo es <strong>{u(negocioUsd)}</strong>.
+              </p>
+            </>
+          )}
         </div>
       </section>
 
@@ -275,6 +305,15 @@ export default async function InformePage({
             </tbody>
           </table>
         </div>
+        {tieneInmueble && (
+          <p className="mt-3 rounded bg-nexo-soft p-3 text-sm text-slate-700">
+            <strong>Negocio vs. inmueble.</strong> Los métodos de arriba (múltiplos y flujo) valúan la
+            {" "}<strong>operación</strong> del negocio (≈ {u(negocioUsd)}). Como incluís el inmueble en la
+            venta, su valor ({u(inmuebleUsd)}) <strong>se suma aparte</strong>: no se calcula por
+            rentabilidad, sino como un activo. Por eso el valor total ({u(totalUsd)}) queda por encima de
+            los métodos operativos: la mayor parte son los <strong>ladrillos</strong>, no la operación.
+          </p>
+        )}
         {drivers.length > 0 && (
           <>
             <h3 className="mt-4 text-sm font-semibold text-slate-700">Qué influye en tu valor</h3>
